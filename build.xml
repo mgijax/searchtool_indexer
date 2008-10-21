@@ -1,0 +1,48 @@
+<project name="Search" default="build" basedir=".">
+    <description>
+        Quick Search Indexer Build File
+    </description>
+
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="conf" location="conf"/>
+    <property name="doc" location="doc"/>
+
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac classpath="/usr/local/mgi/live/lib/java/core.jar; /usr/local/mgi/live/lib/java/qs_commons.jar; /usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar; /usr/local/lucene-2.3.2/lucene-core-2.3.2.jar; /usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar" srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="jar" depends="compile">
+	<jar destfile="qs_indexer.jar" basedir="${build}">
+	<fileset file="${conf}/log4j.xml" />
+	</jar>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} directory tree -->
+    <delete dir="${build}"/>
+    <delete dir="${doc}"/>
+  </target>
+  
+  <target name="javadoc" description="Generate Javadocs"> 
+  	<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="/usr/local/mgi/live/lib/java/core.jar; /usr/local/mgi/live/lib/java/qs_commons.jar; /usr/local/mgi/live/lib/java/jconn3.jar;/usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar; /usr/local/lucene-2.3.2/lucene-core-2.3.2.jar; /usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar">
+  	  	<tag name="is" scope="all" description="Is:" />
+  	  	<tag name="has" scope="all" description="Has:" />
+  	  	<tag name="does" scope="all" description="Does:" />
+  	</javadoc>
+  </target>
+  
+  <target name="build" description="Make Jar and Javadocs" depends="clean, jar, javadoc"/>
+  
+</project>

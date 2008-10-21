@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+. ${MGICONFIG}/master.config.sh
+
+# Play around with JAVA_HOME
+
+JAVA_HOME=/usr/jdk/jdk1.6.0_07/
+CLASSPATH=$CLASSPATH:./qs_indexer.jar:/usr/local/mgi/live/lib/java/core.jar:/usr/local/lucene-2.3.2/lucene-core-2.3.2.jar:/usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar:/usr/local/mgi/live/lib/java/qs_commons.jar:/usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar
+
+export CLASSPATH
+
+echo $CLASSPATH
+
+
+# Backup the current logs directory
+
+rm -rf /data/searchtool/logs_old
+mv /data/searchtool/logs /data/searchtool/logs_old
+
+# Create the Marker Related Indexes
+
+#makeMarkers
+
+# Create the vocab related Indexes
+
+makeVocab
+
+# Create the Other Indexes
+
+# makeOther

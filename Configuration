@@ -1,0 +1,9 @@
+NUMBER_TO_QUERY 50000000
+INDEX_DIR C:/Search/index/index
+NUMBER_OF_THREADS 4
+MERGE_FACTOR 100
+MAX_BUFFERED_DOCS 10000
+USE_COMPOUND_DOCS false
+STACK_MAX 1000000
+DB_URL jdbc:sybase:Tds:rohan.informatics.jax.org:4101/mgd_wi1
+DB_DRIVER com.sybase.jdbc3.jdbc.SybDriver
