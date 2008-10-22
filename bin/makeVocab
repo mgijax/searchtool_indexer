@@ -1,0 +1,48 @@
+#!/bin/sh
+
+cd ..
+
+INDEX_CONFIG=`pwd`/searchtool_indexer.config
+
+if [ ! -r ${INDEX_CONFIG} ]
+then
+    echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
+    exit 1
+fi
+. ${INDEX_CONFIG}
+
+
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+#. ${MGICONFIG}/master.config.sh
+
+CONFIG_MASTER=${MGICONFIG}/master.config.sh
+if [ ! -r ${CONFIG_MASTER} ]
+then
+    echo "Cannot read configuration file: ${CONFIG_MASTER}" | tee -a ${LOG}
+    exit 1
+fi
+
+echo ${INDEX_CONFIG}
+
+echo $CLASSPATH
+
+###########################
+# Make the Vocab Indexes
+###########################
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabInexact/index/ v
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabDisplay/index/ vd
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabExact/index/ ve
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabAccID/index/ va
+
+cd bin

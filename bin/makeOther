@@ -1,0 +1,47 @@
+#!/bin/sh
+
+cd ..
+
+INDEX_CONFIG=`pwd`/searchtool_indexer.config
+
+if [ ! -r ${INDEX_CONFIG} ]
+then
+    echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
+    exit 1
+fi
+. ${INDEX_CONFIG}
+
+
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+#. ${MGICONFIG}/master.config.sh
+
+CONFIG_MASTER=${MGICONFIG}/master.config.sh
+if [ ! -r ${CONFIG_MASTER} ]
+then
+    echo "Cannot read configuration file: ${CONFIG_MASTER}" | tee -a ${LOG}
+    exit 1
+fi
+
+echo ${INDEX_CONFIG}
+
+echo $CLASSPATH
+
+###########################
+# Make the Other Indexes
+###########################
+
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2049m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/nonIDToken/index/ t
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2048m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherExact/index/ o
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2049m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherDisplay/index/ od
+
+cd bin

@@ -1,0 +1,53 @@
+#!/bin/sh
+
+cd ..
+
+INDEX_CONFIG=`pwd`/searchtool_indexer.config
+
+if [ ! -r ${INDEX_CONFIG} ]
+then
+    echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
+    exit 1
+fi
+. ${INDEX_CONFIG}
+
+
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+#. ${MGICONFIG}/master.config.sh
+
+CONFIG_MASTER=${MGICONFIG}/master.config.sh
+if [ ! -r ${CONFIG_MASTER} ]
+then
+    echo "Cannot read configuration file: ${CONFIG_MASTER}" | tee -a ${LOG}
+    exit 1
+fi
+
+echo ${INDEX_CONFIG}
+
+echo $CLASSPATH
+
+# Backup the current logs directory
+
+rm -rf /data/searchtool/logs_old
+mv /data/searchtool/logs /data/searchtool/logs_old
+
+cd bin
+
+# Create the Marker Related Indexes
+
+makeMarkers
+
+# Create the vocab related Indexes
+
+makeVocab
+
+# Create the Other Indexes
+
+makeOther
