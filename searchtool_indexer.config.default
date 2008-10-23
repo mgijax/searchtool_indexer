@@ -1,0 +1,31 @@
+#format: sh
+######################################################################
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+. ${MGICONFIG}/master.config.sh
+
+NUMBER_TO_QUERY=50000000
+NUMBER_OF_THREADS=4
+MERGE_FACTOR=100
+MAX_BUFFERED_DOCS=10000
+USE_COMPOUND_DOCS=false
+STACK_MAX=1000000
+DB_DRIVER=com.sybase.jdbc3.jdbc.SybDriver
+
+# Play around with JAVA_HOME
+
+INSTALLDIR=$SEARCHTOOL_INDEXER
+echo 'Hi ' $INSTALLDIR
+
+JAVA_HOME=/usr/jdk/jdk1.6.0_07/
+
+CLASSPATH=$CLASSPATH:$INSTALLDIR/qs_indexer.jar:/usr/local/mgi/live/lib/java/core.jar:/usr/local/lucene-2.3.2/lucene-core-2.3.2.jar:/usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar:/usr/local/mgi/live/lib/java/qs_commons.jar:/usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar
+
+export CLASSPATH
+export JAVA_HOME
