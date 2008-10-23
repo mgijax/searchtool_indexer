@@ -47,10 +47,12 @@ public class AbstractGatherer implements Runnable {
     public AbstractGatherer(IndexCfg config) {
         try {
             Class.forName(DB_DRIVER);
+            String USER = config.get("MGI_PUBLICUSER");
+            String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("INDEX_JDBC_URL: " + config.get("INDEX_JDBC_URL"));
             con = DriverManager.getConnection(
-                    config.get("INDEX_JDBC_URL"), "mgd_public", "mgdpub");
+                    config.get("INDEX_JDBC_URL"), USER, PASSWORD);
         } catch (Exception e) {
             log.error(e);
         }
