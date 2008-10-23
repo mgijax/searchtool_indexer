@@ -1,9 +1,9 @@
 package org.jax.mgi.index.luceneDocBuilder;
 
 import org.apache.log4j.Logger;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
-import QS_Commons.IndexConstants;
+import org.apache.lucene.document.Field;
+import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * Object that encapsulates the data used to create the MarkerDisplay index.

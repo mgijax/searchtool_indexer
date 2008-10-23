@@ -7,8 +7,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerAccIDLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
-
-import QS_Commons.IndexConstants;
+import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * This class is responsible for gathering up and information we might need in

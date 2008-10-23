@@ -8,8 +8,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerInexactLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
-
-import QS_Commons.IndexConstants;
+import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * This class is responsible to gather up anything we might want to match a marker on

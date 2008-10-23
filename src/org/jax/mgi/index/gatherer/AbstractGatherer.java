@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.util.SharedDocumentStack;
-import org.jax.mgi.shr.config.Configuration;
 import org.jax.mgi.shr.config.IndexCfg;
 
 /**
@@ -47,7 +46,7 @@ public class AbstractGatherer implements Runnable {
 
     public AbstractGatherer(IndexCfg config) {
         try {
-            Class.forName(config.get("DB_DRIVER"));
+            Class.forName(config.get(DB_DRIVER));
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("INDEX_JDBC_URL: " + config.get("INDEX_JDBC_URL"));
             con = DriverManager.getConnection(
@@ -130,4 +129,6 @@ public class AbstractGatherer implements Runnable {
 
     }
 
+    private String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver"; 
+    
 }

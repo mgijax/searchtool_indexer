@@ -24,10 +24,9 @@ import org.jax.mgi.index.gatherer.VocabDisplayGatherer;
 import org.jax.mgi.index.gatherer.VocabExactGatherer;
 import org.jax.mgi.index.gatherer.VocabInexactGatherer;
 import org.jax.mgi.shr.config.IndexCfg;
-
-import QS_Commons.MGIAnalyzer;
-import QS_Commons.MGITokenAnalyzer;
-import QS_Commons.StemmedMGIAnalyzer;
+import org.jax.mgi.shr.searchtool.MGIAnalyzer;
+import org.jax.mgi.shr.searchtool.MGITokenAnalyzer;
+import org.jax.mgi.shr.searchtool.StemmedMGIAnalyzer;
 
 /**
  * Main Indexing Class for the MGI Search tool. This will accept command line
