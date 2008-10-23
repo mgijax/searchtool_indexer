@@ -1,13 +1,16 @@
 #!/bin/sh
-if [ "${MGICONFIG}" = "" ]
+# establish the config files
+MAIN_CONFIG=searchtool_indexer.config
+
+# Make sure config file exists and source it
+if [ -r ${MAIN_CONFIG} ]
 then
-    MGICONFIG=/usr/local/mgi/live/mgiconfig
-    export MGICONFIG
+    echo "Source ${MAIN_CONFIG}"
+    . ${MAIN_CONFIG}
+else
+    echo "Cannot source configuration file: ${MAIN_CONFIG}"
+    installFailed
 fi
-
-. ${MGICONFIG}/master.config.sh
-
-echo $PATH
 
 ant
 
