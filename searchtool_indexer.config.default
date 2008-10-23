@@ -23,9 +23,9 @@ DB_DRIVER=com.sybase.jdbc3.jdbc.SybDriver
 INSTALLDIR=$SEARCHTOOL_INDEXER
 echo 'Hi ' $INSTALLDIR
 
-JAVA_HOME=/usr/jdk/jdk1.6.0_07/
-
 CLASSPATH=$CLASSPATH:$INSTALLDIR/qs_indexer.jar:/usr/local/mgi/live/lib/java/core.jar:/usr/local/lucene-2.3.2/lucene-core-2.3.2.jar:/usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar:/usr/local/mgi/live/lib/java/qs_commons.jar:/usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar
 
 export CLASSPATH
+
+JAVA_HOME=/usr/mgijava6
 export JAVA_HOME
