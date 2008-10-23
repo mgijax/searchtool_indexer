@@ -46,7 +46,7 @@ public class AbstractGatherer implements Runnable {
 
     public AbstractGatherer(IndexCfg config) {
         try {
-            Class.forName(config.get(DB_DRIVER));
+            Class.forName(DB_DRIVER);
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("INDEX_JDBC_URL: " + config.get("INDEX_JDBC_URL"));
             con = DriverManager.getConnection(
