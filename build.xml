@@ -19,7 +19,7 @@
   <target name="compile" depends="init"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac classpath="/usr/local/mgi/live/lib/java/core.jar; /usr/local/mgi/live/lib/java/qs_commons.jar; /usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar; /usr/local/lucene-2.3.2/lucene-core-2.3.2.jar; /usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar" srcdir="${src}" destdir="${build}"/>
+    <javac classpath="${MGI_JAVALIB}/core.jar; ${MGI_JAVALIB}/lib_java_searchtool/searchtool.jar; ${env.LUCENESNOWBALL}; ${env.LUCENEWEB}; ${env.LOG4J}" srcdir="${src}" destdir="${build}"/>
   </target>
 
   <target name="jar" depends="compile">
@@ -36,7 +36,7 @@
   </target>
   
   <target name="javadoc" description="Generate Javadocs"> 
-  	<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="/usr/local/mgi/live/lib/java/core.jar; /usr/local/mgi/live/lib/java/qs_commons.jar; /usr/local/mgi/live/lib/java/jconn3.jar;/usr/local/lucene-2.3.2/contrib/snowball/lucene-snowball-2.3.2.jar; /usr/local/lucene-2.3.2/lucene-core-2.3.2.jar; /usr/local/apache-log4j-1.2.15/log4j-1.2.15.jar">
+  	<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="${MGI_JAVALIB}/core.jar; ${MGI_JAVALIB}/lib_java_searchtool/searchtool.jar; ${env.LUCENESNOWBALL}; ${env.LUCENEWEB}; ${env.LOG4J}">
   	  	<tag name="is" scope="all" description="Is:" />
   	  	<tag name="has" scope="all" description="Has:" />
   	  	<tag name="does" scope="all" description="Does:" />
