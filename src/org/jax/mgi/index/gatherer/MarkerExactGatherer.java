@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerExactLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -50,7 +50,7 @@ public class MarkerExactGatherer extends AbstractGatherer {
      * @param config
      */
 
-    public MarkerExactGatherer(Configuration config) {
+    public MarkerExactGatherer(IndexCfg config) {
 
         super(config);
     }

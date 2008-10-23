@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.VocabInexactLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -32,7 +32,7 @@ public class VocabInexactGatherer extends AbstractGatherer {
      * @param config
      */
 
-    public VocabInexactGatherer(Configuration config) {
+    public VocabInexactGatherer(IndexCfg config) {
         super(config);
 
         hm.put(IndexConstants.VOCAB_TERM, "Term");

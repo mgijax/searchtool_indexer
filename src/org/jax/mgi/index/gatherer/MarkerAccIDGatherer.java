@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerAccIDLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -53,7 +53,7 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
      * @param config
      */
 
-    public MarkerAccIDGatherer(Configuration config) {
+    public MarkerAccIDGatherer(IndexCfg config) {
 
         super(config);
 

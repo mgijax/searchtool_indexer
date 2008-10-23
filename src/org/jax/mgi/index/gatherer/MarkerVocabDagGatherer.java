@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerVocabDagLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -26,7 +26,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
     
     HashMap <String, String> hm = new HashMap <String, String> ();
 
-    public MarkerVocabDagGatherer(Configuration config) {
+    public MarkerVocabDagGatherer(IndexCfg config) {
         super(config);
         
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");

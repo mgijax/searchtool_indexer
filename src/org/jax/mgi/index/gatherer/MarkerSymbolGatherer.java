@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerExactLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -57,7 +57,7 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
      * @param config
      */
 
-    public MarkerSymbolGatherer(Configuration config) {
+    public MarkerSymbolGatherer(IndexCfg config) {
 
         super(config);
 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.VocabDisplayLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -28,7 +28,7 @@ public class VocabDisplayGatherer extends AbstractGatherer {
     
     // SQL Section
 
-    public VocabDisplayGatherer(Configuration config) {
+    public VocabDisplayGatherer(IndexCfg config) {
         super(config);
         
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");

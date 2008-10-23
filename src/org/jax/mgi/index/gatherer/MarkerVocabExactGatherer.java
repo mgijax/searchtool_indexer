@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.index.MakeIndex;
 import org.jax.mgi.index.luceneDocBuilder.VocabExactLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -25,7 +25,7 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
 
     private HashMap<String, String>    hm        = new HashMap<String, String>();
 
-    public MarkerVocabExactGatherer(Configuration config) {
+    public MarkerVocabExactGatherer(IndexCfg config) {
         super(config);
 
         hm.put(IndexConstants.VOCAB_TERM, "Term");

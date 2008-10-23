@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.util.SharedDocumentStack;
 import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 /**
  * The AbstractGatherer class is the superclass for all the other gatherers that we use
@@ -32,7 +33,6 @@ public class AbstractGatherer implements Runnable {
 
     protected static SharedDocumentStack sis;
     protected static Connection          con;
-    protected static Configuration       config;
     protected static Integer             stack_max;
     private static Logger log = 
         Logger.getLogger(AbstractGatherer.class.getName());
@@ -45,14 +45,13 @@ public class AbstractGatherer implements Runnable {
      * @param config
      */
 
-    public AbstractGatherer(Configuration config) {
+    public AbstractGatherer(IndexCfg config) {
         try {
-            config = Configuration.load("Configuration", false);
             Class.forName(config.get("DB_DRIVER"));
             stack_max = new Integer(config.get("STACK_MAX"));
-            log.debug("DB_URL: " + config.get("DB_URL"));
+            log.debug("INDEX_JDBC_URL: " + config.get("INDEX_JDBC_URL"));
             con = DriverManager.getConnection(
-                    config.get("DB_URL"), "mgd_public", "mgdpub");
+                    config.get("INDEX_JDBC_URL"), "mgd_public", "mgdpub");
         } catch (Exception e) {
             log.error(e);
         }

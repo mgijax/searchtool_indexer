@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerInexactLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -52,7 +52,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     
     public static HashMap<String, String> hm            = new HashMap<String, String>();
 
-    public MarkerInexactGatherer(Configuration config) {
+    public MarkerInexactGatherer(IndexCfg config) {
         super(config);
 
         /*

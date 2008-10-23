@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.OtherDisplayLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -64,7 +64,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
     private Date                         writeStart;
     private Date                         writeEnd;
 
-    public OtherDisplayGatherer(Configuration config) {
+    public OtherDisplayGatherer(IndexCfg config) {
         super(config);
     }
 

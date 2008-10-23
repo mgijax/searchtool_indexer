@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 /**
  * This class pulls together the mapping of logical -> actual db's from the
@@ -44,7 +44,7 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
      * @param config
      */
     
-    public ProviderHashMapGatherer(Configuration config) {
+    public ProviderHashMapGatherer(IndexCfg config) {
         super(config);
         init();
     }
@@ -130,12 +130,13 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
      */
 
     public static void main(String[] args) {
-        Configuration config;
+        IndexCfg config;
 
         log.info("Stub for the ProviderHashSet TestHarness");
 
         try {
-            config = Configuration.load("Configuration", false);
+            //config = Configuration.load("Configuration", false);
+            config = new IndexCfg();
             ProviderHashMapGatherer phmg = new ProviderHashMapGatherer(config);
 
             log.info("DB Key 9: " + phmg.get("9"));

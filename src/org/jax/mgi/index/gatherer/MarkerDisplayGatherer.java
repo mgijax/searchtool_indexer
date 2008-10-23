@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.MarkerDisplayLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 /**
  * The marker display gatherer is used to collect anything we might need to
@@ -46,7 +46,7 @@ public class MarkerDisplayGatherer extends AbstractGatherer {
      * @param config
      */
 
-    public MarkerDisplayGatherer(Configuration config) {
+    public MarkerDisplayGatherer(IndexCfg config) {
         super(config);
     }
 

@@ -23,7 +23,7 @@ import org.jax.mgi.index.gatherer.VocabAccIDGatherer;
 import org.jax.mgi.index.gatherer.VocabDisplayGatherer;
 import org.jax.mgi.index.gatherer.VocabExactGatherer;
 import org.jax.mgi.index.gatherer.VocabInexactGatherer;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.MGIAnalyzer;
 import QS_Commons.MGITokenAnalyzer;
@@ -89,18 +89,21 @@ public class MakeIndex {
     }
 
     /*
-     * Internal method, used to get a copy of the GlobalConfig
+     * Internal method, used to get a copy of the configuration from the 
+     * environment.
      */
 
     private static void getConfig() {
         try {
-            config = Configuration.load("Configuration", false);
-            INDEX_DIR = new File(config.get("INDEX_DIR"));
+            
+            config = new IndexCfg();
+            
+            log.info(config.get("NUMBER_TO_QUERY"));
+                        
+            MAX_BUFFERED_DOCS = new Integer(config.get("MAX_BUFFERED_DOCS")).intValue();
             MERGE_FACTOR = new Integer(config.get("MERGE_FACTOR")).intValue();
-            MAX_BUFFERED_DOCS = new Integer(config.get("MAX_BUFFERED_DOCS"))
-                    .intValue();
             USE_COMPOUND_DOCS = new Boolean(config.get("USE_COMPOUND_DOCS"));
-
+            
         } catch (Exception e) {
             log.error(e);
         }
@@ -249,7 +252,9 @@ public class MakeIndex {
         }
     }
 
-    private static Configuration config;
+    //private static Configuration config;
+    
+    private static IndexCfg config;
 
     // The Default index directory.
     private static File          INDEX_DIR = new File("./index/index");

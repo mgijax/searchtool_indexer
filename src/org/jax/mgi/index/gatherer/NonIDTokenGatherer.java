@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jax.mgi.index.luceneDocBuilder.NonIDTokenLuceneDocBuilder;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 import QS_Commons.IndexConstants;
 
@@ -52,7 +52,7 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
     private Logger log = Logger.getLogger(NonIDTokenGatherer.class.getName());
     
-    public NonIDTokenGatherer(Configuration config) {
+    public NonIDTokenGatherer(IndexCfg config) {
         super(config);
 
         /*
