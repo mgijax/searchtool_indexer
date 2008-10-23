@@ -33,11 +33,6 @@ echo ${INDEX_CONFIG}
 
 echo $CLASSPATH
 
-# Backup the current logs directory
-
-rm -rf /data/searchtool/logs_old
-mv /data/searchtool/logs /data/searchtool/logs_old
-
 cd bin
 
 # Create the Marker Related Indexes
