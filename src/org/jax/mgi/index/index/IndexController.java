@@ -2,7 +2,7 @@ package org.jax.mgi.index.index;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.IndexWriter;
-import org.jax.mgi.shr.config.Configuration;
+import org.jax.mgi.shr.config.IndexCfg;
 
 /**
  * The IndexController is responsible for handling the creation of all of the
@@ -22,7 +22,6 @@ public class IndexController implements Runnable {
 
     private static int NUMBER_OF_THREADS = 1;
     IndexWriter        writer            = null;
-    Configuration      config            = null;
     
     Logger log = Logger.getLogger(IndexController.class.getName());
 
@@ -35,11 +34,13 @@ public class IndexController implements Runnable {
     public IndexController(IndexWriter iw) {
         writer = iw;
         try {
-            config = Configuration.load("Configuration", false);
-        } catch (Exception e) {
+            IndexCfg config = new IndexCfg();
+            NUMBER_OF_THREADS = new Integer(config.get("NUMBER_OF_THREADS")).intValue();
+        }
+        catch (Exception e) {
             log.error(e);
         }
-        NUMBER_OF_THREADS = new Integer(config.get("NUMBER_OF_THREADS")).intValue();
+
     }
 
     /**
