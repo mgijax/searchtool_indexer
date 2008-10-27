@@ -815,7 +815,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         writeStart = new Date();
 
-        ResultSet rs_snp_prime = execute(OTHER_SNP_PRIME_SEARCH);
+        ResultSet rs_snp_prime = executeSnp(OTHER_SNP_PRIME_SEARCH);
         rs_snp_prime.next();
 
         writeEnd = new Date();
@@ -879,7 +879,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         writeStart = new Date();
 
-        ResultSet rs_snp_sub = execute(OTHER_SNP_SECONDARY_SEARCH);
+        ResultSet rs_snp_sub = executeSnp(OTHER_SNP_SECONDARY_SEARCH);
         rs_snp_sub.next();
 
         writeEnd = new Date();
