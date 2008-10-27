@@ -372,9 +372,6 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
         if (annotation_count != null) {
             this.annotation_count = annotation_count;
         }
-        else {
-            this.hasError = true;
-        }
     }
 
     /**
@@ -398,9 +395,6 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
         if (annotation_objects != null) {
             this.annotation_objects = annotation_objects;
         }
-        else {
-            this.hasError = true;
-        }
     }
 
     /**
@@ -422,9 +416,6 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
     public void setAnnotation_object_type(String annotation_object_type) {
         if (annotation_object_type != null) {
             this.annotation_object_type = annotation_object_type;
-        }
-        else {
-            this.hasError = true;
         }
     }
 
