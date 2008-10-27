@@ -30,10 +30,10 @@ import org.jax.mgi.shr.config.IndexCfg;
 
 public class AbstractGatherer implements Runnable {
 
-    protected static SharedDocumentStack sis;
-    protected static Connection          con;
-    protected static Integer             stack_max;
-    private static Logger log = 
+    protected SharedDocumentStack sis;
+    protected Connection          con;
+    protected Integer             stack_max;
+    private Logger log = 
         Logger.getLogger(AbstractGatherer.class.getName());
 
     /**
@@ -70,7 +70,7 @@ public class AbstractGatherer implements Runnable {
      * @return String that has been InitCapped
      */
 
-    public static String initCap(String in) {
+    public String initCap(String in) {
         if (in == null || in.length() == 0)
             return in;
         
@@ -95,7 +95,7 @@ public class AbstractGatherer implements Runnable {
      * @return ResultSet
      */
 
-    public static ResultSet execute(String query) {
+    public ResultSet execute(String query) {
         ResultSet set;
 
         try {
@@ -114,7 +114,7 @@ public class AbstractGatherer implements Runnable {
      * being used by the gatherer.
      */
 
-    public static void cleanup() {
+    public void cleanup() {
         try {
             con.close();
         } catch (Exception e) {
@@ -131,6 +131,6 @@ public class AbstractGatherer implements Runnable {
 
     }
 
-    private String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver"; 
+    protected String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver"; 
     
 }

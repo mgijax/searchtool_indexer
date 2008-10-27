@@ -1,5 +1,7 @@
 package org.jax.mgi.index.gatherer;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -62,11 +64,60 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
     private Date                         writeStart;
     private Date                         writeEnd;
+    
+    // This class needs a special connection, set it up.
+    
+    private Connection                   conSnp;
 
     public OtherDisplayGatherer(IndexCfg config) {
         super(config);
+        
+        try {
+            Class.forName(DB_DRIVER);
+            String USER = config.get("MGI_PUBLICUSER");
+            String PASSWORD = config.get("MGI_PUBLICPASSWORD");
+            stack_max = new Integer(config.get("STACK_MAX"));
+            log.debug("INDEX_SNP_JDBC_URL: "
+                            + config.get("INDEX_SNP_JDBC_URL"));
+            conSnp = DriverManager.getConnection(config.get("INDEX_SNP_JDBC_URL"),
+                    USER, PASSWORD);
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
+    /**
+     * Execute a given SQL Statement.
+     * 
+     * @param query
+     * @return ResultSet
+     */
+
+    public ResultSet executeSnp(String query) {
+        ResultSet set;
+
+        try {
+            java.sql.Statement stmt = conSnp.createStatement();
+
+            set = stmt.executeQuery(query);
+            return set;
+        } catch (Exception e) {
+            log.error(e);
+            return null;
+        }
+    }
+    
+    public void cleanup() {
+        super.cleanup();
+        
+        try {
+            conSnp.close();
+        } catch (Exception e) {
+            log.error(e);
+        }
+        
+    }
+    
     /**
      * This method encapsulates the list of tasks that need to be completed in
      * order to gather the information for the OtherDisplay index. Once it is
@@ -668,7 +719,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         // Gather the data
 
-        ResultSet rs_snp = execute(OTHER_SNP_PRIME_DISPLAY);
+        ResultSet rs_snp = executeSnp(OTHER_SNP_PRIME_DISPLAY);
         writeEnd = new Date();
         rs_snp.next();
         log.info("Time taken gather SNP result set: "
@@ -727,7 +778,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         // Gather the data
 
-        ResultSet rs_subsnp = execute(OTHER_SNP_SECONDARY_DISPLAY);
+        ResultSet rs_subsnp = executeSnp(OTHER_SNP_SECONDARY_DISPLAY);
         writeEnd = new Date();
         rs_subsnp.next();
         log.info("Time taken gather Sub SNP result set: "

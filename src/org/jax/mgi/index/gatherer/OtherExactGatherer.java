@@ -1,5 +1,7 @@
 package org.jax.mgi.index.gatherer;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -56,12 +58,61 @@ public class OtherExactGatherer extends AbstractGatherer {
     private OtherExactLuceneDocBuilder otherExact         = new OtherExactLuceneDocBuilder();
 
     private ProviderHashMapGatherer    phmg;
+    
+    // This object needs a special connection.
+    
+    private Connection                 conSnp;
 
     public OtherExactGatherer(IndexCfg config) {
         super(config);
         phmg = new ProviderHashMapGatherer(config);
+        
+        try {
+            Class.forName(DB_DRIVER);
+            String USER = config.get("MGI_PUBLICUSER");
+            String PASSWORD = config.get("MGI_PUBLICPASSWORD");
+            stack_max = new Integer(config.get("STACK_MAX"));
+            log.debug("INDEX_SNP_JDBC_URL: "
+                            + config.get("INDEX_SNP_JDBC_URL"));
+            conSnp = DriverManager.getConnection(config.get("INDEX_SNP_JDBC_URL"),
+                    USER, PASSWORD);
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
+    /**
+     * Execute a given SQL Statement.
+     * 
+     * @param query
+     * @return ResultSet
+     */
+
+    public ResultSet executeSnp(String query) {
+        ResultSet set;
+
+        try {
+            java.sql.Statement stmt = conSnp.createStatement();
+
+            set = stmt.executeQuery(query);
+            return set;
+        } catch (Exception e) {
+            log.error(e);
+            return null;
+        }
+    }
+    
+    public void cleanup() {
+        super.cleanup();
+        
+        try {
+            conSnp.close();
+        } catch (Exception e) {
+            log.error(e);
+        }
+        
+    }
+    
     /**
      * This is the encapsulation of the algorithm used to gather all of the
      * information for the OtherExact index. After this has completed gathering
