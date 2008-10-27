@@ -809,7 +809,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         String OTHER_SNP_PRIME_SEARCH = "SELECT distinct _Accession_key, "
                 + "accID, _Object_key, 'SNP' as _MGIType_key, 1"
-                + " FROM snp_1..SNP_Accession" + " where _MGIType_key = 30";
+                + " FROM SNP_Accession" + " where _MGIType_key = 30";
 
         // Gather the data
 
@@ -873,7 +873,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         String OTHER_SNP_SECONDARY_SEARCH = "SELECT distinct _Accession_key, "
                 + "accID, _Object_key, 'SUBSNP' as _MGIType_key, 0 as prefered"
-                + " FROM snp_1..SNP_Accession" + " where _MGIType_key = 31";
+                + " FROM SNP_Accession" + " where _MGIType_key = 31";
 
         // Gather the data
 

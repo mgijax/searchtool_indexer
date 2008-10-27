@@ -715,7 +715,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
         String OTHER_SNP_PRIME_DISPLAY = "select _ConsensusSnp_key, '"
                 + IndexConstants.OTHER_SNP
                 + "' as type, chromosome, startCoordinate "
-                + "from snp_1..SNP_Coord_Cache ";
+                + "from SNP_Coord_Cache ";
 
         // Gather the data
 
@@ -773,7 +773,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
         String OTHER_SNP_SECONDARY_DISPLAY = "select ss._SubSNP_Key, '"
                 + IndexConstants.OTHER_SUBSNP
                 + "' as type, sc.chromosome, sc.startCoordinate"
-                + " from snp_1..SNP_Coord_Cache sc, snp_1..SNP_Subsnp ss"
+                + " from SNP_Coord_Cache sc, SNP_Subsnp ss"
                 + " where ss._ConsensusSnp_key = sc._ConsensusSnp_key";
 
         // Gather the data
