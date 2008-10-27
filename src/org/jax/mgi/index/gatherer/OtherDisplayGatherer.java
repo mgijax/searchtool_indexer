@@ -363,7 +363,9 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             otherDisplay.setDb_key(rs_seq.getString("_Sequence_key"));
             otherDisplay.setDataType(rs_seq.getString("type"));
             otherDisplay.setQualifier(rs_seq.getString("sequenceType"));
-            otherDisplay.setName(rs_seq.getString("description"));
+            if (rs_seq.getString("description") != null) {
+                otherDisplay.setName(rs_seq.getString("description"));
+            }
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
