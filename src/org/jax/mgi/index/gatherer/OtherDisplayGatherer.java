@@ -77,10 +77,9 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             String USER = config.get("MGI_PUBLICUSER");
             String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
-            log.debug("INDEX_SNP_JDBC_URL: "
-                            + config.get("INDEX_SNP_JDBC_URL"));
-            conSnp = DriverManager.getConnection(config.get("INDEX_SNP_JDBC_URL"),
-                    USER, PASSWORD);
+            log.debug("SNP_JDBC_URL: " + config.get("SNP_JDBC_URL"));
+            conSnp = DriverManager.getConnection(
+                    config.get("SNP_JDBC_URL"), USER, PASSWORD);
         } catch (Exception e) {
             log.error(e);
         }

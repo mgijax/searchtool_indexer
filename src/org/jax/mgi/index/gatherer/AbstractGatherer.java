@@ -50,9 +50,9 @@ public class AbstractGatherer implements Runnable {
             String USER = config.get("MGI_PUBLICUSER");
             String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
-            log.debug("INDEX_JDBC_URL: " + config.get("INDEX_JDBC_URL"));
+            log.debug("MGD_JDBC_URL: " + config.get("MGD_JDBC_URL"));
             con = DriverManager.getConnection(
-                    config.get("INDEX_JDBC_URL"), USER, PASSWORD);
+                    config.get("MGD_JDBC_URL"), USER, PASSWORD);
         } catch (Exception e) {
             log.error(e);
         }
