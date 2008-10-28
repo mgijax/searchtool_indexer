@@ -50,6 +50,6 @@ java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.ind
 
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabDag/index/ gvd
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /export/valinor/index/markerVocabAccID/index/ gva
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabAccID/index/ gva
 
 cd bin
