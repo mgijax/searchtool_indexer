@@ -24,5 +24,8 @@ JAVA_HOME=/usr/jdk/jdk1.6.0_07/
 
 CLASSPATH=$CLASSPATH:${SEARCHTOOL_INDEXER}/qs_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/lib_java_searchtool/searchtool.jar:${LOG4J}
 
+PATH=/usr/mgijava6/bin/:/usr/local/apache-ant-1.7.1/bin/:${PATH}
+export PATH
+
 export CLASSPATH
 export JAVA_HOME
