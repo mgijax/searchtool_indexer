@@ -74,7 +74,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
             doOrthologAccession();
 
-            doESCellLineAccession();
+            doESCellLineAccessionViaAllele();
+            
+            doESCellLineAccessionViaMarkers();
 
         } catch (Exception e) {
             log.error(e);
@@ -97,11 +99,20 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         log.info("Gathering Accession ID's for Markers");
         
+/*        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
+                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
+                + " where private = 0 and _MGIType_key = 2 and"
+                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
+                + " and m._Marker_Status_key != 2";*/
+        
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
                 + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2";
+                + " and m._Marker_Status_key != 2"
+                + " and accID not in (SELECT a.accID"
+                + " FROM dbo.ACC_Accession a"
+                + " where private = 0 and _MGIType_key = 28)";
 
         // Gather the data
 
@@ -265,10 +276,10 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
 
-    private void doESCellLineAccession() throws SQLException,
+    private void doESCellLineAccessionViaAllele() throws SQLException,
             InterruptedException {
 
-        log.info("Gathering Accession ID's for ESCell Lines");
+        log.info("Gathering Accession ID's for ESCell Lines via Alleles");
         
         // SQL for this Subsection
 
@@ -310,5 +321,75 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         rs_es_acc.close();
         log.info("Done ES Cell Line Accession ID's!");
+    }
+
+    /**
+     * Grab ESCellLine Accession ID's that have been associated to Markers.
+     * 
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    
+    private void doESCellLineAccessionViaMarkers() throws SQLException,
+            InterruptedException {
+    
+        // SQL for this Subsection
+
+        log.info("Gathering Accession ID's for ES Cell Lines Via Markers");
+        
+/*        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
+                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
+                + " where private = 0 and _MGIType_key = 2 and"
+                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
+                + " and m._Marker_Status_key != 2";*/
+        
+        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
+                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
+                + " where private = 0 and _MGIType_key = 2 and"
+                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
+                + " and m._Marker_Status_key != 2"
+                + " and accID in (SELECT a.accID"
+                + " FROM dbo.ACC_Accession a"
+                + " where private = 0 and _MGIType_key = 28)";
+
+        // Gather the data
+
+        writeStart = new Date();
+
+        ResultSet rs_acc = execute(GENE_ACC_KEY);
+        rs_acc.next();
+
+        writeEnd = new Date();
+
+        String provider = "";
+        
+        log.info(
+                "Time taken to gather marker's accession id result set: "
+                        + (writeEnd.getTime() - writeStart.getTime()));
+
+        // Parse it
+
+        while (!rs_acc.isAfterLast()) {
+
+            maldb.setData(rs_acc.getString("accID"));
+            maldb.setDb_key(rs_acc.getString("_Object_key"));
+            maldb.setDataType(IndexConstants.ES_ACCESSION_ID);
+            maldb.setDisplay_type("Cell Line ID");
+            provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
+            if (!provider.equals("")) {
+                maldb.setProvider("(" + provider + ")");
+            } else {
+                maldb.setProvider(provider);
+            }
+            sis.push(maldb.getDocument());
+            maldb.clear();
+            rs_acc.next();
+
+        }
+
+        // Clean up
+
+        rs_acc.close();
+        log.info("Done Accession ID's for Markers!");
     }
 }
