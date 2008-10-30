@@ -27,5 +27,8 @@ CLASSPATH=$CLASSPATH:${SEARCHTOOL_INDEXER}/qs_indexer.jar:${MGI_JAVALIB}/core.ja
 PATH=/usr/mgijava6/bin/:/usr/local/apache-ant-1.7.1/bin/:${PATH}
 export PATH
 
+ANT_HOME=/usr/local/apache-ant-1.7.1/bin/ant
 export CLASSPATH
 export JAVA_HOME
+export ANT_HOME
+
