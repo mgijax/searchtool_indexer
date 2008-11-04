@@ -40,8 +40,8 @@ echo $CLASSPATH
 
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2049m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/nonIDToken/index/ t
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2048m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherExact/index/ o
+java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms4g -Xmx8g org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherExact/index/ o
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2049m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherDisplay/index/ od
+java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms4g -Xmx8g org.jax.mgi.index.index.MakeIndex /data/searchtool/build/otherDisplay/index/ od
 
 cd bin
