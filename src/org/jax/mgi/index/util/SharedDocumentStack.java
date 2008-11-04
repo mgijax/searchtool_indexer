@@ -94,7 +94,7 @@ public class SharedDocumentStack {
      * @return Int value for Size
      */
 
-    public synchronized int size() {
+    public int size() {
         return stack.size();
     }
 
