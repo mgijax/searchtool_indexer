@@ -213,5 +213,4 @@ public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
             this.hasError = true;
         }
     }
-
 }

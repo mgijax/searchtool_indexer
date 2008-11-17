@@ -9,22 +9,24 @@ import org.jax.mgi.index.util.SharedDocumentStack;
 import org.jax.mgi.shr.config.IndexCfg;
 
 /**
- * The AbstractGatherer class is the superclass for all the other gatherers that we use
- * in the indexing software.
+ * The AbstractGatherer class is the superclass for all the other gatherers 
+ * that we use in the indexing software.
  * 
- * It provides the constructor that they all use, as well as an initCap method, a method
- * to execute sql, cleanup method that gracefully closes down all of the jdbc connections,
- * and a run method that must be overrun by any implementing class.
+ * It provides the constructor that they all use, as well as an initCap method,
+ *  a method to execute sql, cleanup method that gracefully closes down all of
+ *  the jdbc connections, and a run method that must be overrun by any 
+ *  implementing class.
  * 
  * @author mhall
  *
- * @has A single instance of the SharedDocumentStack, which is used to hold the lucene documents
- * that it produces.
+ * @has A single instance of the SharedDocumentStack, which is used to hold the 
+ * Lucene documents that it produces.
  *      A JDBC Connection
- *      A MGI Configuration Object, used to configure this object and any of its children.
+ *      A MGI Configuration Object, used to configure this object and any of 
+ *       its children.
  *      
- * @does Defines the list of common services provided to any gatherer, as well as enforcing 
- *      an api on them.
+ * @does Defines the list of common services provided to any gatherer, as well
+ *  as enforcing an api on them.
  *
  */
 

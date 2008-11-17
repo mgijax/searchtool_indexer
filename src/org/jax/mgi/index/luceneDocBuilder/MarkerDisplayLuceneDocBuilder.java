@@ -255,5 +255,4 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
             this.hasError = true;
         }
     }
-
 }

@@ -206,7 +206,7 @@ public class OtherExactGatherer extends AbstractGatherer {
             // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -264,10 +264,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -322,12 +321,10 @@ public class OtherExactGatherer extends AbstractGatherer {
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            // log.info("The Doc: " +new_other.toString());
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -381,10 +378,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -440,10 +436,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -498,10 +493,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -559,7 +553,7 @@ public class OtherExactGatherer extends AbstractGatherer {
             sis.push(otherExact.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -617,7 +611,7 @@ public class OtherExactGatherer extends AbstractGatherer {
             sis.push(otherExact.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -678,11 +672,9 @@ public class OtherExactGatherer extends AbstractGatherer {
             }
             sis.push(otherExact.getDocument());
             otherExact.clear();
-
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -690,32 +682,6 @@ public class OtherExactGatherer extends AbstractGatherer {
             rs_seq.next();
         }      
         
-/*
- * // Parse it
- * 
- * int place = -1;
- * 
- * while (!rs_seq.isAfterLast()) { if (place != rs_seq.getInt(1)) { if (place !=
- * -1) { while (sis.size() > stack_max) { Thread.sleep(1); }
- * sis.push(otherExact.getDocument()); otherExact.clear();
- *  // log.info(new_other.getData()); total++; if (total >=
- * output_threshold) { log.info("We have now gathered " + total + "
- * documents!"); output_threshold += output_incrementer; } } place =
- * rs_seq.getInt("_Accession_key");
- * otherExact.setType(rs_seq.getString("_MGIType_key"));
- * otherExact.setData(rs_seq.getString("accID"));
- * otherExact.setDb_key(rs_seq.getString("_Object_key"));
- * otherExact.setAccessionKey(rs_seq.getString("_Accession_key"));
- * otherExact.setPreferred(rs_seq.getString("preferred"));
- * otherExact.setLogical_db(phmg.get(rs_seq .getString("_LogicalDB_key"))); } //
- * The old way // new_other.appendLogical_db(rs_seq.getString(6));
- * rs_seq.next(); }
- *  // For this object we need to add the last document that the loop // kicked
- * out on.
- * 
- * sis.push(otherExact.getDocument());
- */
-
         // Clean up
 
         log.info("Done creating documents for sequences!");
@@ -779,7 +745,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -842,10 +808,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -901,10 +866,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -973,7 +937,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -1033,10 +997,9 @@ public class OtherExactGatherer extends AbstractGatherer {
                 Thread.sleep(1);
             }
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -1094,12 +1057,10 @@ public class OtherExactGatherer extends AbstractGatherer {
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            // log.info("The Doc: " +new_other.toString());
             sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }

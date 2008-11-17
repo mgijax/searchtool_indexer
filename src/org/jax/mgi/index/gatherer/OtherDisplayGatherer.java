@@ -206,7 +206,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -258,7 +258,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug ("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -313,7 +313,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -371,7 +371,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -431,7 +431,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -485,7 +485,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -535,7 +535,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -585,7 +585,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -637,7 +637,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -686,7 +686,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -744,7 +744,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -804,7 +804,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -855,7 +855,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
@@ -918,7 +918,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
             sis.push(otherDisplay.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.info("We have now gathered " + total
+                log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }

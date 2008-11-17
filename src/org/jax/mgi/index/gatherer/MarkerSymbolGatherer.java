@@ -11,14 +11,14 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gathering up any information that we might need
- * for the markerExact index. This currently includes nomenclature and various
- * accession ID's that have been directly related to markers.
+ * This class is responsible for gathering up any information that we might 
+ * need for the markerExact index. This currently includes nomenclature and 
+ * various accession ID's that have been directly related to markers.
  * 
  * @author mhall
  * 
- * @has A hashmap used to translate from shortened codes ("AN") to English words
- * ("Allele Name) 
+ * @has A hashmap used to translate from shortened codes ("AN") to English 
+ * words ("Allele Name") 
  * 
  * An instance of the provider hash map gatherer, which
  * translates from logical Db's -> Display Strings 
@@ -28,9 +28,9 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * Lucene documents
  * 
  * @does Upon being started, it begins gathering up its needed data components.
- * Each component basically makes a call to the database and then starts parsing
- * through its result set. For each record, we generate a Lucene document, and
- * place it on the shared stack.
+ * Each component basically makes a call to the database and then starts 
+ * parsing through its result set. For each record, we generate a Lucene 
+ * document, and place it on the shared stack.
  * 
  * After all of the components are finished, we notify the stack that gathering
  * is complete, clean up our jdbc connections and exit.
@@ -42,7 +42,8 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
 
     private HashMap<String, String> hm = new HashMap<String, String>();
 
-    private MarkerExactLuceneDocBuilder markerExact = new MarkerExactLuceneDocBuilder();
+    private MarkerExactLuceneDocBuilder markerExact =
+        new MarkerExactLuceneDocBuilder();
 
     private Logger log = Logger.getLogger(MarkerAccIDGatherer.class.getName());
     
@@ -67,8 +68,8 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
     }
 
     /**
-     * This method encapsulates the algorithm used for gathering the data needed
-     * to create a MarkerExact document.
+     * This method encapsulates the algorithm used for gathering the data 
+     * needed to create a MarkerExact document.
      */
 
     public void run() {
@@ -96,7 +97,9 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
         // SQL For this Subsection
 
         String GENE_LABEL_EXACT = "select ml._Marker_key, "
-                + "ml.label, ml._OrthologOrganism_key, ml.labelType, ml.labelTypeName, ml._Label_Status_key, ml._Label_key" + " from MRK_Label ml, MRK_Marker m"
+                + "ml.label, ml._OrthologOrganism_key, ml.labelType,"
+                + " ml.labelTypeName, ml._Label_Status_key," + " ml._Label_key"
+                + " from MRK_Label ml, MRK_Marker m"
                 + " where  ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2"
                 + "and ml.labelType in ('MS', 'AS', 'OS')";
@@ -119,14 +122,17 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
         
         while (!rs_label.isAfterLast()) {
 
-            if (rs_label.getString("labelType").equals(IndexConstants.ORTHOLOG_SYMBOL)) {
+            if (rs_label.getString("labelType").equals(
+                    IndexConstants.ORTHOLOG_SYMBOL)) {
                 String organism = rs_label.getString("_OrthologOrganism_key");
                 
                 if (organism != null && organism.equals("2")) {
-                    markerExact.setDataType(IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
+                    markerExact.setDataType(
+                            IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
                 }
                 else if (organism != null && organism.equals("44")) {
-                    markerExact.setDataType(IndexConstants.ORTHOLOG_SYMBOL_RAT);
+                    markerExact.setDataType(
+                            IndexConstants.ORTHOLOG_SYMBOL_RAT);
                 }
                 else {
                     markerExact.setDataType(rs_label.getString("labelType"));  
@@ -145,7 +151,8 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
             
             markerExact.setData(rs_label.getString("label"));
             markerExact.setDb_key(rs_label.getString("_Marker_key"));
-            markerExact.setUnique_key(rs_label.getString("_Label_key") + IndexConstants.MARKER_TYPE_NAME);
+            markerExact.setUnique_key(rs_label.getString("_Label_key")
+                    + IndexConstants.MARKER_TYPE_NAME);
             displayType = initCap(rs_label.getString("labelTypeName"));
             if (displayType.equals("Current Symbol")) {
                 displayType = "Symbol";

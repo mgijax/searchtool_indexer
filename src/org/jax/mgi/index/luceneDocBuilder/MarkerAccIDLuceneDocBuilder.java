@@ -242,5 +242,4 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
             this.hasError = true;
         }
     }
-
 }

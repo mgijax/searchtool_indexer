@@ -99,12 +99,6 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         log.info("Gathering Accession ID's for Markers");
         
-/*        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
-                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
-                + " where private = 0 and _MGIType_key = 2 and"
-                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2";*/
-        
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
@@ -336,12 +330,6 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
         // SQL for this Subsection
 
         log.info("Gathering Accession ID's for ES Cell Lines Via Markers");
-        
-/*        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
-                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
-                + " where private = 0 and _MGIType_key = 2 and"
-                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2";*/
         
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"

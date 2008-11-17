@@ -248,8 +248,6 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
         }
         else {
             this.hasError = true;
-        }
-            
+        }            
     }
-
 }

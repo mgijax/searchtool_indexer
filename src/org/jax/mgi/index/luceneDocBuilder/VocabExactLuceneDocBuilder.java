@@ -351,5 +351,4 @@ public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {
             this.hasError = true;
         }
     }
-
 }
