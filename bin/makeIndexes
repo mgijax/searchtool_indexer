@@ -15,11 +15,11 @@ cd bin
 
 # Create the Marker Related Indexes
 
-#makeMarkers
+makeMarkers
 
 # Create the vocab related Indexes
 
-#makeVocab
+makeVocab
 
 # Create the Other Indexes
 
