@@ -11,27 +11,6 @@ then
 fi
 . ${INDEX_CONFIG}
 
-
-# Load MGI Config
-
-if [ "${MGICONFIG}" = "" ]
-then
-    MGICONFIG=/usr/local/mgi/live/mgiconfig
-    export MGICONFIG
-fi
-
-CONFIG_MASTER=${MGICONFIG}/master.config.sh
-if [ ! -r ${CONFIG_MASTER} ]
-then
-    echo "Cannot read configuration file: ${CONFIG_MASTER}" | tee -a ${LOG}
-    exit 1
-fi
-
-# Play around with JAVA_HOME
-
-echo ${INDEX_CONFIG}
-
-
 ###########################
 # Make the Marker Indexes
 ###########################
