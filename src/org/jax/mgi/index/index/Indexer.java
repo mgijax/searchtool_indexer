@@ -37,12 +37,12 @@ public class Indexer implements Runnable {
     }
 
     /**
-     * This is the method that is invoked when the thread is started. Basically,
-     * we busy wait until there are documents on the stack. Once we find some on
-     * the stack, we take one off, and add it to the IndexWriter. While we are
-     * busy waiting we check to see if the stack says that all documents have
-     * been added to it, and to verify if the stack is empty. If both conditions
-     * are true, we exit.
+     * This is the method that is invoked when the thread is started. 
+     * Basically, we busy wait until there are documents on the stack. 
+     * Once we find some on the stack, we take one off, and add it to the 
+     * IndexWriter. While we are busy waiting we check to see if the stack 
+     * says that all documents have been added to it, and to verify if the 
+     * stack is empty. If both conditions are true, we exit.
      * 
      */
 
@@ -57,7 +57,8 @@ public class Indexer implements Runnable {
                     writer.addDocument(doc);
                     count = count + 1;
                     if (count >= threshold) {
-                        log.debug("Thread: " + this.hashCode() + " has indexed " + count + " documents!");
+                        log.debug("Thread: " + this.hashCode() 
+                                + " has indexed " + count + " documents!");
                         threshold *= 2;
                     }
                 }

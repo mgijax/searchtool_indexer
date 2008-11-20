@@ -12,31 +12,39 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gathering up all the different sorts of information
- * that we need to perform searches against accession id's.  It is however important to 
- * note that this is not always direct accid->object relations.  We do more complex things
- * like escellline accession id's -> alleles, and probes -> sequences as well.
+ * This class is responsible for gathering up all the different sorts of 
+ * information that we need to perform searches against accession id's.  It is
+ * however important to note that this is not always direct accid->object 
+ * relations.  We do more complex things like es cell line 
+ * accession id's -> alleles, and probes -> sequences as well.
+ * 
+ * This class is also special in that it overwrites the cleanup method from
+ * the AbstractGatherer class.  Since we need to have two seperately 
+ * configurable connections, we need to override the cleanup method to close 
+ * them both upon completion.
  * 
  * @author mhall
  *
- * @has A single instance of the OtherExactLuceneDocBuilder, which encapsulates the data
- * needed to populate the index.  This object can produce lucene documents on demand.
+ * @has A single instance of the OtherExactLuceneDocBuilder, which encapsulates
+ * the data needed to populate the index.  This object can produce lucene 
+ * documents on demand.
  * 
- * A single instance of the ProviderHashMap gatherer, which is used to translate logical 
- * db keys into human readable display information.
+ * A single instance of the ProviderHashMap gatherer, which is used to 
+ * translate logical db keys into human readable display information.
  * 
- * @does Upon being started this runs through a group of methods, each of which are 
- * responsible for gathering documents from a different accession id type.
+ * @does Upon being started this runs through a group of methods, each of 
+ * which are responsible for gathering documents from a different accession id
+ * type.
  * 
  * Each subprocess basically operates as follows:
  * 
- * Gather the data for the specific subtype, parse it while creating lucene documents and 
- * adding them to the stack.  
+ * Gather the data for the specific subtype, parse it while creating lucene 
+ * documents and adding them to the stack.  
  * 
  * After it completes parsing, it cleans up its result sets, and exits.
  * 
- * After all of these methods complete, we set gathering complete to true in the shared
- * document stack and exit.
+ * After all of these methods complete, we set gathering complete to true in 
+ * the shared document stack and exit.
  *
  */
 
@@ -44,24 +52,25 @@ public class OtherExactGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private double                     total              = 0;
-    private double                     output_incrementer = 100000;
-    private double                     output_threshold   = 100000;
+    private double total = 0;
+    private double output_incrementer = 100000;
+    private double output_threshold = 100000;
 
     private Logger log = Logger.getLogger(OtherExactGatherer.class.getName());
     
-    private Date                       writeStart;
-    private Date                       writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
     // The single LuceneDocBuilder for this Object.
 
-    private OtherExactLuceneDocBuilder otherExact         = new OtherExactLuceneDocBuilder();
+    private OtherExactLuceneDocBuilder otherExact =
+        new OtherExactLuceneDocBuilder();
 
-    private ProviderHashMapGatherer    phmg;
+    private ProviderHashMapGatherer phmg;
     
     // This object needs a special connection.
     
-    private Connection                 conSnp;
+    private Connection conSnp;
 
     public OtherExactGatherer(IndexCfg config) {
         super(config);
@@ -637,11 +646,12 @@ public class OtherExactGatherer extends AbstractGatherer {
         // SQL for this Subsection
 
         String OTHER_SEQ_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
-                + "a._Object_key, '"
-                + IndexConstants.OTHER_SEQUENCE
+                + "a._Object_key, '" + IndexConstants.OTHER_SEQUENCE
                 + "' as _MGIType_key, a.preferred, a._LogicalDB_key"
                 + " FROM ACC_Accession a, SEQ_Sequence s"
-                + " where a.private != 1 and a._MGIType_key = 19 and a._Object_key = s._Sequence_key and s._Organism_key = 1";
+                + " where a.private != 1 and a._MGIType_key = 19 and"
+                + " a._Object_key = s._Sequence_key and"
+                + " s._Organism_key = 1";
 
         // Gather the data.
 
@@ -696,7 +706,8 @@ public class OtherExactGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
 
-    private void doSequencesByProbe() throws SQLException, InterruptedException {
+    private void doSequencesByProbe() 
+        throws SQLException, InterruptedException {
 
         // SQL for this Subsection
 
@@ -755,8 +766,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         // Clean up
 
-        System.out
-                .println("Done creating documents for sequences by probe IDs!");
+        log.info("Done creating documents for sequences by probe IDs!");
 
         rs_seq_by_probe.close();
     }
@@ -797,12 +807,10 @@ public class OtherExactGatherer extends AbstractGatherer {
             otherExact.setDb_key(rs_snp_prime.getString(3));
             otherExact.setAccessionKey(rs_snp_prime.getString(1));
             otherExact.setPreferred(rs_snp_prime.getString(5));
-            // This is an odd case, as far as I can tell, this is hardcoded.
-            // In the jsp page that Kim most likely got this requirement
-            // from
-            // as a result, I'll hardcode it in here as well, with every
-            // intention
-            // of asking kim for a more rational approach later on.
+            
+            // This is an odd case, as far as I can tell, this is hard coded
+            // on the jsp page that this requirement was pulled from.
+            
             otherExact.setProvider("dbSNP");
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
@@ -1015,8 +1023,10 @@ public class OtherExactGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather the ES Cell Line data.  Please note, we only gather Accession ID's for this data type
-     * if they have a direct relationship to an allele.
+     * Gather the ES Cell Line data.  Please note, we only gather 
+     * Accession ID's for this data type if they have a direct relationship 
+     * to an allele.
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -1052,7 +1062,8 @@ public class OtherExactGatherer extends AbstractGatherer {
             otherExact.setDb_key(rs_escell.getString("_Allele_key"));
             otherExact.setAccessionKey(rs_escell.getString("_Accession_key"));
             otherExact.setPreferred(rs_escell.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_escell.getString("_LogicalDB_key")));
+            otherExact.setProvider(
+                    phmg.get(rs_escell.getString("_LogicalDB_key")));
             otherExact.setDisplay_type("Cell Line ID");
             while (sis.size() > stack_max) {
                 Thread.sleep(1);

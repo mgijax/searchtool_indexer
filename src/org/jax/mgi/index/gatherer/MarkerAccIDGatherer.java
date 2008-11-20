@@ -62,7 +62,7 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
     /**
      * This method encapsulates the algorithm used for gathering the data 
-     * needed to create a MarkerExact document.
+     * needed to create the MarkerExact documents.
      */
 
     public void run() {
@@ -132,6 +132,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setDataType(IndexConstants.ACCESSION_ID);
             maldb.setDisplay_type("ID");
             provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
+            
+            // Set the provider, blanking it out if needed.
+            
             if (!provider.equals("")) {
                 maldb.setProvider("(" + provider + ")");
             } else {
@@ -246,6 +249,10 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setDb_key(rs_orth_acc.getString("_Marker_key"));
             maldb.setDataType(IndexConstants.ORTH_ACCESSION_ID);
             maldb.setDisplay_type("ID");
+            
+            // Another special case for the provider hash map.  We must append
+            // the organism's name for these cases.
+            
             maldb.setProvider("("+phmg.get(
                     rs_orth_acc.getString("_LogicalDB_key")) + " - " 
                     + initCap(rs_orth_acc.getString("commonName"))+")");
@@ -264,7 +271,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
     }
 
     /**
-     * Grab ESCellLine Accession ID's that have been associated to Markers.
+     * Grab ESCellLine Accession ID's that have been associated to Markers 
+     * through Alleles.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -318,7 +326,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
     }
 
     /**
-     * Grab ESCellLine Accession ID's that have been associated to Markers.
+     * Grab ESCellLine Accession ID's that have been associated to Markers via
+     * a direct relationship to a marker record.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -330,6 +339,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
         // SQL for this Subsection
 
         log.info("Gathering Accession ID's for ES Cell Lines Via Markers");
+        
+        // Grab any marker acc id records, whose acc id also directly matches
+        // an es cell line accid record.
         
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
@@ -364,6 +376,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setDataType(IndexConstants.ES_ACCESSION_ID);
             maldb.setDisplay_type("Cell Line ID");
             provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
+            
+            // Again, if we have a blank case, blank out the provider. 
+            
             if (!provider.equals("")) {
                 maldb.setProvider("(" + provider + ")");
             } else {

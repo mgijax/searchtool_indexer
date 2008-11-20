@@ -26,7 +26,8 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
     private String acc_id      = "";
     private Boolean hasError   = false;
     
-    private Logger log = Logger.getLogger(MarkerDisplayLuceneDocBuilder.class.getName());
+    private Logger log = 
+        Logger.getLogger(MarkerDisplayLuceneDocBuilder.class.getName());
 
     /**
      * Returns the MarkerDisplay object to its default state. This enables the
@@ -57,13 +58,21 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
         
         Document doc = new Document();
 
-        doc.add(new Field(IndexConstants.COL_MARKER_SYMBOL, this.getSymbol(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_CHROMOSOME, this.getChr(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_MARKER_TYPE, this.getMarker_type(), Field.Store.YES,Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_MGI_ID, this.getAcc_id(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_MARKER_SYMBOL, this.getSymbol(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_CHROMOSOME, this.getChr(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.getName(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_MARKER_TYPE,
+                this.getMarker_type(), Field.Store.YES,
+                Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_MGI_ID, this.getAcc_id(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
 
@@ -84,11 +93,13 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
         // Set up the logger.
         
-        Logger log = Logger.getLogger(MarkerDisplayLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(MarkerDisplayLuceneDocBuilder.class.getName());
         
         log.info("MarkerDisplayLuceneDocBuilder Test Harness");
 
-        MarkerDisplayLuceneDocBuilder meldb = new MarkerDisplayLuceneDocBuilder();
+        MarkerDisplayLuceneDocBuilder meldb = 
+            new MarkerDisplayLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
@@ -243,10 +254,20 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
         }
     }
 
+    /**
+     * Get the accession id/
+     * @return String representing the accession id.
+     */
+    
     public String getAcc_id() {
         return acc_id;
     }
 
+    /**
+     * Set the accession id.
+     * @param acc_id String to set the accession id to.
+     */
+    
     public void setAcc_id(String acc_id) {
         if (this.acc_id != null) {
             this.acc_id = acc_id;

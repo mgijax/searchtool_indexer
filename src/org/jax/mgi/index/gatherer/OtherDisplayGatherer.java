@@ -15,9 +15,10 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * Gatherer responsible for understanding how to gather all needed information
  * that goes into the other display index.
  * 
- * Please note that all "Other" gatherers have a gathering choke programmed into
- * each of their subsections. Based on this value, they are only able to put a
- * set maximum number of documents onto the stack before being forced to wait.
+ * Please note that all "Other" gatherers have a gathering item limit 
+ * programmed into each of their subsections. Based on this value, they are
+ * only able to put a set maximum number of documents onto the stack before
+ * being forced to wait.
  * 
  * This number is a configurable item via the Configuration file.
  * 
@@ -51,23 +52,25 @@ public class OtherDisplayGatherer extends AbstractGatherer {
      * incrementer, and repeat the process.
      */
 
-    private double                       output_incrementer = 100000;
-    private double                       output_threshold   = 100000;
+    private double output_incrementer = 100000;
+    private double output_threshold = 100000;
 
     // Create the one LuceneDocBuilder that this object will use.
 
-    private OtherDisplayLuceneDocBuilder otherDisplay       = new OtherDisplayLuceneDocBuilder();
+    private OtherDisplayLuceneDocBuilder otherDisplay =
+        new OtherDisplayLuceneDocBuilder();
 
-    private Logger log = Logger.getLogger(OtherDisplayGatherer.class.getName());
+    private Logger log =
+        Logger.getLogger(OtherDisplayGatherer.class.getName());
     
     // Create two data variables that are used with timing.
 
-    private Date                         writeStart;
-    private Date                         writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
     
     // This class needs a special connection, set it up.
     
-    private Connection                   conSnp;
+    private Connection conSnp;
 
     public OtherDisplayGatherer(IndexCfg config) {
         super(config);
@@ -251,7 +254,8 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
             otherDisplay.setDb_key(rs_assay.getString("_Assay_key"));
             otherDisplay.setDataType(rs_assay.getString("type"));
-            otherDisplay.setName(rs_assay.getString("symbol") +", "+rs_assay.getString("name"));
+            otherDisplay.setName(rs_assay.getString("symbol") + ", "
+                    + rs_assay.getString("name"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
@@ -341,7 +345,8 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         String OTHER_SEQ_DISPLAY_KEY = "select distinct _Sequence_key, '"
                 + IndexConstants.OTHER_SEQUENCE
-                + "' as type, description, sequenceType from SEQ_Sequence_view";
+                + "' as type, description, sequenceType"
+                + " from SEQ_Sequence_view";
 
         // Gather the data
 
@@ -386,7 +391,8 @@ public class OtherDisplayGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather the alleles data.  Please note that this has a realized display field.
+     * Gather the alleles data.  Please note that this has a realized display
+     * field.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -447,7 +453,8 @@ public class OtherDisplayGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather Ortholog data.  Please note that this has a realized display field.
+     * Gather Ortholog data.  Please note that this has a realized display 
+     * field.
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -870,7 +877,8 @@ public class OtherDisplayGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather ES Cell Line -> Allele relationship data.  Please note that this also has a realized display field.
+     * Gather ES Cell Line -> Allele relationship data.  Please note that this
+     * also has a realized display field.
      * @throws SQLException
      * @throws InterruptedException
      */

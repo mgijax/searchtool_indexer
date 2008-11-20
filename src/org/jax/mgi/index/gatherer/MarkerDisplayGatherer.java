@@ -28,12 +28,12 @@ public class MarkerDisplayGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    Date   writeStart;
-    Date   writeEnd;
+    private Date   writeStart;
+    private Date   writeEnd;
 
     // Create our ONLY doc builder.
 
-    MarkerDisplayLuceneDocBuilder markerDisplay =
+    private MarkerDisplayLuceneDocBuilder markerDisplay =
         new MarkerDisplayLuceneDocBuilder();
 
     private Logger log = 

@@ -10,20 +10,49 @@ import org.jax.mgi.index.luceneDocBuilder.VocabInexactLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
+/**
+ * The vocab inexact gatherer is responsible for gathering the small token 
+ * relevant information from our vocabulary data sources. 
+ *  
+ * @author mhall
+ *
+ * @has A single reference to a VocabDisplayLucene Doc Builder, which is used
+ *      to create Lucene documents to place onto the stack.
+ *      
+ *      A hash map used to convert database codes to human readable display 
+ *      values.
+ * 
+ * @does Upon being started this runs through a group of methods, each of 
+ * which are responsible for gathering documents from a different accession id
+ * type.
+ * 
+ * Each subprocess basically operates as follows:
+ * 
+ * Gather the data for the specific sub type, parse it while creating Lucene 
+ * documents and adding them to the stack.  
+ * 
+ * After it completes parsing, it cleans up its result sets, and exits.
+ * 
+ * After all of these methods complete, we set gathering complete to true in 
+ * the shared document stack and exit.
+ */
+
 public class VocabInexactGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                         writeStart;
-    private Date                         writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
-    private VocabInexactLuceneDocBuilder sf = new VocabInexactLuceneDocBuilder();
+    private VocabInexactLuceneDocBuilder sf = 
+        new VocabInexactLuceneDocBuilder();
 
-    private Logger log = Logger.getLogger(VocabInexactGatherer.class.getName());
+    private Logger log = 
+        Logger.getLogger(VocabInexactGatherer.class.getName());
     
     // SQL Section
 
-    HashMap<String, String>              hm = new HashMap<String, String>();
+    HashMap<String, String> hm = new HashMap<String, String>();
 
     /**
      * Get a new copy of the Vocab Inexact gatherer, and set up its hashmap.
@@ -159,8 +188,8 @@ public class VocabInexactGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather the non AD note/Definition information. Please note that this is a
-     * compound data row as such its parsing code is a bit unique.
+     * Gather the non AD note/Definition information. Please note that this 
+     * is a compound data row as such its parsing code is a bit unique.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -179,7 +208,7 @@ public class VocabInexactGatherer extends AbstractGatherer {
         // Gather the data
 
         // Since notes are compound rows in the database, we have to
-        // contruct the searchable field.
+        // construct the searchable field.
 
         writeStart = new Date();
 

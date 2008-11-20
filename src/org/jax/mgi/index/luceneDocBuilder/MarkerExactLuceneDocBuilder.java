@@ -12,10 +12,11 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into a
+ *  lucene document.
  * 
- * Note: this document outputs a field raw_data, that simply doesn't lowercase the
- * text from the data field.
+ * Note: this document outputs a field raw_data, that simply doesn't lower case 
+ * the text from the data field.
  * 
  */
 public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {

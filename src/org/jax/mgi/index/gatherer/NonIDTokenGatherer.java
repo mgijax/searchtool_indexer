@@ -11,16 +11,17 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible to gather up anything we might want to match a marker on
- * inexactly.  Meaning where punctuation is non important, and prefix searching will be
- * allowed.
+ * This class is responsible for gathering up every unique token that we have
+ * in all of our various datasources.  It basically replicates the searches
+ * performed in both markers and vocabulary with a slightly different treatment
+ * of the words themselves.
  * 
  * @author mhall
  *
  * @has A hashmap, which is used to translated from shortened codes ("MN") to
  * human readable words ("Marker Name")
  * 
- * A MarkerInexactLuceneDocBuilder, which encapsulates the data for this type, 
+ * A NonIDTokenLuceneDocBuilder, which encapsulates the data for this type, 
  * and produces lucene documents.
  * 
  * @does Upon being started it runs through a group of methods that gather up
@@ -28,11 +29,11 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * Each method behaves as follows:
  * 
- * Gather its data, parse it, add the document to the stack, repeat until finished,
- * clean up the result set, and exit.
+ * Gather its data, parse it, add the document to the stack, repeat until 
+ * finished, clean up the result set, and exit.
  * 
- * After each method has completed, we clean up the overall jdbc connection, set gathering
- * to complete and exit.
+ * After each method has completed, we clean up the overall jdbc connection, 
+ * set gathering to complete and exit.
  *
  */
 
@@ -45,9 +46,10 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
     // Instantiate the single doc builder that this object will use.
 
-    private NonIDTokenLuceneDocBuilder nonIDToken = new NonIDTokenLuceneDocBuilder();
+    private NonIDTokenLuceneDocBuilder nonIDToken =
+        new NonIDTokenLuceneDocBuilder();
 
-    public static HashMap<String, String> hm            = new HashMap<String, String>();
+    public static HashMap<String, String> hm = new HashMap<String, String>();
 
     private Logger log = Logger.getLogger(NonIDTokenGatherer.class.getName());
     
@@ -114,10 +116,11 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
         String GEN_MARKER_LABEL = "select ml._Marker_key, ml.label, "
                 + "ml.labelType, ml._OrthologOrganism_key, "
-                + "ml._Label_Status_key, ml.labelTypeName" + " from MRK_Label ml, MRK_Marker m"
+                + "ml._Label_Status_key, ml.labelTypeName"
+                + " from MRK_Label ml, MRK_Marker m"
                 + " where ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2 ";
-                //+ "and _Label_Status_key = 1";
+        // + "and _Label_Status_key = 1";
 
         // Gather the data
 
@@ -132,14 +135,8 @@ public class NonIDTokenGatherer extends AbstractGatherer {
                 + (writeEnd.getTime() - writeStart.getTime()));
 
         // Parse it
-        
-        //String displayType = "";
-        
-        
 
         while (!rs.isAfterLast()) {
-            
-            //displayType = initCap(rs.getString("labelTypeName"));
             
             nonIDToken.setData(rs.getString("label"));
 
@@ -327,9 +324,35 @@ public class NonIDTokenGatherer extends AbstractGatherer {
             // For AD specifically we are adding in multiple ways for something
             // to match inexactly.
 
-            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key")
-                    + " "
-                    + rs_ad_term.getString("printName").replaceAll(";", " "));
+            // This code is WRONG, its currently presenting inexact tokens 
+            // instead of exact ones, placing the proper code here into comments
+            // for the time being.
+            
+            // TS#:Printname version.
+            
+            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
+                    + rs_ad_term.getString("printName"));
+            sis.push(nonIDToken.getDocument());
+            
+            // TS#: printname version
+            
+            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+                    + rs_ad_term.getString("printName"));
+            sis.push(nonIDToken.getDocument());
+            
+            // printname version
+            
+            nonIDToken.setData(rs_ad_term.getString("printName"));
+            sis.push(nonIDToken.getDocument());
+            
+            // TS#: print name version
+            
+            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+                    + rs_ad_term.getString("printName").replaceAll(";", "; "));
+            sis.push(nonIDToken.getDocument());
+/*            //nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key")
+            //        + " "
+            //        + rs_ad_term.getString("printName").replaceAll(";", " "));
 
             sis.push(nonIDToken.getDocument());
             // Transformed version, w/o TS
@@ -337,7 +360,7 @@ public class NonIDTokenGatherer extends AbstractGatherer {
                     ";", " "));
             sis.push(nonIDToken.getDocument());
 
-            nonIDToken.clear();
+*/            nonIDToken.clear();
             rs_ad_term.next();
         }
 
@@ -398,14 +421,16 @@ public class NonIDTokenGatherer extends AbstractGatherer {
          * @throws InterruptedException
          */
         
-        private void doAlleleSynonym() throws SQLException, InterruptedException {
+        private void doAlleleSynonym()
+            throws SQLException, InterruptedException {
         
             // SQL for this Subsection
         
-            String ALLELE_SYNONYM_KEY = "select distinct gag._Marker_key, al.label, al.labelType, al.labelTypeName"+
-     " from all_label al, GXD_AlleleGenotype gag"+
-     " where al.labelType = 'AY' and al._Allele_key = gag._Allele_key"+
-     " and al._Label_Status_key != 0";
+            String ALLELE_SYNONYM_KEY = "select distinct gag._Marker_key,"
+                + " al.label, al.labelType, al.labelTypeName"
+                + " from all_label al, GXD_AlleleGenotype gag"
+                + " where al.labelType = 'AY' and al._Allele_key ="
+                + " gag._Allele_key and al._Label_Status_key != 0";
         
             // Gather the data
         

@@ -181,7 +181,7 @@ public class MarkerVocabAccIDGatherer extends AbstractGatherer {
             new_vocab.setRaw_data(rs_acc_id.getString("term"));
             new_vocab.setDb_key(rs_acc_id.getString("_Term_key"));
             new_vocab.setVocabulary(rs_acc_id.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.ACCESSION_ID);
+            new_vocab.setDataType(IndexConstants.VOC_ACCESSION_ID); 
             new_vocab.setDisplay_type(hm.get(
                     rs_acc_id.getString("vocabName")));
             new_vocab.setProvider("("+rs_acc_id.getString("accId")+")");

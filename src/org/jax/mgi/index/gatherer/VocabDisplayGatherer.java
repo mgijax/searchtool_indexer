@@ -10,6 +10,34 @@ import org.jax.mgi.index.luceneDocBuilder.VocabDisplayLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
+/**
+ * The vocab display gatherer is responsible for gathering all the possible
+ * display information for our various vocabulary data sources.  Like all
+ * vocabulary related gatherers it is split into non AD and AD datasources.
+ * 
+ * @author mhall
+ *
+ * @has A single reference to a VocabDisplayLucene Doc Builder, which is used
+ *      to create Lucene documents to place onto the stack.
+ *      
+ *      A hash map used to convert database codes to human readable display 
+ *      values.
+ * 
+ * @does Upon being started this runs through a group of methods, each of 
+ * which are responsible for gathering documents from a different accession id
+ * type.
+ * 
+ * Each subprocess basically operates as follows:
+ * 
+ * Gather the data for the specific sub type, parse it while creating Lucene 
+ * documents and adding them to the stack.  
+ * 
+ * After it completes parsing, it cleans up its result sets, and exits.
+ * 
+ * After all of these methods complete, we set gathering complete to true in 
+ * the shared document stack and exit.
+ */
+
 public class VocabDisplayGatherer extends AbstractGatherer {
 
     // Class Variables
@@ -19,9 +47,11 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
     // Instantiate the single VocabDisplay Lucene doc builder.
 
-    private VocabDisplayLuceneDocBuilder vocabDisplay = new VocabDisplayLuceneDocBuilder();
+    private VocabDisplayLuceneDocBuilder vocabDisplay = 
+        new VocabDisplayLuceneDocBuilder();
 
-    private Logger log = Logger.getLogger(VocabDisplayGatherer.class.getName());
+    private Logger log = 
+        Logger.getLogger(VocabDisplayGatherer.class.getName());
     
     HashMap <String, String> hm = new HashMap <String, String> ();
     
@@ -56,9 +86,9 @@ public class VocabDisplayGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather up all of the display information for non AD vocab terms.  This is by far
-     * the most complex thing we do in indexing, as such the code is documented inline much 
-     * more carefully.
+     * Gather up all of the display information for non AD vocab terms.  
+     * This is by far the most complex thing we do in indexing, as such the 
+     * code is documented inline much more carefully.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -70,25 +100,26 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
         // Since this is a compound object, the order by clauses are important.
 
-        String GEN_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID, tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv"
+        String GEN_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
+                + " tv.vocabName" + " FROM dbo.VOC_Term_View tv"
                 + " where tv.isObsolete != 1 and tv._Vocab_key in "
-                + "(44, 4, 5, 8, 46)"
-                + " order by _Term_key";
+                + "(44, 4, 5, 8, 46)" + " order by _Term_key";
 
-        String VOC_MARKER_DISPLAY_KEY = "select distinct _Term_key, _Marker_key from VOC_Marker_Cache"
+        String VOC_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
+                + " _Marker_key from VOC_Marker_Cache"
                 + " where annotType != 'AD'" + " order by _Term_key";
 
-        String VOC_NON_AD_MARKER_COUNT = "select _Term_key, count(_Marker_key) as marker_count"
-                + " from VOC_Marker_Cache" + " where annotType !='AD'"
+        String VOC_NON_AD_MARKER_COUNT = "select _Term_key, count(_Marker_key)"
+                + " as marker_count" + " from VOC_Marker_Cache"
+                + " where annotType !='AD'"
                 + " group by _Term_key order by _Term_key";
 
         String VOC_NON_AD_ANNOT_COUNT = "select _Term_key, _MGIType_key, "
                 + "objectCount, annotCount" + " from VOC_Annot_Count_Cache"
                 + " where annotType != 'AD'" + " order by _Term_key";
 
-        String VOC_DAG_KEY = "select _AncestorObject_key, _DescendentObject_key"
-                + " from DAG_Closure"
+        String VOC_DAG_KEY = "select _AncestorObject_key,"
+                + " _DescendentObject_key" + " from DAG_Closure"
                 + " where _MGIType_key = 13"
                 + " order by _AncestorObject_key, _DescendentObject_key";
 
@@ -129,8 +160,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
             if (place != rs_vocabTerm.getInt(1)) {
                 if (place != -1) {
 
-                    // We have, try to put it on the stack, waiting if the stack
-                    // is busy.
+                    // We have, try to put it on the stack, waiting if the 
+                    // stack is busy.
                     while (sis.size() > 100000) {
                         Thread.sleep(1);
                     }
@@ -150,7 +181,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
                 vocabDisplay.setDb_key(rs_vocabTerm.getString("_Term_key"));
                 vocabDisplay.setVocabulary(rs_vocabTerm.getString("vocabName"));
-                vocabDisplay.setTypeDisplay(hm.get(rs_vocabTerm.getString("vocabName")));
+                vocabDisplay.setTypeDisplay(
+                        hm.get(rs_vocabTerm.getString("vocabName")));
                 vocabDisplay.setAcc_id(rs_vocabTerm.getString("accID"));
 
                 // Set the place to be the current terms object key, when this
@@ -170,14 +202,16 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                     marker_display_rs.next();
                 }
 
-                // Set the annotation counts, and in the case of non human omim, the secondary object counts.
+                // Set the annotation counts, and in the case of non human
+                // omim, the secondary object counts.
 
                 while (!vocab_annot_rs.isAfterLast()
                         && vocab_annot_rs.getInt("_Term_key") <= place) {
 
                     if (!vocabDisplay.getVocabulary().equals("OMIM")
-                            || (vocabDisplay.getVocabulary().equals("OMIM") && vocab_annot_rs
-                                    .getString("_MGIType_key").equals("12"))) {
+                            || (vocabDisplay.getVocabulary().equals("OMIM") 
+                                    && vocab_annot_rs.getString("_MGIType_key")
+                                    .equals("12"))) {
                         vocabDisplay.setAnnotation_object_type(vocab_annot_rs
                                 .getString("_MGIType_key"));
                         vocabDisplay.setAnnotation_objects(vocab_annot_rs
@@ -185,15 +219,14 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                         vocabDisplay.setAnnotation_count(vocab_annot_rs
                                 .getString("annotCount"));
                     } else {
-                        // log.info("Term: " + new_mp.getDb_key()
-                        // + " Has a secondary annotation");
                         vocabDisplay.setSecondary_object_count(vocab_annot_rs
                                 .getString("annotCount"));
                     }
                     vocab_annot_rs.next();
                 }
 
-                // Count the number of markers directly annotated to this object.
+                // Count the number of markers directly annotated to this 
+                // object.
 
                 while (!vocab_marker_count_rs.isAfterLast()
                         && vocab_marker_count_rs.getInt("_Term_key") < place) {
@@ -205,12 +238,14 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                             .getString("marker_count"));
                 }
 
-                // Add in all the other vocabulary terms that are children on this term
-                // in term_key order.
+                // Add in all the other vocabulary terms that are children on 
+                // this term in term_key order.
 
-                while (!child_rs.isAfterLast() && child_rs.getInt("_AncestorObject_key") <= place) {
+                while (!child_rs.isAfterLast() 
+                        && child_rs.getInt("_AncestorObject_key") <= place) {
                     if (child_rs.getInt("_AncestorObject_key") == place) {
-                        vocabDisplay.appendChild_ids(child_rs.getString("_DescendentObject_key"));
+                        vocabDisplay.appendChild_ids(
+                                child_rs.getString("_DescendentObject_key"));
                     }
                     child_rs.next();
 
@@ -236,8 +271,10 @@ public class VocabDisplayGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather up all of the AD Term's display information, please note that while similar to
-     * non ad terms, AD is special in that it doesn't posses Accession ID's.  
+     * Gather up all of the AD Term's display information, please note that 
+     * while similar to non ad terms, AD is special in that it doesn't possess 
+     * Accession ID's.
+     *   
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -246,29 +283,17 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
         // SQL For this Subsection
 
-/*        String VOC_AD_ANNOT_COUNT = "select _Term_key, _MGIType_key, objects, annotations"
-                + " from VOC_Annot_Count_Cache" + " where name = 'AD'";
-*/
-        String VOC_AD_MARKER_COUNT = "select _Term_key, count(_Marker_key) as marker_count"
-                + " from VOC_Marker_Cache" + " where annotType ='AD'"
+        String VOC_AD_MARKER_COUNT = "select _Term_key, count(_Marker_key)"
+                + " as marker_count" + " from VOC_Marker_Cache"
+                + " where annotType ='AD'"
                 + " group by _Term_key order by _Term_key";
 
-/*        String GEN_AD_KEY = "SELECT s._Structure_key, 'TS' + convert(VARCHAR, s._Stage_key) +': '+ s.printName as PrintName2, sn.Structure as synonym, s._StructureName_key as key1, sn._StructureName_key as key2, 'AD' as VocabName"
-                + " FROM dbo.GXD_Structure s, GXD_StructureName sn"
-                + " where s._parent_key != null"
-                + " and s._Structure_key *= sn._Structure_key ";*/
-        
-/*        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS' + convert(VARCHAR, s._Stage_key) +': '+ " 
-                + "s.printName as PrintName2, 'AD' as VocabName"
-                + " FROM dbo.GXD_Structure s, GXD_StructureName sn"
-                + " where s._parent_key != null"
-                + " and s._Structure_key *= sn._Structure_key" 
-                + " order by _Structure_key";*/
-        
-
-        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS' + convert(VARCHAR, s._Stage_key) +': '+ s.printName as PrintName2, 'AD' as VocabName, vac.objectCount, vac.annotCount, vac._MGIType_key"
-                + " FROM dbo.GXD_Structure s, GXD_StructureName sn, VOC_Annot_Count_Cache vac"
-                + " where s._parent_key != null"
+        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS'"
+                + " + convert(VARCHAR, s._Stage_key) +': '+ s.printName"
+                + " as PrintName2, 'AD' as VocabName, vac.objectCount,"
+                + " vac.annotCount, vac._MGIType_key"
+                + " FROM dbo.GXD_Structure s, GXD_StructureName sn,"
+                + " VOC_Annot_Count_Cache vac" + " where s._parent_key != null"
                 + " and s._Structure_key = sn._Structure_key"
                 + " and s._Structure_key *= vac._Term_key"
                 + " and vac.annotType = 'AD'" + " order by _Structure_key";
@@ -277,7 +302,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 + " from GXD_StructureClosure"
                 + " order by _Structure_key, _Descendent_key";
 
-        String VOC_AD_MARKER_DISPLAY_KEY = "select distinct _Term_key, _Marker_key  from VOC_Marker_Cache"
+        String VOC_AD_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
+                + " _Marker_key  from VOC_Marker_Cache"
                 + " where annotType = 'AD'" + " order by _Term_key";
 
         writeStart = new Date();
@@ -298,7 +324,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
         log.info("Time taken gather AD Display result sets: "
                 + (writeEnd.getTime() - writeStart.getTime()));
 
-        // Since these are compound documents, we need to keep track of the document we are on.
+        // Since these are compound documents, we need to keep track of the
+        // document we are on.
 
         int place = -1;
 
@@ -308,8 +335,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
             
             if (place != rs_ad.getInt("_Structure_key")) {
                 
-                // If so, and its not the first document, add the current document
-                // to the stack.
+                // If so, and its not the first document, add the current
+                // document to the stack.
                 
                 if (place != -1) {
                     sis.push(vocabDisplay.getDocument());
@@ -321,9 +348,12 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 vocabDisplay.setDb_key(rs_ad.getString("_Structure_key"));
                 vocabDisplay.setContents(rs_ad.getString("PrintName2"));
                 vocabDisplay.setVocabulary(rs_ad.getString("VocabName"));
-                vocabDisplay.setTypeDisplay(hm.get(rs_ad.getString("vocabName")));
-                vocabDisplay.setAnnotation_object_type(rs_ad.getString("_MGIType_key"));
-                vocabDisplay.setAnnotation_objects(rs_ad.getString("objectCount"));
+                vocabDisplay.setTypeDisplay(hm
+                        .get(rs_ad.getString("vocabName")));
+                vocabDisplay.setAnnotation_object_type(rs_ad
+                        .getString("_MGIType_key"));
+                vocabDisplay.setAnnotation_objects(rs_ad
+                        .getString("objectCount"));
                 vocabDisplay.setAnnotation_count(rs_ad.getString("annotCount"));
 
                 // Set the document place, when this changes we know we are on a
@@ -354,20 +384,22 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                             .getString("marker_count"));
                 }
 
-                // Grab the terms that are decendants of this term, by term key order.
+                // Grab the terms that are decendants of this term, by term 
+                // key order.
                 
                 while (!ad_child_rs.isAfterLast()
                         && ad_child_rs.getInt("_Structure_key") <= place) {
                     if (ad_child_rs.getInt("_Structure_key") == place) {
-                        vocabDisplay.appendChild_ids(ad_child_rs.getString("_Descendent_key"));
+                        vocabDisplay.appendChild_ids(ad_child_rs
+                                .getString("_Descendent_key"));
                     }
-                    // child_place = ad_child_rs.getInt(1);
                     ad_child_rs.next();
                 }
             }
         }
 
-        // Push the last document onto the stack, the one the loop kicked out on.
+        // Push the last document onto the stack, the one the loop kicked 
+        // out on.
         
         sis.push(vocabDisplay.getDocument());
         

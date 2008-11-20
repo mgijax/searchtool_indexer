@@ -11,10 +11,24 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * Gather up all of the information needed to search for vocabulary terms by accession id.
+ * Gather up all of the information needed to search for vocabulary terms by 
+ * accession id.
  *  
  * @author mhall
  *
+ * @does Upon being started this runs through a group of methods, each of 
+ * which are responsible for gathering documents from a different accession id
+ * type.
+ * 
+ * Each subprocess basically operates as follows:
+ * 
+ * Gather the data for the specific subtype, parse it while creating lucene 
+ * documents and adding them to the stack.  
+ * 
+ * After it completes parsing, it cleans up its result sets, and exits.
+ * 
+ * After all of these methods complete, we set gathering complete to true in 
+ * the shared document stack and exit.
  */
 
 public class VocabAccIDGatherer extends AbstractGatherer {
@@ -24,9 +38,10 @@ public class VocabAccIDGatherer extends AbstractGatherer {
     private Date                       writeStart;
     private Date                       writeEnd;
 
-    private VocabExactLuceneDocBuilder new_vocab = new VocabExactLuceneDocBuilder();
+    private VocabExactLuceneDocBuilder new_vocab = 
+        new VocabExactLuceneDocBuilder();
 
-    private HashMap<String, String>    hm        = new HashMap<String, String>();
+    private HashMap<String, String> hm = new HashMap<String, String>();
 
     private Logger log = Logger.getLogger(VocabAccIDGatherer.class.getName());
     
@@ -53,12 +68,15 @@ public class VocabAccIDGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather the vocabulary accession ID's.  Please note that AD has no accession ID's
+     * Gather the vocabulary accession ID's.  Please note that AD has no 
+     * accession ID's
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
     
-    private void doVocabAccessionID() throws SQLException, InterruptedException {
+    private void doVocabAccessionID() 
+        throws SQLException, InterruptedException {
         
         //SQL for this Subsection
         
@@ -85,7 +103,8 @@ public class VocabAccIDGatherer extends AbstractGatherer {
             new_vocab.setRaw_data(rs_acc_id.getString("accId"));
             new_vocab.setDb_key(rs_acc_id.getString("_Term_key"));
             new_vocab.setVocabulary(rs_acc_id.getString("vocabName"));
-            if (rs_acc_id.getString("vocabName").equals(IndexConstants.OMIM_TYPE_NAME)) {
+            if (rs_acc_id.getString("vocabName").equals(
+                    IndexConstants.OMIM_TYPE_NAME)) {
                 new_vocab.setProvider("(OMIM)");
             }
             new_vocab.setDataType(IndexConstants.ACCESSION_ID);

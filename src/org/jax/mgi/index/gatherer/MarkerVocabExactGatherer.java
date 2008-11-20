@@ -20,9 +20,10 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
 
     private Logger log = Logger.getLogger(MakeIndex.class.getName());
     
-    private VocabExactLuceneDocBuilder new_vocab = new VocabExactLuceneDocBuilder();
+    private VocabExactLuceneDocBuilder new_vocab =
+        new VocabExactLuceneDocBuilder();
 
-    private HashMap<String, String>    hm        = new HashMap<String, String>();
+    private HashMap<String, String> hm = new HashMap<String, String>();
 
     public MarkerVocabExactGatherer(IndexCfg config) {
         super(config);
@@ -84,16 +85,19 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         String MP_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
         " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
         " where tv.isObsolete != 1 and tv._Vocab_key = 5"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType = 'Mammalian Phenotype/Genotype'";
+        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
+        " 'Mammalian Phenotype/Genotype'";
 
         doVocabTerm(MP_TERM_KEY);
                 
         log.info("Collecting Interpro Terms");
         
-        String INTERPRO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
-        " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
-        " where tv.isObsolete != 1 and tv._Vocab_key = 8"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType = 'InterPro/Marker'";
+        String INTERPRO_TERM_KEY = "select tv._Term_key, tv.term,"
+                + " tv.vocabName"
+                + " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+                + " where tv.isObsolete != 1 and tv._Vocab_key = 8"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'InterPro/Marker'";
                 
         doVocabTerm(INTERPRO_TERM_KEY);
         
@@ -102,7 +106,8 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         String PIRSF_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
         " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
         " where tv.isObsolete != 1 and tv._Vocab_key = 46"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType = 'PIRSF/Marker'";
+        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
+        " 'PIRSF/Marker'";
                 
         doVocabTerm(PIRSF_TERM_KEY);
                 
@@ -111,16 +116,19 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         String OMIM_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
         " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"+
         " where tv.isObsolete != 1 and tv._Vocab_key = 44"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType = 'OMIM/Genotype'";
+        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
+        " 'OMIM/Genotype'";
                 
         doVocabTerm(OMIM_TERM_KEY);
                 
         log.info("Collecting OMIM/Human Terms");
         
-        String OMIM_HUMAN_TERM_KEY = "select tv._Term_key, tv.term, '"+IndexConstants.OMIM_ORTH_TYPE_NAME+"' as vocabName"+
+        String OMIM_HUMAN_TERM_KEY = "select tv._Term_key, tv.term," +
+        		" '"+IndexConstants.OMIM_ORTH_TYPE_NAME+"' as vocabName"+
                 " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"+
                 " where tv.isObsolete != 1 and tv._Vocab_key = 44"+
-                " and tv._Term_key = vacc._Term_key and vacc.annotType = 'OMIM/Human Marker'";
+                " and tv._Term_key = vacc._Term_key and vacc.annotType" +
+                " = 'OMIM/Human Marker'";
                         
         doVocabTerm(OMIM_HUMAN_TERM_KEY);
         
@@ -141,41 +149,50 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
 
         log.info("Collecting GO Synonyms");
 
-        String GO_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName, s._Synonym_key"
-            + " from VOC_Term_View tv, MGI_Synonym s, Voc_Annot_count_cache vacc"
-            + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-            + " and tv._Vocab_key = 4 and s._MGIType_key = 13 "
-            + "and tv._Term_key = vacc._Term_key and vacc.annotType = 'GO/Marker'";
+        String GO_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
+                + " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key = 4 and s._MGIType_key = 13 "
+                + "and tv._Term_key = vacc._Term_key and vacc.annotType"
+                + " = 'GO/Marker'";
         
         doVocabSynonym(GO_SYN_KEY);
         
         log.info("Collecting MP Synonyms");
         
-        String MP_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName, s._Synonym_key"
-            + " from VOC_Term_View tv, MGI_Synonym s, Voc_Annot_count_cache vacc"
-            + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-            + " and tv._Vocab_key = 5 and s._MGIType_key = 13 "
-            + "and tv._Term_key = vacc._Term_key and vacc.annotType = 'Mammalian Phenotype/Genotype'";
+        String MP_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
+                + " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key = 5 and s._MGIType_key = 13 "
+                + "and tv._Term_key = vacc._Term_key and vacc.annotType"
+                + " = 'Mammalian Phenotype/Genotype'";
         
         doVocabSynonym(MP_SYN_KEY);
         
         log.info("Collecitng OMIM Synonyms");
         
-        String OMIM_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName, s._Synonym_key"
-            + " from VOC_Term_View tv, MGI_Synonym s, Voc_Annot_count_cache vacc"
-            + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-            + " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
-            + "and tv._Term_key = vacc._Term_key and vacc.annotType = 'OMIM/Genotype'";
+        String OMIM_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
+                + " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+                + "and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'OMIM/Genotype'";
         
         doVocabSynonym(OMIM_SYN_KEY);
         
         log.info("Collecting OMIM/Human Synonyms");
         
-        String OMIM_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"+IndexConstants.OMIM_ORTH_TYPE_NAME+"' as vocabName, s._Synonym_key"
-            + " from VOC_Term_View tv, MGI_Synonym s, Voc_Annot_count_cache vacc"
-            + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-            + " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
-            + "and tv._Term_key = vacc._Term_key and vacc.annotType = 'OMIM/Human Marker'";
+        String OMIM_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"
+                + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName,"
+                + " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+                + "and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'OMIM/Human Marker'";
         
         doVocabSynonym(OMIM_HUMAN_SYN_KEY);
         
@@ -198,22 +215,25 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         log.info("Collecting GO Notes/Definitions");
 
         String GO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
-            + " from VOC_Term_View tv, VOC_text t, Voc_Annot_count_cache vacc"
-            + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-            + " and tv._Vocab_key = 4"
-            + " and tv._Term_key = vacc._Term_key and vacc.annotType = 'GO/Marker'"
-            + " order by tv._Term_key, t.sequenceNum";
+                + " from VOC_Term_View tv, VOC_text t,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
+                + " and tv._Vocab_key = 4"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'GO/Marker' order by tv._Term_key, t.sequenceNum";
 
         doVocabNote(GO_NOTE_KEY);
     
         log.info("Collecting MP Notes/Definitions");
         
         String MP_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
-        + " from VOC_Term_View tv, VOC_text t, Voc_Annot_count_cache vacc"
-        + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-        + " and tv._Vocab_key = 5"
-        + " and tv._Term_key = vacc._Term_key and vacc.annotType = 'Mammalian Phenotype/Genotype'"
-        + " order by tv._Term_key, t.sequenceNum";
+                + " from VOC_Term_View tv, VOC_text t,"
+                + " Voc_Annot_count_cache vacc"
+                + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
+                + " and tv._Vocab_key = 5"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'Mammalian Phenotype/Genotype'"
+                + " order by tv._Term_key, t.sequenceNum";
 
         doVocabNote (MP_NOTE_KEY);
 
@@ -259,11 +279,13 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
             new_vocab.setRaw_data("TS" + rs_ad_term.getString("_Stage_key")
                     + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            new_vocab.setUnique_key(rs_ad_term.getString("_Structure_key")+rs_ad_term.getString("vocabName"));
+            new_vocab.setUnique_key(rs_ad_term.getString("_Structure_key")
+                    + rs_ad_term.getString("vocabName"));
             new_vocab.setDb_key(rs_ad_term.getString("_Structure_key"));
             new_vocab.setVocabulary(rs_ad_term.getString("vocabName"));
             new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab.setDisplay_type(hm.get(rs_ad_term.getString("vocabName")));
+            new_vocab
+                    .setDisplay_type(hm.get(rs_ad_term.getString("vocabName")));
             sis.push(new_vocab.getDocument());
             // Untransformed version, w/ space
             new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
@@ -328,7 +350,9 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
             new_vocab.setDb_key(rs_ad_syn.getString("_Structure_key"));
             new_vocab.setVocabulary(rs_ad_syn.getString("vocabName"));
             new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setUnique_key(rs_ad_syn.getString("_Structure_key")+rs_ad_syn.getString("Structure")+rs_ad_syn.getString("vocabName"));
+            new_vocab.setUnique_key(rs_ad_syn.getString("_Structure_key")
+                    + rs_ad_syn.getString("Structure")
+                    + rs_ad_syn.getString("vocabName"));
             new_vocab.setDisplay_type(hm.get(rs_ad_syn.getString("vocabName")));
             sis.push(new_vocab.getDocument());
             new_vocab.clear();
@@ -349,7 +373,8 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
     
-    private void doVocabTerm(String sql) throws SQLException, InterruptedException {
+    private void doVocabTerm(String sql)
+        throws SQLException, InterruptedException {
     
     
         writeStart = new Date();
@@ -365,14 +390,16 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         // Parse it
     
         while (!rs_non_ad_term.isAfterLast()) {
-    
+
             new_vocab.setVocabulary(rs_non_ad_term.getString("vocabName"));
             new_vocab.setData(rs_non_ad_term.getString("term"));
             new_vocab.setRaw_data(rs_non_ad_term.getString("term"));
             new_vocab.setDb_key(rs_non_ad_term.getString("_Term_key"));
             new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab.setUnique_key(rs_non_ad_term.getString("_Term_key")+rs_non_ad_term.getString("vocabName"));
-            new_vocab.setDisplay_type(hm.get(rs_non_ad_term.getString("vocabName")));
+            new_vocab.setUnique_key(rs_non_ad_term.getString("_Term_key")
+                    + rs_non_ad_term.getString("vocabName"));
+            new_vocab.setDisplay_type(hm.get(rs_non_ad_term
+                    .getString("vocabName")));
             sis.push(new_vocab.getDocument());
             new_vocab.clear();
             rs_non_ad_term.next();
@@ -391,7 +418,8 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
     
-    private void doVocabSynonym(String sql) throws SQLException, InterruptedException {
+    private void doVocabSynonym(String sql)
+        throws SQLException, InterruptedException {
     
         // Gather the Data
     
@@ -413,8 +441,11 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
             new_vocab.setDb_key(rs_non_ad_syn.getString("_Term_key"));
             new_vocab.setVocabulary(rs_non_ad_syn.getString("vocabName"));
             new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setUnique_key(rs_non_ad_syn.getString("_Synonym_key")+IndexConstants.VOCAB_SYNONYM+rs_non_ad_syn.getString("vocabName"));
-            new_vocab.setDisplay_type(hm.get(rs_non_ad_syn.getString("vocabName")));
+            new_vocab.setUnique_key(rs_non_ad_syn.getString("_Synonym_key")
+                    + IndexConstants.VOCAB_SYNONYM
+                    + rs_non_ad_syn.getString("vocabName"));
+            new_vocab.setDisplay_type(hm.get(rs_non_ad_syn
+                    .getString("vocabName")));
             sis.push(new_vocab.getDocument());
             new_vocab.clear();
             rs_non_ad_syn.next();
@@ -434,7 +465,8 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
     
-    private void doVocabNote(String sql) throws SQLException, InterruptedException {
+    private void doVocabNote(String sql)
+        throws SQLException, InterruptedException {
     
         // Gather the data.
     
@@ -463,8 +495,11 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
                 new_vocab.setDb_key(rs_non_ad_note.getString("_Term_key"));
                 new_vocab.setVocabulary(rs_non_ad_note.getString("vocabName"));
                 new_vocab.setDataType(IndexConstants.VOCAB_NOTE);
-                new_vocab.setUnique_key(rs_non_ad_note.getString("_Term_key")+IndexConstants.VOCAB_NOTE+rs_non_ad_note.getString("vocabName"));
-                new_vocab.setDisplay_type(hm.get(rs_non_ad_note.getString("vocabName")));
+                new_vocab.setUnique_key(rs_non_ad_note.getString("_Term_key")
+                        + IndexConstants.VOCAB_NOTE
+                        + rs_non_ad_note.getString("vocabName"));
+                new_vocab.setDisplay_type(hm.get(rs_non_ad_note
+                        .getString("vocabName")));
                 place = rs_non_ad_note.getInt("_Term_key");
             }
             new_vocab.appendData(rs_non_ad_note.getString("note"));

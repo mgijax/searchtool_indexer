@@ -22,17 +22,24 @@ import org.jax.mgi.shr.searchtool.StemmedMGIAnalyzer;
  * They are set as follows: ThreadProto zzzzzz name
  * 
  * <br>
- * zzzzz = Directory to put index to. Default is
- * /home/mhall/Search/index/index2_jdbc <br>
- * name = What do you want to index? Current choices are g (genes) ge (gene
- * exact) gd (gene display), ga (gene accession ID's), gs (gene symbols) v
- * (vocab), vd (vocab display), ve (vocab exact) o (other) and od (other
- * display)
+ * zzzzz = Directory to put index to.
+ * name = What do you want to index? Current choices are:  
+ * g (genes) 
+ * ge (gene exact) 
+ * gd (gene display) 
+ * ga (gene accession ID's)
+ * gs (gene symbols)
+ * gve (gene related vocab exact information)
+ * gva (gene related vocab accession id's)
+ * gvd (Gene related vocab dag information)
+ * v (vocab) 
+ * vd (vocab display)
+ * ve (vocab exact)
+ * va (vocab accession id's)
+ * o (other)
+ * od (other display)
+ * t (non id tokens)
  * 
- * <br>
- * <br>
- * You can accept the defaults for any value by simply passing the word null as
- * the argument.
  * 
  * @author mhall
  * 
@@ -194,8 +201,8 @@ public class MakeIndex {
                         true);
             } else {
 
-                // If we aren't in a special analyzer case, use the standard one
-                // instead.
+                // If we aren't in a special analyzer case, use the standard 
+                // one instead.
 
                 writer = new IndexWriter(INDEX_DIR, new StandardAnalyzer(),
                         true);
@@ -229,9 +236,10 @@ public class MakeIndex {
     private static Logger log = Logger.getLogger(MakeIndex.class.getName());
 
     /* 
-     * This sections defines variables that will be used by the Lucene index to control
-     * its indexing behavior.  For more information please see the Lucene javadocs.
-     * These are configured for our use via the configuration object in the setup method.
+     * This sections defines variables that will be used by the Lucene index 
+     * to control its indexing behavior.  For more information please see the 
+     * Lucene javadocs.  These are configured for our use via the 
+     * configuration object in the setup method.
      */
 
     private static int MERGE_FACTOR;

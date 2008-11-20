@@ -10,6 +10,33 @@ import org.jax.mgi.index.luceneDocBuilder.VocabExactLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
+/**
+ * The vocab exact gatherer is responsible for gathering large token relevant 
+ * search information for our vocabulary searches.
+ * 
+ * @author mhall
+ *
+ * @has A single reference to a VocabDisplayLucene Doc Builder, which is used
+ *      to create Lucene documents to place onto the stack.
+ *      
+ *      A hash map used to convert database codes to human readable display 
+ *      values.
+ * 
+ * @does Upon being started this runs through a group of methods, each of 
+ * which are responsible for gathering documents from a different accession id
+ * type.
+ * 
+ * Each subprocess basically operates as follows:
+ * 
+ * Gather the data for the specific sub type, parse it while creating Lucene 
+ * documents and adding them to the stack.  
+ * 
+ * After it completes parsing, it cleans up its result sets, and exits.
+ * 
+ * After all of these methods complete, we set gathering complete to true in 
+ * the shared document stack and exit.
+ */
+
 public class VocabExactGatherer extends AbstractGatherer {
 
     // Class Variables
@@ -17,9 +44,10 @@ public class VocabExactGatherer extends AbstractGatherer {
     private Date                       writeStart;
     private Date                       writeEnd;
 
-    private VocabExactLuceneDocBuilder new_vocab = new VocabExactLuceneDocBuilder();
+    private VocabExactLuceneDocBuilder new_vocab =
+        new VocabExactLuceneDocBuilder();
 
-    private HashMap<String, String>    hm        = new HashMap<String, String>();
+    private HashMap<String, String> hm = new HashMap<String, String>();
 
     private Logger log = Logger.getLogger(VocabExactGatherer.class.getName());
     

@@ -15,7 +15,7 @@ import org.jax.mgi.shr.config.IndexCfg;
  * @has An internal HashMap which stores the provider relationships Two SQL
  * Statements that gather the information needed to populate this object.
  * 
- * @does A singleton, than upon instantiation will populate itself with the
+ * @does A singleton, that upon instantiation will populate itself with the
  * display text for the various logical providers, with special handling for
  * certian providers.
  * 
@@ -23,23 +23,23 @@ import org.jax.mgi.shr.config.IndexCfg;
 
 public class ProviderHashMapGatherer extends AbstractGatherer {
 
-    public HashMap<String, String> providerHash           = new HashMap<String, String>();
+    public HashMap<String, String> providerHash = 
+        new HashMap<String, String>();
 
-    private String                 PROVIDER_SQL           = "select _LogicalDB_key, name"
-                                                                  + " from ACC_LogicalDB";
+    private String PROVIDER_SQL = "select _LogicalDB_key, name"
+            + " from ACC_LogicalDB";
 
-    private String                 EXCEPTION_PROVIDER_SQL = "select distinct _LogicalDB_key, name"
-                                                                  + " from ACC_ActualDB"
-                                                                  + " where active = 1 "
-                                                                  + " group by _LogicalDB_key"
-                                                                  + " having count(*) > 1"
-                                                                  + " order by _LogicalDB_key, name desc";
+    private String EXCEPTION_PROVIDER_SQL = "select distinct _LogicalDB_key,"
+            + " name" + " from ACC_ActualDB" + " where active = 1"
+            + " group by _LogicalDB_key" + " having count(*) > 1"
+            + " order by _LogicalDB_key, name desc";
 
-    private static Logger log = Logger.getLogger(ProviderHashMapGatherer.class.getName());
+    private static Logger log = 
+        Logger.getLogger(ProviderHashMapGatherer.class.getName());
     
     /**
-     * Constructor, this calls the superclasses constructor, and then invokes the init method
-     * which populates this object.
+     * Constructor, this calls the super class constructor, and then invokes
+     * the init method which populates this object.
      * 
      * @param config
      */
@@ -53,17 +53,20 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
      * Populate this object with the providers.
      */
     
+    public void run () {}
+    
     private void init() {
 
-        // This is the standard case, each provider directly coorelates to a logical db key.
+        // This is the standard case, each provider directly coorelates 
+        // to a logical db key.
         
         ResultSet provider_set = execute(PROVIDER_SQL);
         try {
             provider_set.next();
 
             while (!provider_set.isAfterLast()) {
-                providerHash.put(provider_set.getString("_LogicalDB_key"), provider_set
-                        .getString("name"));
+                providerHash.put(provider_set.getString("_LogicalDB_key"), 
+                        provider_set.getString("name"));
                 provider_set.next();
             }
         } catch (Exception e) {
@@ -135,7 +138,6 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
         log.info("Stub for the ProviderHashSet TestHarness");
 
         try {
-            //config = Configuration.load("Configuration", false);
             config = new IndexCfg();
             ProviderHashMapGatherer phmg = new ProviderHashMapGatherer(config);
 

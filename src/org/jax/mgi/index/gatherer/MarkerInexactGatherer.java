@@ -119,19 +119,18 @@ public class MarkerInexactGatherer extends AbstractGatherer {
 
         log.info("Collecting Marker Labels");
         
-        String GEN_MARKER_LABEL = "select ml._Marker_key, ml.label, "
+        String MARKER_LABEL_KEY = "select ml._Marker_key, ml.label, "
                 + "ml.labelType, ml._OrthologOrganism_key, "
                 + "ml._Label_Status_key, ml.labelTypeName, ml._Label_key" 
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2 ";
-                //+ "and _Label_Status_key = 1";
 
         // Gather the data
 
         writeStart = new Date();
 
-        ResultSet rs = execute(GEN_MARKER_LABEL);
+        ResultSet rs = execute(MARKER_LABEL_KEY);
         rs.next();
 
         writeEnd = new Date();
@@ -222,6 +221,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                     markerInexact.setDataType(markerInexact.getDataType()+"O");
                 }
                 
+                // Manually remove the word current from two special cases.
                 
                 if (displayType.equals("Current Symbol")) {
                     displayType = "Symbol";
@@ -229,8 +229,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                 if (displayType.equals("Current Name")) {
                     displayType = "Name";
                 }
-                markerInexact
-                .setDisplay_type(displayType);
+                markerInexact.setDisplay_type(displayType);
 
                 }
 
@@ -247,7 +246,10 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather Vocab terms, non AD.
+     * Gather Vocab terms, non AD.  This method goes each vocabulary one at a 
+     * time, passing them onto another method for processing.  This allows the
+     * sql that we use for each vocabulary type to move independently.
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -322,7 +324,9 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     }
 
     /**
-     * Gather the vocab synonyms, non AD.
+     * Gather the vocab synonyms, non AD.  Each vocabulary type is done
+     * separately.  This allows the SQL used in gathering them to move 
+     * independently.
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -384,6 +388,8 @@ public class MarkerInexactGatherer extends AbstractGatherer {
 
     /**
      * Gather the vocab notes/definitions, non AD.
+     * Once again these are done in sequence, which allows the SQL for each 
+     * subtype to move independently.
      * @throws SQLException
      * @throws InterruptedException
      */

@@ -12,10 +12,11 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into a
+ *  lucene document.
  * 
- * Note: this document outputs a field raw_data, that simply doesn't lowercase the
- * text from the data field.
+ * Note: this document outputs a field raw_data, that simply doesn't lower case
+ * the text from the data field.
  * 
  */
 public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
@@ -29,7 +30,8 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
     private String display_type = "";
     private Boolean hasError    = false;
     
-    private Logger log = Logger.getLogger(MarkerAccIDLuceneDocBuilder.class.getName());
+    private Logger log = 
+        Logger.getLogger(MarkerAccIDLuceneDocBuilder.class.getName());
 
     /**
      * Resets this object back to its default state. This allows the object to
@@ -46,9 +48,10 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Returns a lucene document.
+     * Returns a Lucene document.
      * 
-     * @return A lucene document representing the data contained in this object.
+     * @return A Lucene document representing the data contained in this 
+     * object.
      */
 
     public Document getDocument() {
@@ -58,12 +61,20 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
         }
         
         Document doc = new Document();
-        doc.add(new Field(IndexConstants.COL_DATA, this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getDataType(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_PROVIDER, this.getProvider(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.getDisplay_type(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DATA, 
+                this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "")
+                .replaceAll("\\s$", "").toLowerCase(), 
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getDataType(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_PROVIDER, this.getProvider(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this
+                .getDisplay_type(), Field.Store.YES, Field.Index.NO));
         return doc;
     }
 
@@ -72,19 +83,23 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
      */
 
     public String toString() {
-        return "Id: " + this.getDb_key() + " Data: " + this.getData() + " Data Type: " + this.getDataType()
-             + " Provider: " + this.getProvider() + " Display Type: " + this.getDisplay_type();
+        return "Id: " + this.getDb_key() + " Data: " + this.getData()
+                + " Data Type: " + this.getDataType() + " Provider: "
+                + this.getProvider() + " Display Type: "
+                + this.getDisplay_type();
     }
 
     /**
-     * This main program is a stub for a test harness that can be built to specifically test this object.
+     * This main program is a stub for a test harness that can be built to 
+     * specifically test this object.
      * 
      * @param args Standard argument.
      */
     public static void main(String[] args) {
         // Set up the logger.
         
-        Logger log = Logger.getLogger(MarkerAccIDLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(MarkerAccIDLuceneDocBuilder.class.getName());
         
         log.info("MarkerExactLuceneDocBuilder Test Harness");
 
@@ -173,7 +188,7 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
     /**
      * Returns the data type.
      * 
-     * @return String represention of the data_type field.
+     * @return String representation of the data_type field.
      */
 
     public String getDataType() {
@@ -220,8 +235,9 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Returns the Display Type field.  Valid display types are maintained in the IndexConstants class
-     * in QuickSearchCommons
+     * Returns the Display Type field.  Valid display types are maintained in 
+     * the IndexConstants class in QuickSearchCommons.
+     * 
      * @return String representing the DisplayType
      */
 

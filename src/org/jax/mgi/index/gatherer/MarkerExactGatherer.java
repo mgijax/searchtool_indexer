@@ -11,13 +11,13 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * This class is responsible for gathering up any information that we might 
- * need for the markerExact index. This currently includes nomenclature 
- * and various accession ID's that have been directly related to markers.
+ * need for the markerExact index. This currently consists of non symbol
+ * nomenclature.
  * 
  * @author mhall
  * 
- * @has A hashmap used to translate from shortened codes ("AN") to English 
- * words ("Allele Name")
+ * @has A MarkerExactLuceneDocBuilder, used to generate Lucene documents for
+ * this dataset.
  * 
  * A single instance of the MarkerExactLuceneDocBuilder which is used 
  * throughout to create its needed Lucene documents
@@ -44,8 +44,7 @@ public class MarkerExactGatherer extends AbstractGatherer {
     private Logger log = Logger.getLogger(MarkerExactGatherer.class.getName());
 
     /**
-     * Create a new instance of the MarkerExactGatherer, and populate its
-     * translation hashmaps.
+     * Create a new instance of the MarkerExactGatherer.
      * 
      * @param config
      */
@@ -138,6 +137,8 @@ public class MarkerExactGatherer extends AbstractGatherer {
                     + IndexConstants.MARKER_TYPE_NAME);
             displayType = initCap(rs_label.getString("labelTypeName"));
             
+            // A manual adjustment of the display type for a special case.
+            
             if (displayType.equals("Current Name")) {
                 displayType = "Name";
             }
@@ -157,7 +158,7 @@ public class MarkerExactGatherer extends AbstractGatherer {
     }
 
     /**
-         * Gather the marker labels.
+         * Gather the Allele Synonyms, since they are in a different table.
          * @throws SQLException
          * @throws InterruptedException
          */
@@ -192,6 +193,9 @@ public class MarkerExactGatherer extends AbstractGatherer {
                 markerExact.setData(rs.getString("label"));
                 markerExact.setDb_key(rs.getString("_Marker_key")); 
                 markerExact.setDataType(rs.getString("labelType"));
+                
+                // Since this is the Allele Synonym Section, set its type.
+                
                 markerExact.setDisplay_type("Allele Synonym");
                 markerExact.setUnique_key(rs.getString("_Marker_key")
                         +rs.getString("label") 

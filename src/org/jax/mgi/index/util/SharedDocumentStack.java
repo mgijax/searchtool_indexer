@@ -7,27 +7,27 @@ import org.apache.lucene.document.Document;
 /**
  * This stack is the repository for all the Lucene documents that are being
  * created during indexing. This is a stateful object, and has a method that
- * both allows the consumers to interrogate the state, as well as the gatherers
- * to set the state when they have completed their tasks.
+ * both allows the consumers to interrogate the state, as well as the 
+ * gatherers to set the state when they have completed their tasks.
  * 
  * The pop, isEmpty() and size methods are all synchronized, so using this
  * object should be thread safe.
  * 
  * @author mhall
  * @has A stack object, and a Boolean to keep track of state.
- * @does Encapsulates the interaction for a shared stack object, enforcing synchronization, 
- * and keeps track of the state of the processing overall.
+ * @does Encapsulates the interaction for a shared stack object, enforcing 
+ * synchronization, and keeps track of the state of the processing overall.
  * 
  */
 
 public class SharedDocumentStack {
 
-    private static SharedDocumentStack theInstance       = new SharedDocumentStack();
-    private static Stack<Document>     stack             = new Stack<Document>();
+    private static SharedDocumentStack theInstance = new SharedDocumentStack();
+    private static Stack<Document>     stack = new Stack<Document>();
     private Boolean                    gatheringComplete = false;
 
-    // Hidden constructor, access to this object is through the singleton getter
-    // method.
+    // Hidden constructor, access to this object is through the singleton 
+    // getter method.
 
     private SharedDocumentStack() {
     };

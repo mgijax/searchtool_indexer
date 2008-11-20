@@ -13,8 +13,8 @@ import org.jax.mgi.shr.config.IndexCfg;
  * @author mhall
  * @is Thread
  * @has Configurable array of Indexers
- * @does Controls the creation of the indexers, and then optimizes the resulting
- * Lucene index.
+ * @does Controls the creation of the indexers, and then optimizes the  
+ * resulting Lucene index.
  * 
  */
 
@@ -35,7 +35,8 @@ public class IndexController implements Runnable {
         writer = iw;
         try {
             IndexCfg config = new IndexCfg();
-            NUMBER_OF_THREADS = new Integer(config.get("NUMBER_OF_THREADS")).intValue();
+            NUMBER_OF_THREADS = 
+                new Integer(config.get("NUMBER_OF_THREADS")).intValue();
         }
         catch (Exception e) {
             log.error(e);

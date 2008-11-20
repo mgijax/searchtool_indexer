@@ -13,16 +13,16 @@ import org.jax.mgi.shr.config.IndexCfg;
  * that we use in the indexing software.
  * 
  * It provides the constructor that they all use, as well as an initCap method,
- *  a method to execute sql, cleanup method that gracefully closes down all of
- *  the jdbc connections, and a run method that must be overrun by any 
- *  implementing class.
+ * a method to execute sql, a cleanup method that gracefully closes down all 
+ * of the jdbc connections, and a run method that must be overridden by any 
+ * implementing class.
  * 
  * @author mhall
  *
- * @has A single instance of the SharedDocumentStack, which is used to hold the 
- * Lucene documents that it produces.
+ * @has A single instance of the SharedDocumentStack, which is used to hold the
+ *       Lucene documents that implementing objects produce.
  *      A JDBC Connection
- *      A MGI Configuration Object, used to configure this object and any of 
+ *      A IndexCfg Object, used to configure this object and any of 
  *       its children.
  *      
  * @does Defines the list of common services provided to any gatherer, as well
@@ -30,7 +30,7 @@ import org.jax.mgi.shr.config.IndexCfg;
  *
  */
 
-public class AbstractGatherer implements Runnable {
+public abstract class AbstractGatherer implements Runnable {
 
     protected SharedDocumentStack sis;
     protected Connection          con;
@@ -46,13 +46,16 @@ public class AbstractGatherer implements Runnable {
      * @param config
      */
 
-    public AbstractGatherer(IndexCfg config) {
+    protected AbstractGatherer(IndexCfg config) {
         try {
             Class.forName(DB_DRIVER);
             String USER = config.get("MGI_PUBLICUSER");
             String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("MGD_JDBC_URL: " + config.get("MGD_JDBC_URL"));
+            
+            // Setup the standard jdbc connection.  Every gatherer needs this.
+            
             con = DriverManager.getConnection(
                     config.get("MGD_JDBC_URL"), USER, PASSWORD);
         } catch (Exception e) {
@@ -72,7 +75,7 @@ public class AbstractGatherer implements Runnable {
      * @return String that has been InitCapped
      */
 
-    public String initCap(String in) {
+    protected String initCap(String in) {
         if (in == null || in.length() == 0)
             return in;
         
@@ -97,7 +100,7 @@ public class AbstractGatherer implements Runnable {
      * @return ResultSet
      */
 
-    public ResultSet execute(String query) {
+    protected ResultSet execute(String query) {
         ResultSet set;
 
         try {
@@ -116,7 +119,7 @@ public class AbstractGatherer implements Runnable {
      * being used by the gatherer.
      */
 
-    public void cleanup() {
+    protected void cleanup() {
         try {
             con.close();
         } catch (Exception e) {
@@ -129,10 +132,11 @@ public class AbstractGatherer implements Runnable {
      * where the indexing algorithm is implemented.
      */
 
-    public void run() {
+    public abstract void run();
 
-    }
-
+    // The Sybase JDBC Driver, if we were to switch to a different database
+    // this would have to be updated.
+    
     protected String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver"; 
     
 }
