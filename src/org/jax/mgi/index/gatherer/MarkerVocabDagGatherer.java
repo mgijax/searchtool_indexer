@@ -175,9 +175,12 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 + " and vacc.annotType = 'OMIM/Genotype' and vacc._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
 
-        String OMIM_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
-                + " _Marker_key " + "from VOC_Marker_Cache"
-                + " where annotType = 'OMIM/Genotype'" + " order by _Term_key";
+        String OMIM_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
+                + " vmc._Marker_key "
+                + "from VOC_Marker_Cache vmc, mrk_label ml"
+                + " where annotType = 'OMIM/Genotype' and vmc._Marker_key = "
+                + " ml._Marker_key and ml.label not like 'tg%cre%' and "
+                + "ml.labelType = 'MS'" + " order by _Term_key";
         
         doNonADVocab(OMIM_VOC_KEY, OMIM_MARKER_DISPLAY_KEY);
         
@@ -191,10 +194,13 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 + " and vacc._Term_key =" + " tv._Term_key"
                 + " order by _Term_key";
 
-        String OMIM_HUMAN_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
-                + " _Marker_key " + "from VOC_Marker_Cache"
-                + " where annotType = 'OMIM/Human Marker'"
-                + " order by _Term_key";
+        String OMIM_HUMAN_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
+                + "vmc._Marker_key "
+                + "from VOC_Marker_Cache vmc, mrk_label ml"
+                + " where annotType = 'OMIM/Human Marker' "
+                + "and vmc._Marker_key ="
+                + " ml._Marker_key and ml.label not like 'tg%cre%' and "
+                + "ml.labelType = 'MS'" + " order by _Term_key";
         
         doNonADVocab(OMIM_HUMAN_VOC_KEY, OMIM_HUMAN_MARKER_DISPLAY_KEY);
         
