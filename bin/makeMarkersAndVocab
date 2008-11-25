@@ -30,3 +30,16 @@ java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.ind
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabDag/index/ gvd
 
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabAccID/index/ gva
+
+###########################
+# Make the Vocab Indexes
+###########################
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabInexact/index/ v
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabDisplay/index/ vd
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabExact/index/ ve
+
+java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabAccID/index/ va
+

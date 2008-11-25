@@ -11,13 +11,9 @@ then
 fi
 . ${INDEX_CONFIG}
 
-# Create the Marker Related Indexes
+# Create the Marker and Vocab Related Indexes
 
-makeMarkers
-
-# Create the vocab related Indexes
-
-makeVocab
+makeMarkersAndVocab
 
 # Create the Other Indexes
 
