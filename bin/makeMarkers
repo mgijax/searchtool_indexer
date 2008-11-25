@@ -1,8 +1,8 @@
 #!/bin/sh
 
-cd ..
+cd `dirname $0`
 
-INDEX_CONFIG=`pwd`/searchtool_indexer.config
+INDEX_CONFIG=../searchtool_indexer.config
 
 if [ ! -r ${INDEX_CONFIG} ]
 then
@@ -30,5 +30,3 @@ java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.ind
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabDag/index/ gvd
 
 java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabAccID/index/ gva
-
-cd bin
