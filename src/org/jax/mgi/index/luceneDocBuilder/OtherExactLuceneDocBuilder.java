@@ -72,7 +72,8 @@ public class OtherExactLuceneDocBuilder implements LuceneDocBuilder {
         Document doc = new Document();
         doc.add(new Field(IndexConstants.COL_DATA, 
                 this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "")
-                .replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+                .replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, 
+                Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(),
                 Field.Store.YES, Field.Index.NO));
         doc.add(new Field(IndexConstants.COL_ACC_KEY, this.getAccessionKey(),

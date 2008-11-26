@@ -301,7 +301,8 @@ public class VocabInexactGatherer extends AbstractGatherer {
             
             sis.push(vildb.getDocument());
             // Transformed version, w/o TS
-            vildb.setData(rs_ad_term.getString("printName").replaceAll(";", " "));
+            vildb.setData(rs_ad_term.getString("printName")
+                    .replaceAll(";", " "));
             
             // Place the document on the stack
             

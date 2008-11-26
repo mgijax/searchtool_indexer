@@ -92,7 +92,8 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Returns a string representation of the data contained within this object.
+     * Returns a string representation of the data contained within this 
+     * object.
      */
 
     public String toString() {
@@ -110,7 +111,8 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
        // Set up the logger.
         
-        Logger log = Logger.getLogger(MarkerVocabDagLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(MarkerVocabDagLuceneDocBuilder.class.getName());
         
         log.info("MarkerVocabDagLuceneDocBuilder Test Harness");
 
@@ -269,8 +271,8 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
 
     /**
      * Set the vocabulary. There is special handling in here for when the data
-     * passed is "Mammalian Phenotype" when we encounter that case we convert it
-     * into "MP"
+     * passed is "Mammalian Phenotype" when we encounter that case we convert 
+     * it into "MP"
      * 
      * @param type
      */

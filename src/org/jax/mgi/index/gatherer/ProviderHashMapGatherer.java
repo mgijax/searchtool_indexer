@@ -23,7 +23,8 @@ import org.jax.mgi.shr.config.IndexCfg;
 
 public class ProviderHashMapGatherer extends AbstractGatherer {
 
-    public HashMap<String, String> providerHash = new HashMap<String, String>();
+    public HashMap<String, String> providerHash = 
+        new HashMap<String, String>();
 
     private String PROVIDER_SQL = "select _LogicalDB_key, name"
             + " from ACC_LogicalDB";

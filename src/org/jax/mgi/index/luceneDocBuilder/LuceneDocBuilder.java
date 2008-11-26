@@ -7,7 +7,6 @@ import org.apache.lucene.document.Document;
  * 
  * @author mhall
  *
- * @is An Interface
  * @has nothing
  * @does defines a template for all LuceneDocBuilders to implement.
  */

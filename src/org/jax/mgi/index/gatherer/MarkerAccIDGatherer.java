@@ -93,7 +93,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
 
-    private void doMarkerAccession() throws SQLException, InterruptedException {
+    private void doMarkerAccession() 
+        throws SQLException, InterruptedException {
 
         // SQL for this Subsection
 
@@ -165,7 +166,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
      * @throws InterruptedException
      */
 
-    private void doAlleleAccession() throws SQLException, InterruptedException {
+    private void doAlleleAccession() 
+        throws SQLException, InterruptedException {
 
         log.info("Gathering Accession ID's for Alleles");
         
@@ -390,7 +392,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setDb_key(rs_es_acc_by_marker.getString("_Object_key"));
             maldb.setDataType(IndexConstants.ES_ACCESSION_ID);
             maldb.setDisplay_type("Cell Line ID");
-            provider = phmg.get(rs_es_acc_by_marker.getString("_LogicalDB_key"));
+            provider = 
+                phmg.get(rs_es_acc_by_marker.getString("_LogicalDB_key"));
             
             // Again, if we have a blank case, blank out the provider. 
             

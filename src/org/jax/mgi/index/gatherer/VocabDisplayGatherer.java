@@ -367,11 +367,13 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 // Grab the marker counts
                 
                 while (!vocab_marker_count_rs_ad.isAfterLast()
-                        && vocab_marker_count_rs_ad.getInt("_Term_key") < place) {
+                        && vocab_marker_count_rs_ad.getInt("_Term_key") 
+                        < place) {
                     vocab_marker_count_rs_ad.next();
                 }
                 if (!vocab_marker_count_rs_ad.isAfterLast()
-                        && vocab_marker_count_rs_ad.getInt("_Term_key") == place) {
+                        && vocab_marker_count_rs_ad.getInt("_Term_key") 
+                        == place) {
                     vdldb.setMarker_count(vocab_marker_count_rs_ad
                             .getString("marker_count"));
                 }

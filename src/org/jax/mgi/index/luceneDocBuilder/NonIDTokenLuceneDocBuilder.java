@@ -108,7 +108,8 @@ public class NonIDTokenLuceneDocBuilder implements LuceneDocBuilder {
 
     /**
      * Appends to the data field. Some of our fields are split up in the
-     * database, so they have to be put back together manually at indexing time.
+     * database, so they have to be put back together manually at indexing 
+     * time.
      * 
      * @param data
      */

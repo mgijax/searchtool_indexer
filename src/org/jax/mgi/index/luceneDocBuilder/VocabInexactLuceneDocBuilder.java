@@ -35,8 +35,8 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
     private Boolean hasError     = false;
 
     /**
-     * Returns the object to its default state. This allows reuse of this object
-     * during the indexing process.
+     * Returns the object to its default state. This allows reuse of this 
+     * object during the indexing process.
      */
     
     public void clear() {
@@ -236,7 +236,8 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
 
     /**
      * Set the vocabulary This function will check for the irregularly long
-     * vocabulary names, and convert them to a shortened format for the indexes.
+     * vocabulary names, and convert them to a shortened format for the 
+     * indexes.
      * 
      * @param type
      */
@@ -296,7 +297,8 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Sets the raw data, this data will not be put through analysis at indexing time.
+     * Sets the raw data, this data will not be put through analysis at 
+     * indexing time.
      * 
      * @param raw_data
      */

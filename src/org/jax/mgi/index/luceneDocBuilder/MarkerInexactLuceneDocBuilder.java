@@ -12,7 +12,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * @author mhall
  * 
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into 
+ * a lucene document.
  * 
  */
 
@@ -28,7 +29,8 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
     private String display_type = "";
     private String unique_key   = "";
     
-    private Logger log = Logger.getLogger(MarkerExactLuceneDocBuilder.class.getName());
+    private Logger log = 
+        Logger.getLogger(MarkerExactLuceneDocBuilder.class.getName());
     
     private Boolean hasError     = false;
 
@@ -66,16 +68,31 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
         
         Document doc = new Document();
 
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DATA, this.getData().replaceAll("\\W", " "), Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getRaw_data(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_SDATA, this.getData().replaceAll("\\W", " "), Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getDataType(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_IS_CURRENT, this.getIsCurrent(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_ORGANISM, this.getOrganism(), Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_OBJ_TYPE, this.getVocabulary(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.getDisplay_type(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.getUnique_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, 
+                this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DATA, 
+                this.getData().replaceAll("\\W", " "), 
+                Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_RAW_DATA, 
+                this.getRaw_data(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_SDATA, 
+                this.getData().replaceAll("\\W", " "), 
+                Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DATA_TYPE, 
+                this.getDataType(), Field.Store.YES, 
+                Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_IS_CURRENT, 
+                this.getIsCurrent(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_ORGANISM, 
+                this.getOrganism(), Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_OBJ_TYPE, 
+                this.getVocabulary(), Field.Store.YES, 
+                Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, 
+                this.getDisplay_type(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, 
+                this.getUnique_key(), Field.Store.YES, 
+                Field.Index.UN_TOKENIZED));
         return doc;
     }
 
@@ -85,10 +102,11 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
 
     public String toString() {
         return "DB Key: " + this.getDb_key() + " Data: " + this.getData()
-             + " Type: " + this.getDataType() + " Current: "
-             + this.getIsCurrent() + " Organism Type: " + this.getOrganism()
-             + " Object/Vocabulary Type: " + this.getVocabulary() + " Raw Data: "
-             + this.getRaw_data() + " Unique Key: " + this.getUnique_key();
+                + " Type: " + this.getDataType() + " Current: "
+                + this.getIsCurrent() + " Organism Type: " + this.getOrganism()
+                + " Object/Vocabulary Type: " + this.getVocabulary()
+                + " Raw Data: " + this.getRaw_data() + " Unique Key: "
+                + this.getUnique_key();
     }
 
     /**
@@ -100,11 +118,13 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
        // Set up the logger.
         
-        Logger log = Logger.getLogger(MarkerInexactLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(MarkerInexactLuceneDocBuilder.class.getName());
         
         log.info("MarkerExactLuceneDocBuilder Test Harness");
 
-        MarkerInexactLuceneDocBuilder meldb = new MarkerInexactLuceneDocBuilder();
+        MarkerInexactLuceneDocBuilder meldb = 
+            new MarkerInexactLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
@@ -140,7 +160,8 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
 
     /**
      * Appends to the data field. Some of our fields are split up in the
-     * database, so they have to be put back together manually at indexing time.
+     * database, so they have to be put back together manually at indexing 
+     * time.
      * 
      * @param data
      */
@@ -324,8 +345,8 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Sets the raw data field, this is used at display time to see an unaltered
-     * form of the item we are matching on.
+     * Sets the raw data field, this is used at display time to see an 
+     * unaltered form of the item we are matching on.
      * 
      * @param raw_data
      * String

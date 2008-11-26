@@ -334,10 +334,6 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
             // For AD specifically we are adding in multiple ways for something
             // to match inexactly.
-
-            // This code is WRONG, its currently presenting inexact tokens 
-            // instead of exact ones, placing the proper code here into comments
-            // for the time being.
             
             // TS#:Printname version.
             

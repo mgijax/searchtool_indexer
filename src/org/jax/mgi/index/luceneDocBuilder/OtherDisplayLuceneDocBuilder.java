@@ -46,8 +46,8 @@ public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
      * the data field, stripping out all unneeded whitespace before sending it
      * off to be indexed.
      * 
-     * @return Lucene document constructed with the information that this object
-     *         encapsulates.
+     * @return Lucene document constructed with the information that this 
+     * object encapsulates.
      */
 
     public Document getDocument() {
@@ -88,11 +88,13 @@ public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
        // Set up the logger.
         
-        Logger log = Logger.getLogger(OtherDisplayLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(OtherDisplayLuceneDocBuilder.class.getName());
         
         log.info("OtherDisplayLuceneDocBuilder Test Harness");
 
-        OtherDisplayLuceneDocBuilder odldb = new OtherDisplayLuceneDocBuilder();
+        OtherDisplayLuceneDocBuilder odldb = 
+            new OtherDisplayLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.

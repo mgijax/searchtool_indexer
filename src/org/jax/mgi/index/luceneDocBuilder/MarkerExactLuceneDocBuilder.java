@@ -14,8 +14,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * @does Knows how to take the data contained inside of it, and turn it into a
  *  lucene document.
  * 
- * Note: this document outputs a field raw_data, that simply doesn't lower case 
- * the text from the data field.
+ * Note: this document outputs a field raw_data, that simply doesn't lower 
+ * case the text from the data field.
  * 
  */
 public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
@@ -28,7 +28,7 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
     private String  display_type = "";
     private String  unique_key   = "";
     
-    private Logger  log          =
+    private Logger log = 
         Logger.getLogger(MarkerExactLuceneDocBuilder.class.getName());
     
     private Boolean hasError     = false;
@@ -50,7 +50,8 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
     /**
      * Returns a lucene document.
      * 
-     * @return A lucene document representing the data contained in this object.
+     * @return A lucene document representing the data contained in this 
+     * object.
      */
 
     public Document getDocument() {
@@ -100,7 +101,8 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * This main program is a stub for a test harness that can be built to specifically test this object.
+     * This main program is a stub for a test harness that can be built to 
+     * specifically test this object.
      * 
      * @param args Standard argument.
      */
@@ -108,7 +110,8 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
         
         // Set up the logger.
         
-        Logger log = Logger.getLogger(MarkerExactLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(MarkerExactLuceneDocBuilder.class.getName());
         
         log.info("MarkerExactLuceneDocBuilder Test Harness");
 
@@ -220,8 +223,9 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Returns the Display Type field.  Valid display types are maintained in the IndexConstants class
-     * in QuickSearchCommons
+     * Returns the Display Type field.  Valid display types are maintained 
+     * in the IndexConstants class in QuickSearchCommons.
+     * 
      * @return String representation of the Display Type
      */
 

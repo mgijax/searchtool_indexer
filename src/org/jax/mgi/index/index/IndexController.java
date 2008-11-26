@@ -46,7 +46,7 @@ public class IndexController implements Runnable {
 
     /**
      * This is what is invoked when this thread is started by the main program.
-     * It used the configuration file to figure out how many threads it should
+     * It uses the configuration file to figure out how many threads it should
      * be creating, and then monitors them as they work. When its complete, it
      * optimizes the index, and then exits.
      */

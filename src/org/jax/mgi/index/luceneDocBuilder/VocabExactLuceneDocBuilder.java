@@ -13,7 +13,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into a
+ *  lucene document.
  * 
  */
 public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {

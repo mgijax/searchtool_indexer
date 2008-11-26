@@ -186,8 +186,8 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
         
         // OMIM Human Orthologs
         
-         String OMIM_HUMAN_VOC_KEY = "SELECT tv._Term_key, tv.term, tv.accID, '"
-                + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName"
+         String OMIM_HUMAN_VOC_KEY = "SELECT tv._Term_key, tv.term, tv.accID,"
+         		+ " '" + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName"
                 + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
                 + " and vacc.annotType = 'OMIM/Human Marker'"

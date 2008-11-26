@@ -119,7 +119,8 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Returns a string representation of the data contained within this object.
+     * Returns a string representation of the data contained within this 
+     * object.
      */
 
     public String toString() {
@@ -379,8 +380,7 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
     }
 
     /**
-     * Get the annotation object (count) This is probably miss named, and should
-     * be refactored into something that makes more sense in the near future.
+     * Get the annotation object (count).
      * 
      * @return String representation of the annotation_objects field.
      */
@@ -546,8 +546,8 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
 
     /**
      * Returns a realized string that will be used at display time. This string
-     * contains the specific information for each vocabulary as to which details
-     * they want displayed in their annotation section.
+     * contains the specific information for each vocabulary as to which 
+     * details they want displayed in their annotation section.
      * 
      * @return Realized String of the Annotation Display
      */
@@ -557,13 +557,15 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
         String annot_display = "";
 
         if (this.vocabulary.equals("OMIM")) {
-            if (!this.annotation_count.equals("0") && !this.secondary_object_count.equals("0")) {
+            if (!this.annotation_count.equals("0") && 
+                    !this.secondary_object_count.equals("0")) {
                 annot_display = this.annotation_count + " mouse model";
                 if (!this.annotation_count.equals("1")) {
                     annot_display += "s";
                 }
 
-                annot_display += ", " + this.secondary_object_count + " mouse ortholog";
+                annot_display += ", " + this.secondary_object_count
+                        + " mouse ortholog";
 
                 if (!this.secondary_object_count.equals("1")) {
                     annot_display += "s";
@@ -575,7 +577,8 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
                     annot_display += "s";
                 }
             } else if (!this.secondary_object_count.equals("0")) {
-                annot_display = this.secondary_object_count + " mouse ortholog";
+                annot_display = this.secondary_object_count 
+                        + " mouse ortholog";
                 if (!this.secondary_object_count.equals("1")) {
                     annot_display += "s";
                 }
@@ -623,7 +626,8 @@ public class VocabDisplayLuceneDocBuilder implements LuceneDocBuilder {
             }
         } else if (this.vocabulary.equals("AD")) {
             if (!this.annotation_count.equals("0")) {
-                annot_display = this.annotation_count + " gene expression result";
+                annot_display = this.annotation_count 
+                        + " gene expression result";
                 if (!this.annotation_count.equals("1")) {
                     annot_display += "s";
                 }

@@ -43,6 +43,23 @@ import org.jax.mgi.shr.searchtool.StemmedMGIAnalyzer;
  * 
  * @author mhall
  * 
+ * @has A IndexCfg Object, which contains all of the configurable information
+ * for this script.
+ * 
+ * A gatherer thread, which implements the AbstractGatherer class, this thread
+ * is what populates the stack for indexing.
+ * 
+ * A Consumer thread, which takes the documents off of the stack, and places
+ * them into the index.
+ * 
+ * @does Upon instantiation it reads in the arguments that have been passed
+ * to it from the command line, and then proceeds onto setting up the specific
+ * indexing task its been asked to perform.  
+ * 
+ * After choosing an index to create, it starts up a gatherer thread and a 
+ * consumer thread, and then waits for indexing to complete.
+ * 
+ * After indexing has completed, it prints out a timing report and exits.
  * 
  */
 
