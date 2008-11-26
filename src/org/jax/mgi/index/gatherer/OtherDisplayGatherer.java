@@ -41,7 +41,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private double                       total              = 0;
+    private double total = 0;
 
     /*
      * Since other gathering is so long, it has extra log messages, these
@@ -57,7 +57,7 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
     // Create the one LuceneDocBuilder that this object will use.
 
-    private OtherDisplayLuceneDocBuilder otherDisplay =
+    private OtherDisplayLuceneDocBuilder odldb =
         new OtherDisplayLuceneDocBuilder();
 
     private Logger log =
@@ -74,15 +74,15 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
     public OtherDisplayGatherer(IndexCfg config) {
         super(config);
-        
+
         try {
             Class.forName(DB_DRIVER);
             String USER = config.get("MGI_PUBLICUSER");
             String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("SNP_JDBC_URL: " + config.get("SNP_JDBC_URL"));
-            conSnp = DriverManager.getConnection(
-                    config.get("SNP_JDBC_URL"), USER, PASSWORD);
+            conSnp = DriverManager.getConnection(config.get("SNP_JDBC_URL"),
+                    USER, PASSWORD);
         } catch (Exception e) {
             log.error(e);
         }
@@ -199,21 +199,23 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs.getString("_Probe_key"));
-            otherDisplay.setDataType(rs.getString("type"));
-            otherDisplay.setQualifier(rs.getString("Term"));
-            otherDisplay.setName(rs.getString("name"));
+            odldb.setDb_key(rs.getString("_Probe_key"));
+            odldb.setDataType(rs.getString("type"));
+            odldb.setQualifier(rs.getString("Term"));
+            odldb.setName(rs.getString("name"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs.next();
         }
 
@@ -252,21 +254,23 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_assay.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_assay.getString("_Assay_key"));
-            otherDisplay.setDataType(rs_assay.getString("type"));
-            otherDisplay.setName(rs_assay.getString("symbol") + ", "
+            odldb.setDb_key(rs_assay.getString("_Assay_key"));
+            odldb.setDataType(rs_assay.getString("type"));
+            odldb.setName(rs_assay.getString("symbol") + ", "
                     + rs_assay.getString("name"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug ("We have now gathered " + total
-                        + " documents!");
+                log.debug ("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_assay.next();
         }
 
@@ -308,20 +312,22 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_ref.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_ref.getString("_Refs_key"));
-            otherDisplay.setDataType(rs_ref.getString("type"));
-            otherDisplay.setName(rs_ref.getString("short_citation"));
+            odldb.setDb_key(rs_ref.getString("_Refs_key"));
+            odldb.setDataType(rs_ref.getString("type"));
+            odldb.setName(rs_ref.getString("short_citation"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_ref.next();
         }
 
@@ -364,23 +370,25 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_seq.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_seq.getString("_Sequence_key"));
-            otherDisplay.setDataType(rs_seq.getString("type"));
-            otherDisplay.setQualifier(rs_seq.getString("sequenceType"));
+            odldb.setDb_key(rs_seq.getString("_Sequence_key"));
+            odldb.setDataType(rs_seq.getString("type"));
+            odldb.setQualifier(rs_seq.getString("sequenceType"));
             if (rs_seq.getString("description") != null) {
-                otherDisplay.setName(rs_seq.getString("description"));
+                odldb.setName(rs_seq.getString("description"));
             }
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place a document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_seq.next();
         }
 
@@ -406,9 +414,9 @@ public class OtherDisplayGatherer extends AbstractGatherer {
                 + IndexConstants.OTHER_ALLELE
                 + "' as type, av.symbol, av.name, ml.label, vt.term"
                 + " from ALL_Allele_View av, VOC_Term vt, MRK_Label ml"
-                + " where av._Allele_Type_key = vt._Term_key and "
-                + "av._Marker_key = ml._Marker_key "
-                + "and ml._Label_Status_key = 1 and ml.labelType = 'MN'";
+                + " where av._Allele_Type_key = vt._Term_key and"
+                + " av._Marker_key = ml._Marker_key"
+                + " and ml._Label_Status_key = 1 and ml.labelType = 'MN'";
 
         // Gather the data.
 
@@ -423,25 +431,30 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_all.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_all.getString("_Allele_key"));
-            otherDisplay.setDataType(rs_all.getString("type"));
-            otherDisplay.setQualifier(rs_all.getString("term"));
+            odldb.setDb_key(rs_all.getString("_Allele_key"));
+            odldb.setDataType(rs_all.getString("type"));
+            odldb.setQualifier(rs_all.getString("term"));
+            
+            // The name for Alleles is a realized field.
+            
             String symbol = new String(rs_all.getString("symbol"));
             String name = new String(rs_all.getString("name"));
             String marker_name = new String(rs_all.getString("label"));
 
-            otherDisplay.setName(symbol + ", " + marker_name + "; " + name);
+            odldb.setName(symbol + ", " + marker_name + "; " + name);
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_all.next();
         }
 
@@ -480,23 +493,28 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_ortho.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_ortho.getString("_Marker_key"));
-            otherDisplay.setDataType(rs_ortho.getString("type"));
+            odldb.setDb_key(rs_ortho.getString("_Marker_key"));
+            odldb.setDataType(rs_ortho.getString("type"));
+            
+            // The name for Orthologs is a realized field.
+            
             String symbol = new String(rs_ortho.getString("symbol"));
             String name = new String(rs_ortho.getString("name"));
 
-            otherDisplay.setName(symbol + ", " + name);
+            odldb.setName(symbol + ", " + name);
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_ortho.next();
         }
 
@@ -533,20 +551,22 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_antibody.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_antibody.getString("_Antibody_key"));
-            otherDisplay.setDataType(rs_antibody.getString("type"));
-            otherDisplay.setName(rs_antibody.getString("antibodyName"));
+            odldb.setDb_key(rs_antibody.getString("_Antibody_key"));
+            odldb.setDataType(rs_antibody.getString("type"));
+            odldb.setName(rs_antibody.getString("antibodyName"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_antibody.next();
         }
 
@@ -583,20 +603,22 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_antigen.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_antigen.getString("_Antigen_key"));
-            otherDisplay.setDataType(rs_antigen.getString("type"));
-            otherDisplay.setName(rs_antigen.getString("antigenName"));
+            odldb.setDb_key(rs_antigen.getString("_Antigen_key"));
+            odldb.setDataType(rs_antigen.getString("type"));
+            odldb.setName(rs_antigen.getString("antigenName"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_antigen.next();
         }
 
@@ -634,21 +656,23 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_experiment.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_experiment.getString("_Expt_key"));
-            otherDisplay.setDataType(rs_experiment.getString("type"));
-            otherDisplay.setQualifier(rs_experiment.getString("exptType"));
-            otherDisplay.setName(rs_experiment.getString("short_citation"));
+            odldb.setDb_key(rs_experiment.getString("_Expt_key"));
+            odldb.setDataType(rs_experiment.getString("type"));
+            odldb.setQualifier(rs_experiment.getString("exptType"));
+            odldb.setName(rs_experiment.getString("short_citation"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_experiment.next();
         }
 
@@ -684,20 +708,22 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_image.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_image.getString("_Image_key"));
-            otherDisplay.setDataType(rs_image.getString("type"));
-            otherDisplay.setName(rs_image.getString("short_citation"));
+            odldb.setDb_key(rs_image.getString("_Image_key"));
+            odldb.setDataType(rs_image.getString("type"));
+            odldb.setName(rs_image.getString("short_citation"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_image.next();
         }
 
@@ -737,25 +763,28 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_snp.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_snp.getString("_ConsensusSnp_key"));
-            otherDisplay.setDataType(rs_snp.getString("type"));
+            odldb.setDb_key(rs_snp.getString("_ConsensusSnp_key"));
+            odldb.setDataType(rs_snp.getString("type"));
 
             // SNPs are a bit different, they need a realized name field.
 
-            otherDisplay.setName("SNP at Chr" + rs_snp.getString("chromosome")
+            odldb.setName("SNP at Chr" + rs_snp.getString("chromosome")
                     + ":" + rs_snp.getInt("startCoordinate"));
 
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
                 log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_snp.next();
         }
 
@@ -796,26 +825,29 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_subsnp.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_subsnp.getString("_SubSNP_Key"));
-            otherDisplay.setDataType(rs_subsnp.getString("type"));
+            odldb.setDb_key(rs_subsnp.getString("_SubSNP_Key"));
+            odldb.setDataType(rs_subsnp.getString("type"));
 
             // SNPs are a bit different, they need a realized name field.
 
-            otherDisplay.setName("SNP at Chr"
+            odldb.setName("SNP at Chr"
                     + rs_subsnp.getString("chromosome") + ":"
                     + rs_subsnp.getInt("startCoordinate"));
 
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
                 log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_subsnp.next();
         }
 
@@ -853,20 +885,23 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_ama.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_ama.getString("_Term_key"));
-            otherDisplay.setDataType(rs_ama.getString("type"));
-            otherDisplay.setName(rs_ama.getString("term"));
+            odldb.setDb_key(rs_ama.getString("_Term_key"));
+            odldb.setDataType(rs_ama.getString("type"));
+            odldb.setName(rs_ama.getString("term"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
                 log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_ama.next();
         }
 
@@ -912,25 +947,31 @@ public class OtherDisplayGatherer extends AbstractGatherer {
 
         while (!rs_es_cell.isAfterLast()) {
 
-            otherDisplay.setDb_key(rs_es_cell.getString("_Allele_key"));
-            otherDisplay.setDataType(rs_es_cell.getString("type"));
-            otherDisplay.setQualifier(rs_es_cell.getString("term"));
+            odldb.setDb_key(rs_es_cell.getString("_Allele_key"));
+            odldb.setDataType(rs_es_cell.getString("type"));
+            odldb.setQualifier(rs_es_cell.getString("term"));
+            
+            // ESCellLines have a realized name field.
+            
             String symbol = new String(rs_es_cell.getString("symbol"));
             String name = new String(rs_es_cell.getString("name"));
             String marker_name = new String(rs_es_cell.getString("label"));
 
-            otherDisplay.setName(symbol + ", " + marker_name + "; " + name);
+            odldb.setName(symbol + ", " + marker_name + "; " + name);
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherDisplay.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(odldb.getDocument());
             total++;
             if (total >= output_threshold) {
                 log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherDisplay.clear();
+            odldb.clear();
             rs_es_cell.next();
         }
 

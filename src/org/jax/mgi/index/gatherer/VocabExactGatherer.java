@@ -41,10 +41,10 @@ public class VocabExactGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                       writeStart;
-    private Date                       writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
-    private VocabExactLuceneDocBuilder new_vocab =
+    private VocabExactLuceneDocBuilder veldb =
         new VocabExactLuceneDocBuilder();
 
     private HashMap<String, String> hm = new HashMap<String, String>();
@@ -111,14 +111,17 @@ public class VocabExactGatherer extends AbstractGatherer {
 
         while (!rs_non_ad_term.isAfterLast()) {
 
-            new_vocab.setVocabulary(rs_non_ad_term.getString("vocabName"));
-            new_vocab.setData(rs_non_ad_term.getString("term"));
-            new_vocab.setRaw_data(rs_non_ad_term.getString("term"));
-            new_vocab.setDb_key(rs_non_ad_term.getString("_Term_key"));
-            new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setVocabulary(rs_non_ad_term.getString("vocabName"));
+            veldb.setData(rs_non_ad_term.getString("term"));
+            veldb.setRaw_data(rs_non_ad_term.getString("term"));
+            veldb.setDb_key(rs_non_ad_term.getString("_Term_key"));
+            veldb.setDataType(IndexConstants.VOCAB_TERM);
+            veldb.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_non_ad_term.next();
         }
 
@@ -142,8 +145,8 @@ public class VocabExactGatherer extends AbstractGatherer {
 
         String VOC_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName"
                 + " from VOC_Term_View tv, MGI_Synonym s"
-                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1 "
-                + "and tv._Vocab_key in (44, 4, 5, 8, 46)"
+                + " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key in (44, 4, 5, 8, 46)"
                 + " and s._MGIType_key = 13 ";
 
         // Gather the Data
@@ -161,14 +164,17 @@ public class VocabExactGatherer extends AbstractGatherer {
         // Parse it
 
         while (!rs_non_ad_syn.isAfterLast()) {
-            new_vocab.setData(rs_non_ad_syn.getString("synonym"));
-            new_vocab.setRaw_data(rs_non_ad_syn.getString("synonym"));
-            new_vocab.setDb_key(rs_non_ad_syn.getString("_Term_key"));
-            new_vocab.setVocabulary(rs_non_ad_syn.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setData(rs_non_ad_syn.getString("synonym"));
+            veldb.setRaw_data(rs_non_ad_syn.getString("synonym"));
+            veldb.setDb_key(rs_non_ad_syn.getString("_Term_key"));
+            veldb.setVocabulary(rs_non_ad_syn.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            veldb.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_non_ad_syn.next();
         }
 
@@ -193,8 +199,8 @@ public class VocabExactGatherer extends AbstractGatherer {
 
         String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
                 + " from VOC_Term_View tv, VOC_text t"
-                + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-                + "and tv._Vocab_key in (44, 4, 5, 8, 46)"
+                + " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+                + " and tv._Vocab_key in (44, 4, 5, 8, 46)"
                 + " order by tv._Term_key, t.sequenceNum";
 
         // Gather the data.
@@ -216,18 +222,21 @@ public class VocabExactGatherer extends AbstractGatherer {
         while (!rs_non_ad_note.isAfterLast()) {
             if (place != rs_non_ad_note.getInt("_Term_key")) {
                 if (place != -1) {
-                    new_vocab.setRaw_data(new_vocab.getData());
-                    sis.push(new_vocab.getDocument());
-                    new_vocab.clear();
+                    veldb.setRaw_data(veldb.getData());
+                    
+                    // Place the document on the stack.
+                    
+                    sis.push(veldb.getDocument());
+                    veldb.clear();
                 }
 
-                new_vocab.setDb_key(rs_non_ad_note.getString("_Term_key"));
-                new_vocab.setVocabulary(rs_non_ad_note.getString("vocabName"));
-                new_vocab.setDataType(IndexConstants.VOCAB_NOTE);
-                new_vocab.setDisplay_type(hm.get(IndexConstants.VOCAB_NOTE));
+                veldb.setDb_key(rs_non_ad_note.getString("_Term_key"));
+                veldb.setVocabulary(rs_non_ad_note.getString("vocabName"));
+                veldb.setDataType(IndexConstants.VOCAB_NOTE);
+                veldb.setDisplay_type(hm.get(IndexConstants.VOCAB_NOTE));
                 place = rs_non_ad_note.getInt("_Term_key");
             }
-            new_vocab.appendData(rs_non_ad_note.getString("note"));
+            veldb.appendData(rs_non_ad_note.getString("note"));
             rs_non_ad_note.next();
         }
 
@@ -269,29 +278,40 @@ public class VocabExactGatherer extends AbstractGatherer {
 
         while (!rs_ad_term.isAfterLast()) {
             // Add in the TS form w/o space
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
                     + rs_ad_term.getString("printName"));
-            new_vocab.setRaw_data("TS" + rs_ad_term.getString("_Stage_key")
-                    + ": "
+            veldb.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            new_vocab.setDb_key(rs_ad_term.getString("_Structure_key"));
-            new_vocab.setVocabulary(rs_ad_term.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
-            sis.push(new_vocab.getDocument());
+            veldb.setDb_key(rs_ad_term.getString("_Structure_key"));
+            veldb.setVocabulary(rs_ad_term.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_TERM);
+            veldb.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
+            
+            // Place the document on the stack
+            
+            sis.push(veldb.getDocument());
             // Untransformed version, w/ space
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName"));
-            sis.push(new_vocab.getDocument());
+            
+            // Place the document on the stack
+            
+            sis.push(veldb.getDocument());
             // Untransformed version, w/o TS
-            new_vocab.setData(rs_ad_term.getString("printName"));
-            sis.push(new_vocab.getDocument());
+            veldb.setData(rs_ad_term.getString("printName"));
+            
+            // Place the document on the stack
+            
+            sis.push(veldb.getDocument());
             // Transformed version, w/ TS
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            sis.push(new_vocab.getDocument());
+            
+            // Place the document on the stack
+            
+            sis.push(veldb.getDocument());
 
-            new_vocab.clear();
+            veldb.clear();
             rs_ad_term.next();
         }
 
@@ -313,12 +333,12 @@ public class VocabExactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
-        String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
-                + "'AD' as vocabName"
+        String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure,"
+                + " 'AD' as vocabName"
                 + " from dbo.GXD_Structure s, GXD_StructureName sn"
                 + " where s._parent_key != null"
-                + " and s._Structure_key = sn._Structure_key and "
-                + "s._StructureName_key != sn._StructureName_key";
+                + " and s._Structure_key = sn._Structure_key and"
+                + " s._StructureName_key != sn._StructureName_key";
 
         // Gather the data
 
@@ -335,14 +355,17 @@ public class VocabExactGatherer extends AbstractGatherer {
         // Parse it
 
         while (!rs_ad_syn.isAfterLast()) {
-            new_vocab.setData(rs_ad_syn.getString("Structure"));
-            new_vocab.setRaw_data(rs_ad_syn.getString("Structure"));
-            new_vocab.setDb_key(rs_ad_syn.getString("_Structure_key"));
-            new_vocab.setVocabulary(rs_ad_syn.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setData(rs_ad_syn.getString("Structure"));
+            veldb.setRaw_data(rs_ad_syn.getString("Structure"));
+            veldb.setDb_key(rs_ad_syn.getString("_Structure_key"));
+            veldb.setVocabulary(rs_ad_syn.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            veldb.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
+            
+            // Place the document on the stack
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_ad_syn.next();
         }
 

@@ -10,9 +10,9 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @author mhall
  * 
- * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into 
+ * a lucene document.
  * 
  */
 public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
@@ -54,6 +54,10 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
      */
 
     public Document getDocument() {
+
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
@@ -110,32 +114,33 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
         
         log.info("MarkerVocabDagLuceneDocBuilder Test Harness");
 
-        MarkerVocabDagLuceneDocBuilder meldb = new MarkerVocabDagLuceneDocBuilder();
+        MarkerVocabDagLuceneDocBuilder mvdldb = 
+            new MarkerVocabDagLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
         
-        meldb.setContents(null);
-        Document doc = meldb.getDocument();
+        mvdldb.setContents(null);
+        Document doc = mvdldb.getDocument();
         
         // Reset the doc builder for the next object.
         
-        meldb.clear();
+        mvdldb.clear();
         
         log.info("Lucene document: " + doc);
         
         // Should work properly, resulting in a Lucene document being returned.
 
-        meldb.setContents("test");
-        meldb.setDb_key("123");        
-        meldb.setUnique_key("123test_type");
-        meldb.setVocabulary("MARKER");
+        mvdldb.setContents("test");
+        mvdldb.setDb_key("123");        
+        mvdldb.setUnique_key("123test_type");
+        mvdldb.setVocabulary("MARKER");
         
-        doc = meldb.getDocument();
+        doc = mvdldb.getDocument();
 
         // Should print out the toString() version of the doc builder.
         
-        log.info(meldb);
+        log.info(mvdldb);
         
         log.info("Lucene document: " + doc);
 
@@ -386,11 +391,21 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
         }
     }
     
+    /**
+     * Returns the unique key.  This is used as a join point across indexes,
+     * @return
+     */
+    
 
     public String getUnique_key() {
         return unique_key;
     }
 
+    /**
+     * Sets the unique key.  This is used as a join point across indexes.
+     * @param unique_key
+     */
+    
     public void setUnique_key(String unique_key) {
         if (unique_key != null) {
             this.unique_key = unique_key;

@@ -22,7 +22,7 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * Each subprocess basically operates as follows:
  * 
- * Gather the data for the specific subtype, parse it while creating lucene 
+ * Gather the data for the specific sub-type, parse it while creating lucene 
  * documents and adding them to the stack.  
  * 
  * After it completes parsing, it cleans up its result sets, and exits.
@@ -35,10 +35,10 @@ public class VocabAccIDGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                       writeStart;
-    private Date                       writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
-    private VocabExactLuceneDocBuilder new_vocab = 
+    private VocabExactLuceneDocBuilder veldb = 
         new VocabExactLuceneDocBuilder();
 
     private HashMap<String, String> hm = new HashMap<String, String>();
@@ -99,18 +99,24 @@ public class VocabAccIDGatherer extends AbstractGatherer {
         // Parse it
         
         while (!rs_acc_id.isAfterLast()) {
-            new_vocab.setData(rs_acc_id.getString("accId"));
-            new_vocab.setRaw_data(rs_acc_id.getString("accId"));
-            new_vocab.setDb_key(rs_acc_id.getString("_Term_key"));
-            new_vocab.setVocabulary(rs_acc_id.getString("vocabName"));
+            veldb.setData(rs_acc_id.getString("accId"));
+            veldb.setRaw_data(rs_acc_id.getString("accId"));
+            veldb.setDb_key(rs_acc_id.getString("_Term_key"));
+            veldb.setVocabulary(rs_acc_id.getString("vocabName"));
+            
+            // Omim terms have a provider which must be displayed.
+            
             if (rs_acc_id.getString("vocabName").equals(
                     IndexConstants.OMIM_TYPE_NAME)) {
-                new_vocab.setProvider("(OMIM)");
+                veldb.setProvider("(OMIM)");
             }
-            new_vocab.setDataType(IndexConstants.ACCESSION_ID);
-            new_vocab.setDisplay_type(hm.get(IndexConstants.ACCESSION_ID));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setDataType(IndexConstants.ACCESSION_ID);
+            veldb.setDisplay_type(hm.get(IndexConstants.ACCESSION_ID));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_acc_id.next();
         }
 

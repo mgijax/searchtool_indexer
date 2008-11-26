@@ -44,7 +44,7 @@ public class VocabInexactGatherer extends AbstractGatherer {
     private Date writeStart;
     private Date writeEnd;
 
-    private VocabInexactLuceneDocBuilder sf = 
+    private VocabInexactLuceneDocBuilder vildb = 
         new VocabInexactLuceneDocBuilder();
 
     private Logger log = 
@@ -123,14 +123,17 @@ public class VocabInexactGatherer extends AbstractGatherer {
 
         while (!rs.isAfterLast()) {
 
-            sf.setData(rs.getString("term"));
-            sf.setRaw_data(rs.getString("term"));
-            sf.setDb_key(rs.getString("_Term_key"));
-            sf.setVocabulary(rs.getString("vocabName"));
-            sf.setDataType(IndexConstants.VOCAB_TERM);
-            sf.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
-            sis.push(sf.getDocument());
-            sf.clear();
+            vildb.setData(rs.getString("term"));
+            vildb.setRaw_data(rs.getString("term"));
+            vildb.setDb_key(rs.getString("_Term_key"));
+            vildb.setVocabulary(rs.getString("vocabName"));
+            vildb.setDataType(IndexConstants.VOCAB_TERM);
+            vildb.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
+            
+            // Place the document on the stack
+            
+            sis.push(vildb.getDocument());
+            vildb.clear();
             rs.next();
         }
 
@@ -170,14 +173,17 @@ public class VocabInexactGatherer extends AbstractGatherer {
 
         while (!rs_syn.isAfterLast()) {
 
-            sf.setData(rs_syn.getString("synonym"));
-            sf.setRaw_data(rs_syn.getString("synonym"));
-            sf.setDb_key(rs_syn.getString("_Term_key"));
-            sf.setVocabulary(rs_syn.getString("vocabName"));
-            sf.setDataType(IndexConstants.VOCAB_SYNONYM);
-            sf.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
-            sis.push(sf.getDocument());
-            sf.clear();
+            vildb.setData(rs_syn.getString("synonym"));
+            vildb.setRaw_data(rs_syn.getString("synonym"));
+            vildb.setDb_key(rs_syn.getString("_Term_key"));
+            vildb.setVocabulary(rs_syn.getString("vocabName"));
+            vildb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            vildb.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
+            
+            // Place the document on the stack
+            
+            sis.push(vildb.getDocument());
+            vildb.clear();
             rs_syn.next();
         }
 
@@ -226,21 +232,24 @@ public class VocabInexactGatherer extends AbstractGatherer {
         while (!rs_note.isAfterLast()) {
             if (place != rs_note.getInt("_Term_key")) {
                 if (place != -1) {
-                    sf.setRaw_data(sf.getData());
-                    sis.push(sf.getDocument());
-                    sf.clear();
+                    vildb.setRaw_data(vildb.getData());
+                    
+                    // Place the document on the stack
+                    
+                    sis.push(vildb.getDocument());
+                    vildb.clear();
                 }
-                sf.setDb_key(rs_note.getString("_Term_key"));
-                sf.setVocabulary(rs_note.getString("vocabName"));
-                sf.setDataType(IndexConstants.VOCAB_NOTE);
-                sf.setDisplay_type(hm.get(IndexConstants.VOCAB_NOTE));
+                vildb.setDb_key(rs_note.getString("_Term_key"));
+                vildb.setVocabulary(rs_note.getString("vocabName"));
+                vildb.setDataType(IndexConstants.VOCAB_NOTE);
+                vildb.setDisplay_type(hm.get(IndexConstants.VOCAB_NOTE));
                 place = rs_note.getInt("_Term_key");
             }
-            sf.appendData(rs_note.getString("note"));
+            vildb.appendData(rs_note.getString("note"));
             rs_note.next();
         }
 
-        sis.push(sf.getDocument());
+        sis.push(vildb.getDocument());
 
         // Clean up
 
@@ -279,20 +288,26 @@ public class VocabInexactGatherer extends AbstractGatherer {
 
         while (!rs_ad_term.isAfterLast()) {
             // Add in the TS form
-            sf.setData("TS" + rs_ad_term.getString("_Stage_key") + " "
+            vildb.setData("TS" + rs_ad_term.getString("_Stage_key") + " "
                     + rs_ad_term.getString("printName").replaceAll(";", " "));
-            sf.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            vildb.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            sf.setDb_key(rs_ad_term.getString("_Structure_key"));
-            sf.setVocabulary(rs_ad_term.getString("vocabName"));
-            sf.setDataType(IndexConstants.VOCAB_TERM);
-            sf.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
-            sis.push(sf.getDocument());
+            vildb.setDb_key(rs_ad_term.getString("_Structure_key"));
+            vildb.setVocabulary(rs_ad_term.getString("vocabName"));
+            vildb.setDataType(IndexConstants.VOCAB_TERM);
+            vildb.setDisplay_type(hm.get(IndexConstants.VOCAB_TERM));
+            
+            // Place the document on the stack
+            
+            sis.push(vildb.getDocument());
             // Transformed version, w/o TS
-            sf.setData(rs_ad_term.getString("printName").replaceAll(";", " "));
-            sis.push(sf.getDocument());
+            vildb.setData(rs_ad_term.getString("printName").replaceAll(";", " "));
+            
+            // Place the document on the stack
+            
+            sis.push(vildb.getDocument());
 
-            sf.clear();
+            vildb.clear();
             rs_ad_term.next();
         }
 
@@ -336,14 +351,17 @@ public class VocabInexactGatherer extends AbstractGatherer {
 
         while (!rs_ad_syn.isAfterLast()) {
 
-            sf.setData(rs_ad_syn.getString("Structure"));
-            sf.setRaw_data(rs_ad_syn.getString("Structure"));
-            sf.setDb_key(rs_ad_syn.getString("_Structure_key"));
-            sf.setVocabulary(rs_ad_syn.getString("vocabName"));
-            sf.setDataType(IndexConstants.VOCAB_SYNONYM);
-            sf.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
-            sis.push(sf.getDocument());
-            sf.clear();
+            vildb.setData(rs_ad_syn.getString("Structure"));
+            vildb.setRaw_data(rs_ad_syn.getString("Structure"));
+            vildb.setDb_key(rs_ad_syn.getString("_Structure_key"));
+            vildb.setVocabulary(rs_ad_syn.getString("vocabName"));
+            vildb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            vildb.setDisplay_type(hm.get(IndexConstants.VOCAB_SYNONYM));
+            
+            // Place the document on the stack
+            
+            sis.push(vildb.getDocument());
+            vildb.clear();
             rs_ad_syn.next();
         }
 

@@ -43,6 +43,9 @@ public class NonIDTokenLuceneDocBuilder implements LuceneDocBuilder {
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }

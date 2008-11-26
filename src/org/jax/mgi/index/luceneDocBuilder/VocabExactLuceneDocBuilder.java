@@ -53,12 +53,16 @@ public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {
      * the data field, stripping out all unneeded whitespace before sending it
      * off to be indexed.
      * 
-     * @return Lucene document constructed with the information that this object
+     * @return Lucene document constructed with the information that this 
+     * object
      *         encapsulates.
      */
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
@@ -66,7 +70,8 @@ public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {
         Document doc = new Document();
         
         doc.add(new Field(IndexConstants.COL_DATA,
-                this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(),
+                this.getData().replaceAll("\\s+", " ")
+                .replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(),
                      Field.Store.YES, Field.Index.UN_TOKENIZED));
         
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getRaw_data(),
@@ -110,38 +115,39 @@ public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
         // Set up the logger.
         
-        Logger log = Logger.getLogger(VocabExactLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(VocabExactLuceneDocBuilder.class.getName());
         
         log.info("VocabExactLuceneDocBuilder Test Harness");
 
-        VocabExactLuceneDocBuilder ldb = new VocabExactLuceneDocBuilder();
+        VocabExactLuceneDocBuilder veldb = new VocabExactLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
         
-        ldb.setData(null);
-        Document doc = ldb.getDocument();
+        veldb.setData(null);
+        Document doc = veldb.getDocument();
         
         // Reset the doc builder for the next object.
         
-        ldb.clear();
+        veldb.clear();
         
         log.info("Lucene document: " + doc);
         
         // Should work properly, resulting in a Lucene document being returned.
 
-        ldb.setData("test");
-        ldb.setDb_key("123");
-        ldb.setDataType("test type");
-        ldb.setDisplay_type("Test: test");
-        ldb.setUnique_key("123test_type");
-        ldb.setVocabulary("MARKER");
+        veldb.setData("test");
+        veldb.setDb_key("123");
+        veldb.setDataType("test type");
+        veldb.setDisplay_type("Test: test");
+        veldb.setUnique_key("123test_type");
+        veldb.setVocabulary("MARKER");
         
-        doc = ldb.getDocument();
+        doc = veldb.getDocument();
 
         // Should print out the toString() version of the doc builder.
         
-        log.info(ldb);
+        log.info(veldb);
         
         log.info("Lucene document: " + doc);
 
@@ -339,9 +345,22 @@ public class VocabExactLuceneDocBuilder implements LuceneDocBuilder {
         }
     }
 
+    /**
+     * Returns the unique key for this document.  This is used as a join point
+     * across indexes at display time.
+     * @return
+     */
+    
     public String getUnique_key() {
         return unique_key;
     }
+    
+    /**
+     * Sets the unique key for this document.  This is used as a join point 
+     * across indexes at display time.
+     * 
+     * @param unique_key
+     */
 
     public void setUnique_key(String unique_key) {
         if (unique_key != null) {

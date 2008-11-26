@@ -13,7 +13,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  *  
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a Lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into 
+ * a Lucene document.
  * 
  */
 public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
@@ -51,15 +52,22 @@ public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
         
         Document doc = new Document();
-        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getDataType(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.getName(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_QUALIFIER1, this.getQualifier(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getDataType(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.getName(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_QUALIFIER1, this.getQualifier(),
+                Field.Store.YES, Field.Index.NO));
         return doc;
     }
 
@@ -84,32 +92,32 @@ public class OtherDisplayLuceneDocBuilder implements LuceneDocBuilder {
         
         log.info("OtherDisplayLuceneDocBuilder Test Harness");
 
-        OtherDisplayLuceneDocBuilder meldb = new OtherDisplayLuceneDocBuilder();
+        OtherDisplayLuceneDocBuilder odldb = new OtherDisplayLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
         
-        meldb.setName(null);
-        Document doc = meldb.getDocument();
+        odldb.setName(null);
+        Document doc = odldb.getDocument();
         
         // Reset the doc builder for the next object.
         
-        meldb.clear();
+        odldb.clear();
         
         log.info("Lucene document: " + doc);
         
         // Should work properly, resulting in a Lucene document being returned.
 
-        meldb.setName("test");
-        meldb.setDb_key("123");        
-        meldb.setDataType("123test_type");
-        meldb.setQualifier("MARKER");
+        odldb.setName("test");
+        odldb.setDb_key("123");        
+        odldb.setDataType("123test_type");
+        odldb.setQualifier("MARKER");
         
-        doc = meldb.getDocument();
+        doc = odldb.getDocument();
 
         // Should print out the toString() version of the doc builder.
         
-        log.info(meldb);
+        log.info(odldb);
         
         log.info("Lucene document: " + doc);
 

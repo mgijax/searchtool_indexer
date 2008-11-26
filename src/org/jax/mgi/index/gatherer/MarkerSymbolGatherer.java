@@ -12,8 +12,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * This class is responsible for gathering up any information that we might 
- * need for the markerExact index. This currently includes nomenclature and 
- * various accession ID's that have been directly related to markers.
+ * need for the marker symbol index. This is therefore restricted to just 
+ * symbols for markers/alleles and orthologs.
  * 
  * @author mhall
  * 
@@ -42,7 +42,7 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
 
     private HashMap<String, String> hm = new HashMap<String, String>();
 
-    private MarkerExactLuceneDocBuilder markerExact =
+    private MarkerExactLuceneDocBuilder meldb =
         new MarkerExactLuceneDocBuilder();
 
     private Logger log = Logger.getLogger(MarkerAccIDGatherer.class.getName());
@@ -61,9 +61,9 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
 
         super(config);
 
-        hm.put("MS", "Symbol");
-        hm.put("AS", "Allele Symbol");
-        hm.put("OS", "Ortholog Symbol");
+        hm.put(IndexConstants.MARKER_SYMBOL, "Symbol");
+        hm.put(IndexConstants.ALLELE_SYMBOL, "Allele Symbol");
+        hm.put(IndexConstants.ORTHOLOG_SYMBOL, "Ortholog Symbol");
 
     }
 
@@ -126,41 +126,46 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
                     IndexConstants.ORTHOLOG_SYMBOL)) {
                 String organism = rs_label.getString("_OrthologOrganism_key");
                 
+                // There is a special case where we want to define a new type
+                // for human and rat symbols.
+                
                 if (organism != null && organism.equals("2")) {
-                    markerExact.setDataType(
+                    meldb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
                 }
                 else if (organism != null && organism.equals("44")) {
-                    markerExact.setDataType(
+                    meldb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_RAT);
                 }
                 else {
-                    markerExact.setDataType(rs_label.getString("labelType"));  
+                    meldb.setDataType(rs_label.getString("labelType"));  
                 }
             }
             else {
-                markerExact.setDataType(rs_label.getString("labelType"));
+                meldb.setDataType(rs_label.getString("labelType"));
             }
+            
+            // If we have an old symbol, we need to create a custom type.
             
             if (!rs_label.getString("_Label_Status_key").equals("1")) {
                 
-                // If we have an old symbol, we need to create a custom type.
-                
-                markerExact.setDataType(markerExact.getDataType()+"O");
+                meldb.setDataType(meldb.getDataType()+"O");
             }
             
-            markerExact.setData(rs_label.getString("label"));
-            markerExact.setDb_key(rs_label.getString("_Marker_key"));
-            markerExact.setUnique_key(rs_label.getString("_Label_key")
+            meldb.setData(rs_label.getString("label"));
+            meldb.setDb_key(rs_label.getString("_Marker_key"));
+            meldb.setUnique_key(rs_label.getString("_Label_key")
                     + IndexConstants.MARKER_TYPE_NAME);
             displayType = initCap(rs_label.getString("labelTypeName"));
             if (displayType.equals("Current Symbol")) {
                 displayType = "Symbol";
             }
-            markerExact
-                    .setDisplay_type(displayType);
-            sis.push(markerExact.getDocument());
-            markerExact.clear();
+            meldb.setDisplay_type(displayType);
+            
+            // Place the document on the stack.
+            
+            sis.push(meldb.getDocument());
+            meldb.clear();
             rs_label.next();
         }
 

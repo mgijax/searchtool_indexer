@@ -41,12 +41,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                          writeStart;
-    private Date                          writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
     // Instantiate the single doc builder that this object will use.
 
-    private NonIDTokenLuceneDocBuilder nonIDToken =
+    private NonIDTokenLuceneDocBuilder nitldb =
         new NonIDTokenLuceneDocBuilder();
 
     public static HashMap<String, String> hm = new HashMap<String, String>();
@@ -95,7 +95,7 @@ public class NonIDTokenGatherer extends AbstractGatherer {
             doVocabADSynonym();
 
             doAlleleSynonym();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -106,6 +106,7 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
     /**
      * Gather the marker labels.
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -120,7 +121,6 @@ public class NonIDTokenGatherer extends AbstractGatherer {
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2 ";
-        // + "and _Label_Status_key = 1";
 
         // Gather the data
 
@@ -138,10 +138,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
         while (!rs.isAfterLast()) {
             
-            nonIDToken.setData(rs.getString("label"));
+            nitldb.setData(rs.getString("label"));
 
-            sis.push(nonIDToken.getDocument());
-            nonIDToken.clear();
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
+            nitldb.clear();
             rs.next();
         }
 
@@ -182,9 +184,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
         while (!rs_term.isAfterLast()) {
 
-            nonIDToken.setData(rs_term.getString("term"));
-            sis.push(nonIDToken.getDocument());
-            nonIDToken.clear();
+            nitldb.setData(rs_term.getString("term"));
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
+            nitldb.clear();
             rs_term.next();
         }
 
@@ -227,9 +232,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
 
         while (!rs_syn.isAfterLast()) {
 
-            nonIDToken.setData(rs_syn.getString("synonym"));
-            sis.push(nonIDToken.getDocument());
-            nonIDToken.clear();
+            nitldb.setData(rs_syn.getString("synonym"));
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
+            nitldb.clear();
             rs_syn.next();
         }
 
@@ -279,12 +287,15 @@ public class NonIDTokenGatherer extends AbstractGatherer {
         while (!rs_note.isAfterLast()) {
             if (place != rs_note.getInt(1)) {
                 if (place != -1) {
-                    sis.push(nonIDToken.getDocument());
-                    nonIDToken.clear();
+                    
+                    // Place the document on the stack.
+                    
+                    sis.push(nitldb.getDocument());
+                    nitldb.clear();
                 }
                 place = rs_note.getInt("_Term_key");
             }
-            nonIDToken.appendData(rs_note.getString("note"));
+            nitldb.appendData(rs_note.getString("note"));
             rs_note.next();
         }
 
@@ -330,37 +341,39 @@ public class NonIDTokenGatherer extends AbstractGatherer {
             
             // TS#:Printname version.
             
-            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
+            nitldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
                     + rs_ad_term.getString("printName"));
-            sis.push(nonIDToken.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
             
             // TS#: printname version
             
-            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            nitldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName"));
-            sis.push(nonIDToken.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
             
             // printname version
             
-            nonIDToken.setData(rs_ad_term.getString("printName"));
-            sis.push(nonIDToken.getDocument());
+            nitldb.setData(rs_ad_term.getString("printName"));
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
             
             // TS#: print name version
             
-            nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            nitldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            sis.push(nonIDToken.getDocument());
-/*            //nonIDToken.setData("TS" + rs_ad_term.getString("_Stage_key")
-            //        + " "
-            //        + rs_ad_term.getString("printName").replaceAll(";", " "));
-
-            sis.push(nonIDToken.getDocument());
-            // Transformed version, w/o TS
-            nonIDToken.setData(rs_ad_term.getString("printName").replaceAll(
-                    ";", " "));
-            sis.push(nonIDToken.getDocument());
-
-*/            nonIDToken.clear();
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
+            nitldb.clear();
             rs_ad_term.next();
         }
 
@@ -384,8 +397,8 @@ public class NonIDTokenGatherer extends AbstractGatherer {
                 + "'AD' as vocabName"
                 + " from dbo.GXD_Structure s, GXD_StructureName sn"
                 + " where s._parent_key != null"
-                + " and s._Structure_key = sn._Structure_key and "
-                + "s._StructureName_key != sn._StructureName_key";
+                + " and s._Structure_key = sn._Structure_key and"
+                + " s._StructureName_key != sn._StructureName_key";
 
         // Gather the data
         
@@ -403,9 +416,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
         
         while (!rs_ad_syn.isAfterLast()) {
 
-            nonIDToken.setData(rs_ad_syn.getString("Structure"));
-            sis.push(nonIDToken.getDocument());
-            nonIDToken.clear();
+            nitldb.setData(rs_ad_syn.getString("Structure"));
+            
+            // Place the document on the stack.
+            
+            sis.push(nitldb.getDocument());
+            nitldb.clear();
             rs_ad_syn.next();
         }
 
@@ -448,10 +464,12 @@ public class NonIDTokenGatherer extends AbstractGatherer {
         
             while (!rs.isAfterLast()) {
                 
-                nonIDToken.setData(rs.getString("label"));
+                nitldb.setData(rs.getString("label"));
         
-                sis.push(nonIDToken.getDocument());
-                nonIDToken.clear();
+                // Place the document on the stack.
+                
+                sis.push(nitldb.getDocument());
+                nitldb.clear();
                 rs.next();
             }
         

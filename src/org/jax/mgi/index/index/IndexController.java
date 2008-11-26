@@ -11,7 +11,7 @@ import org.jax.mgi.shr.config.IndexCfg;
  * ahead and optimized the index, and then exits.
  * 
  * @author mhall
- * @is Thread
+ * 
  * @has Configurable array of Indexers
  * @does Controls the creation of the indexers, and then optimizes the  
  * resulting Lucene index.
@@ -60,8 +60,7 @@ public class IndexController implements Runnable {
         }
 
         // Wait until all the threads have completed their work, after which
-        // optimize and close
-        // the indexwriter.
+        // optimize and close the indexwriter.
 
         try {
 

@@ -10,7 +10,6 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @author mhall
  * 
- * @is A LuceneDocBuilder
  * @has Nothing
  * @does Knows how to take the data contained inside of it, and turn it into a
  *  lucene document.
@@ -56,6 +55,9 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
@@ -63,7 +65,8 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
         Document doc = new Document();
         
         doc.add(new Field(IndexConstants.COL_DATA,
-                this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(),
+                this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "")
+                .replaceAll("\\s$", "").toLowerCase(),
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(),
@@ -75,7 +78,8 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
         doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.getDisplay_type(),
+        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY,
+                this.getDisplay_type(),
                 Field.Store.YES, Field.Index.NO));
         
         doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.getUnique_key(),
@@ -239,10 +243,24 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
         }
     }
 
+    /**
+     * Return the calculated unique key for this object.  This is in place to 
+     * allow a join between indexes at display time.
+     * 
+     * @return
+     */
+    
     public String getUnique_key() {
         return unique_key;
     }
 
+    /**
+     * Set the unique key for this object.  This is used to create a join point
+     * across indexes at display time.
+     * 
+     * @param unique_key
+     */
+    
     public void setUnique_key(String unique_key) {
         if (unique_key != null) {
             this.unique_key = unique_key;

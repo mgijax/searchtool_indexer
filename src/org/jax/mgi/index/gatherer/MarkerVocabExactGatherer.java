@@ -20,7 +20,7 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
 
     private Logger log = Logger.getLogger(MakeIndex.class.getName());
     
-    private VocabExactLuceneDocBuilder new_vocab =
+    private VocabExactLuceneDocBuilder veldb =
         new VocabExactLuceneDocBuilder();
 
     private HashMap<String, String> hm = new HashMap<String, String>();
@@ -29,9 +29,9 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         super(config);
 
         hm.put(IndexConstants.VOCAB_TERM, "Term");
-        hm.put("Mammalian Phenotype", "Phenotype");
-        hm.put("PIR Superfamily", "Protein Family");
-        hm.put("InterPro Domains", "Protein Domain");
+        hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
         hm.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
@@ -73,20 +73,21 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         
         log.info("Collecting GO terms!");
         
-        String GO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
-        " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
-        " where tv.isObsolete != 1 and tv._Vocab_key = 4"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType = 'GO/Marker'";    
+        String GO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+                + " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+                + " where tv.isObsolete != 1 and tv._Vocab_key = 4"
+                + " and tv._Term_key = vacc._Term_key and"
+                + " vacc.annotType = 'GO/Marker'";    
                 
         doVocabTerm(GO_TERM_KEY);
                 
         log.info("Collecting MP Terms");
         
-        String MP_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
-        " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
-        " where tv.isObsolete != 1 and tv._Vocab_key = 5"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
-        " 'Mammalian Phenotype/Genotype'";
+        String MP_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+                + " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+                + " where tv.isObsolete != 1 and tv._Vocab_key = 5"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'Mammalian Phenotype/Genotype'";
 
         doVocabTerm(MP_TERM_KEY);
                 
@@ -103,21 +104,21 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         
         log.info("Collecting PIRSF Terms");
         
-        String PIRSF_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
-        " from VOC_Term_View tv, VOC_annot_count_cache vacc"+
-        " where tv.isObsolete != 1 and tv._Vocab_key = 46"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
-        " 'PIRSF/Marker'";
+        String PIRSF_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+                + " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+                + " where tv.isObsolete != 1 and tv._Vocab_key = 46"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'PIRSF/Marker'";
                 
         doVocabTerm(PIRSF_TERM_KEY);
                 
         log.info("Collecting OMIM Terms");
         
-        String OMIM_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"+
-        " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"+
-        " where tv.isObsolete != 1 and tv._Vocab_key = 44"+
-        " and tv._Term_key = vacc._Term_key and vacc.annotType =" +
-        " 'OMIM/Genotype'";
+        String OMIM_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+                + " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
+                + " and tv._Term_key = vacc._Term_key and vacc.annotType ="
+                + " 'OMIM/Genotype'";
                 
         doVocabTerm(OMIM_TERM_KEY);
                 
@@ -255,8 +256,10 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         log.info("Collecting AD Terms");
         
         String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
-                + "s.printName, 'AD' as vocabName" + " from GXD_Structure s"
-                + " where s._Parent_key != null";
+                + "s.printName, 'AD' as vocabName"
+                + " from GXD_Structure s, VOC_Annot_Count_Cache vacc"
+                + " where s._Parent_key != null and vacc.annotType = 'AD'"
+                + " and vacc._Term_key = s._Structure_key";
 
         // Gather the data
 
@@ -274,32 +277,42 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
 
         while (!rs_ad_term.isAfterLast()) {
             // Add in the TS form w/o space
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
                     + rs_ad_term.getString("printName"));
-            new_vocab.setRaw_data("TS" + rs_ad_term.getString("_Stage_key")
-                    + ": "
+            veldb.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            new_vocab.setUnique_key(rs_ad_term.getString("_Structure_key")
+            veldb.setUnique_key(rs_ad_term.getString("_Structure_key")
                     + rs_ad_term.getString("vocabName"));
-            new_vocab.setDb_key(rs_ad_term.getString("_Structure_key"));
-            new_vocab.setVocabulary(rs_ad_term.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab
-                    .setDisplay_type(hm.get(rs_ad_term.getString("vocabName")));
-            sis.push(new_vocab.getDocument());
+            veldb.setDb_key(rs_ad_term.getString("_Structure_key"));
+            veldb.setVocabulary(rs_ad_term.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_TERM);
+            veldb.setDisplay_type(hm.get(rs_ad_term.getString("vocabName")));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
             // Untransformed version, w/ space
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName"));
-            sis.push(new_vocab.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
             // Untransformed version, w/o TS
-            new_vocab.setData(rs_ad_term.getString("printName"));
-            sis.push(new_vocab.getDocument());
+            veldb.setData(rs_ad_term.getString("printName"));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
             // Transformed version, w/ TS
-            new_vocab.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
+            veldb.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            sis.push(new_vocab.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
 
-            new_vocab.clear();
+            veldb.clear();
             rs_ad_term.next();
         }
 
@@ -324,11 +337,14 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         log.info("Collecting AD Synonyms");
         
         String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
-                + "'AD' as vocabName"
-                + " from dbo.GXD_Structure s, GXD_StructureName sn"
-                + " where s._parent_key != null"
-                + " and s._Structure_key = sn._Structure_key and "
-                + "s._StructureName_key != sn._StructureName_key";
+            + "'AD' as vocabName"
+            + " from dbo.GXD_Structure s, GXD_StructureName sn,"
+            + " VOC_Annot_Count_Cache vacc"
+            + " where s._parent_key != null"
+            + " and s._Structure_key = sn._Structure_key and"
+            + " s._StructureName_key != sn._StructureName_key"
+            + " and vacc.annotType='AD' and vacc._Term_key ="
+            + " s._Structure_key";
 
         // Gather the data
 
@@ -345,17 +361,20 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         // Parse it
 
         while (!rs_ad_syn.isAfterLast()) {
-            new_vocab.setData(rs_ad_syn.getString("Structure"));
-            new_vocab.setRaw_data(rs_ad_syn.getString("Structure"));
-            new_vocab.setDb_key(rs_ad_syn.getString("_Structure_key"));
-            new_vocab.setVocabulary(rs_ad_syn.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setUnique_key(rs_ad_syn.getString("_Structure_key")
+            veldb.setData(rs_ad_syn.getString("Structure"));
+            veldb.setRaw_data(rs_ad_syn.getString("Structure"));
+            veldb.setDb_key(rs_ad_syn.getString("_Structure_key"));
+            veldb.setVocabulary(rs_ad_syn.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            veldb.setUnique_key(rs_ad_syn.getString("_Structure_key")
                     + rs_ad_syn.getString("Structure")
                     + rs_ad_syn.getString("vocabName"));
-            new_vocab.setDisplay_type(hm.get(rs_ad_syn.getString("vocabName")));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setDisplay_type(hm.get(rs_ad_syn.getString("vocabName")));
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_ad_syn.next();
         }
 
@@ -391,17 +410,20 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
     
         while (!rs_non_ad_term.isAfterLast()) {
 
-            new_vocab.setVocabulary(rs_non_ad_term.getString("vocabName"));
-            new_vocab.setData(rs_non_ad_term.getString("term"));
-            new_vocab.setRaw_data(rs_non_ad_term.getString("term"));
-            new_vocab.setDb_key(rs_non_ad_term.getString("_Term_key"));
-            new_vocab.setDataType(IndexConstants.VOCAB_TERM);
-            new_vocab.setUnique_key(rs_non_ad_term.getString("_Term_key")
+            veldb.setVocabulary(rs_non_ad_term.getString("vocabName"));
+            veldb.setData(rs_non_ad_term.getString("term"));
+            veldb.setRaw_data(rs_non_ad_term.getString("term"));
+            veldb.setDb_key(rs_non_ad_term.getString("_Term_key"));
+            veldb.setDataType(IndexConstants.VOCAB_TERM);
+            veldb.setUnique_key(rs_non_ad_term.getString("_Term_key")
                     + rs_non_ad_term.getString("vocabName"));
-            new_vocab.setDisplay_type(hm.get(rs_non_ad_term
+            veldb.setDisplay_type(hm.get(rs_non_ad_term
                     .getString("vocabName")));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_non_ad_term.next();
         }
     
@@ -436,18 +458,21 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         // Parse it
     
         while (!rs_non_ad_syn.isAfterLast()) {
-            new_vocab.setData(rs_non_ad_syn.getString("synonym"));
-            new_vocab.setRaw_data(rs_non_ad_syn.getString("synonym"));
-            new_vocab.setDb_key(rs_non_ad_syn.getString("_Term_key"));
-            new_vocab.setVocabulary(rs_non_ad_syn.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOCAB_SYNONYM);
-            new_vocab.setUnique_key(rs_non_ad_syn.getString("_Synonym_key")
+            veldb.setData(rs_non_ad_syn.getString("synonym"));
+            veldb.setRaw_data(rs_non_ad_syn.getString("synonym"));
+            veldb.setDb_key(rs_non_ad_syn.getString("_Term_key"));
+            veldb.setVocabulary(rs_non_ad_syn.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            veldb.setUnique_key(rs_non_ad_syn.getString("_Synonym_key")
                     + IndexConstants.VOCAB_SYNONYM
                     + rs_non_ad_syn.getString("vocabName"));
-            new_vocab.setDisplay_type(hm.get(rs_non_ad_syn
+            veldb.setDisplay_type(hm.get(rs_non_ad_syn
                     .getString("vocabName")));
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_non_ad_syn.next();
         }
     
@@ -487,22 +512,25 @@ public class MarkerVocabExactGatherer extends AbstractGatherer {
         while (!rs_non_ad_note.isAfterLast()) {
             if (place != rs_non_ad_note.getInt("_Term_key")) {
                 if (place != -1) {
-                    new_vocab.setRaw_data(new_vocab.getData());
-                    sis.push(new_vocab.getDocument());
-                    new_vocab.clear();
+                    veldb.setRaw_data(veldb.getData());
+                    
+                    // Place the document on the stack.
+                    
+                    sis.push(veldb.getDocument());
+                    veldb.clear();
                 }
     
-                new_vocab.setDb_key(rs_non_ad_note.getString("_Term_key"));
-                new_vocab.setVocabulary(rs_non_ad_note.getString("vocabName"));
-                new_vocab.setDataType(IndexConstants.VOCAB_NOTE);
-                new_vocab.setUnique_key(rs_non_ad_note.getString("_Term_key")
+                veldb.setDb_key(rs_non_ad_note.getString("_Term_key"));
+                veldb.setVocabulary(rs_non_ad_note.getString("vocabName"));
+                veldb.setDataType(IndexConstants.VOCAB_NOTE);
+                veldb.setUnique_key(rs_non_ad_note.getString("_Term_key")
                         + IndexConstants.VOCAB_NOTE
                         + rs_non_ad_note.getString("vocabName"));
-                new_vocab.setDisplay_type(hm.get(rs_non_ad_note
+                veldb.setDisplay_type(hm.get(rs_non_ad_note
                         .getString("vocabName")));
                 place = rs_non_ad_note.getInt("_Term_key");
             }
-            new_vocab.appendData(rs_non_ad_note.getString("note"));
+            veldb.appendData(rs_non_ad_note.getString("note"));
             rs_non_ad_note.next();
         }
     

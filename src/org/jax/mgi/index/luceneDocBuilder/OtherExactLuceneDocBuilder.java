@@ -13,7 +13,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  *
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into 
+ * a lucene document.
  * 
  */
 public class OtherExactLuceneDocBuilder implements LuceneDocBuilder {
@@ -27,7 +28,8 @@ public class OtherExactLuceneDocBuilder implements LuceneDocBuilder {
     private String provider      = "";
     private String display_type  = "ID";
     
-    private Logger log = Logger.getLogger(OtherExactLuceneDocBuilder.class.getName());
+    private Logger log = 
+        Logger.getLogger(OtherExactLuceneDocBuilder.class.getName());
     
     private Boolean hasError   = false;
 
@@ -53,25 +55,38 @@ public class OtherExactLuceneDocBuilder implements LuceneDocBuilder {
      * the data field, stripping out all uneeded whitespace before sending it
      * off to be indexed.
      * 
-     * @return Lucene document constructed with the information that this object
+     * @return Lucene document constructed with the information that this 
+     * object
      * encapsulates.
      */
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
         
         Document doc = new Document();
-        doc.add(new Field(IndexConstants.COL_DATA, this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_ACC_KEY, this.getAccessionKey(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getType(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_PREFERRED, this.getPreferred(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_PROVIDER, this.getProvider(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.getDisplay_type(), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DATA, 
+                this.getData().replaceAll("\\s+", " ").replaceAll("^\\s", "")
+                .replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getData(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_ACC_KEY, this.getAccessionKey(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.getType(),
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_DB_KEY, this.getDb_key(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_PREFERRED, this.getPreferred(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_PROVIDER, this.getProvider(),
+                Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY,
+                this.getDisplay_type(), Field.Store.YES, Field.Index.NO));
         return doc;
     }
 
@@ -93,40 +108,41 @@ public class OtherExactLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
        // Set up the logger.
         
-        Logger log = Logger.getLogger(OtherExactLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(OtherExactLuceneDocBuilder.class.getName());
         
         log.info("OtherExactLuceneDocBuilder Test Harness");
 
-        OtherExactLuceneDocBuilder ldb = new OtherExactLuceneDocBuilder();
+        OtherExactLuceneDocBuilder oeldb = new OtherExactLuceneDocBuilder();
         
         // Should result in an error being printed!, but the lucene document
         // should still come through.
         
-        ldb.setData(null);
-        Document doc = ldb.getDocument();
+        oeldb.setData(null);
+        Document doc = oeldb.getDocument();
         
         // Reset the doc builder for the next object.
         
-        ldb.clear();
+        oeldb.clear();
         
         log.info("Lucene document: " + doc);
         
         // Should work properly, resulting in a Lucene document being returned.
 
-        ldb.setData("test");
-        ldb.setDb_key("123");        
-        ldb.setAccessionKey("123123456");
-        ldb.setType("test");
-        ldb.setOrganism("testorg");
-        ldb.setPreferred("yes");
-        ldb.setProvider("testprovider");
-        ldb.setDisplay_type("display type test");
+        oeldb.setData("test");
+        oeldb.setDb_key("123");        
+        oeldb.setAccessionKey("123123456");
+        oeldb.setType("test");
+        oeldb.setOrganism("testorg");
+        oeldb.setPreferred("yes");
+        oeldb.setProvider("testprovider");
+        oeldb.setDisplay_type("display type test");
         
-        doc = ldb.getDocument();
+        doc = oeldb.getDocument();
 
         // Should print out the toString() version of the doc builder.
         
-        log.info(ldb);
+        log.info(oeldb);
         
         log.info("Lucene document: " + doc);
 

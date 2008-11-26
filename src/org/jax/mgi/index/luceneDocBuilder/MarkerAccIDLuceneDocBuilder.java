@@ -10,7 +10,6 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @author mhall
  * 
- * @is A LuceneDocBuilder
  * @has Nothing
  * @does Knows how to take the data contained inside of it, and turn it into a
  *  lucene document.
@@ -56,6 +55,9 @@ public class MarkerAccIDLuceneDocBuilder implements LuceneDocBuilder {
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }

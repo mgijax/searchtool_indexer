@@ -9,12 +9,12 @@ import org.jax.mgi.index.util.SharedDocumentStack;
 import org.jax.mgi.shr.config.IndexCfg;
 
 /**
- * The AbstractGatherer class is the superclass for all the other gatherers 
- * that we use in the indexing software.
+ * The AbstractGatherer class is the superclass for all the gatherers 
+ * in the indexing software.
  * 
  * It provides the constructor that they all use, as well as an initCap method,
  * a method to execute sql, a cleanup method that gracefully closes down all 
- * of the jdbc connections, and a run method that must be overridden by any 
+ * of the jdbc connections, and a run method that can be overridden by any 
  * implementing class.
  * 
  * @author mhall
@@ -91,7 +91,7 @@ public abstract class AbstractGatherer implements Runnable {
                 data[i] = Character.toLowerCase(data[i]);
         }
         return new String(data);
-    } // initCap
+    } 
 
     /**
      * Execute a given SQL Statement.
@@ -128,7 +128,7 @@ public abstract class AbstractGatherer implements Runnable {
     }
     
     /**
-     * This method MUST be overridden by any implementing class, its 
+     * This method can be overridden by any implementing class, its 
      * where the indexing algorithm is implemented.
      */
 

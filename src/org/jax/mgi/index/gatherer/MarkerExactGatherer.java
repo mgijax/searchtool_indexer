@@ -35,11 +35,11 @@ public class MarkerExactGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private MarkerExactLuceneDocBuilder markerExact =
+    private MarkerExactLuceneDocBuilder meldb =
         new MarkerExactLuceneDocBuilder();
 
-    private Date                        writeStart;
-    private Date                        writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
     
     private Logger log = Logger.getLogger(MarkerExactGatherer.class.getName());
 
@@ -56,7 +56,7 @@ public class MarkerExactGatherer extends AbstractGatherer {
 
     /**
      * This method encapsulates the algorithm used for gathering the data 
-     * needed to create a MarkerExact document.
+     * needed to create the MarkerExact documents.
      */
 
     public void run() {
@@ -117,10 +117,10 @@ public class MarkerExactGatherer extends AbstractGatherer {
             
             if (dataType.equals(IndexConstants.MARKER_SYNOYNM) &&
                     rs_label.getString("_OrthologOrganism_key") != null ) {
-                markerExact.setDataType(IndexConstants.ORTHOLOG_SYNONYM);
+                meldb.setDataType(IndexConstants.ORTHOLOG_SYNONYM);
             }
             else {
-                markerExact.setDataType(dataType);
+                meldb.setDataType(dataType);
             }
                 
             if (!rs_label.getString("_Label_Status_key").equals("1")) {
@@ -128,12 +128,12 @@ public class MarkerExactGatherer extends AbstractGatherer {
                 // If we have an old bit of nomen, we need to create a 
                 // custom type.
                 
-                markerExact.setDataType(markerExact.getDataType()+"O");
+                meldb.setDataType(meldb.getDataType()+"O");
             }
             
-            markerExact.setData(rs_label.getString("label"));
-            markerExact.setDb_key(rs_label.getString("_Marker_key"));
-            markerExact.setUnique_key(rs_label.getString("_Label_key") 
+            meldb.setData(rs_label.getString("label"));
+            meldb.setDb_key(rs_label.getString("_Marker_key"));
+            meldb.setUnique_key(rs_label.getString("_Label_key") 
                     + IndexConstants.MARKER_TYPE_NAME);
             displayType = initCap(rs_label.getString("labelTypeName"));
             
@@ -143,9 +143,12 @@ public class MarkerExactGatherer extends AbstractGatherer {
                 displayType = "Name";
             }
             
-            markerExact.setDisplay_type(displayType);
-            sis.push(markerExact.getDocument());
-            markerExact.clear();
+            meldb.setDisplay_type(displayType);
+            
+            // Add the document to the stack
+            
+            sis.push(meldb.getDocument());
+            meldb.clear();
             rs_label.next();
         }
 
@@ -158,10 +161,11 @@ public class MarkerExactGatherer extends AbstractGatherer {
     }
 
     /**
-         * Gather the Allele Synonyms, since they are in a different table.
-         * @throws SQLException
-         * @throws InterruptedException
-         */
+     * Gather the Allele Synonyms, since they are in a different table.
+     * 
+     * @throws SQLException
+     * @throws InterruptedException
+     */
         
         private void doAlleleSynonym() 
             throws SQLException, InterruptedException {
@@ -190,19 +194,21 @@ public class MarkerExactGatherer extends AbstractGatherer {
         
             while (!rs.isAfterLast()) {
                 
-                markerExact.setData(rs.getString("label"));
-                markerExact.setDb_key(rs.getString("_Marker_key")); 
-                markerExact.setDataType(rs.getString("labelType"));
+                meldb.setData(rs.getString("label"));
+                meldb.setDb_key(rs.getString("_Marker_key")); 
+                meldb.setDataType(rs.getString("labelType"));
                 
                 // Since this is the Allele Synonym Section, set its type.
                 
-                markerExact.setDisplay_type("Allele Synonym");
-                markerExact.setUnique_key(rs.getString("_Marker_key")
+                meldb.setDisplay_type("Allele Synonym");
+                meldb.setUnique_key(rs.getString("_Marker_key")
                         +rs.getString("label") 
                         + IndexConstants.MARKER_TYPE_NAME);
                 
-                sis.push(markerExact.getDocument());
-                markerExact.clear();
+                // Add the document to the stack
+                
+                sis.push(meldb.getDocument());
+                meldb.clear();
                 rs.next();
             }
         

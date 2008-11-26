@@ -10,7 +10,7 @@ import org.apache.lucene.document.Document;
  * both allows the consumers to interrogate the state, as well as the 
  * gatherers to set the state when they have completed their tasks.
  * 
- * The pop, isEmpty() and size methods are all synchronized, so using this
+ * The pop, isEmpty() methods are synchronized, so using this
  * object should be thread safe.
  * 
  * @author mhall
@@ -27,7 +27,7 @@ public class SharedDocumentStack {
     private Boolean                    gatheringComplete = false;
 
     // Hidden constructor, access to this object is through the singleton 
-    // getter method.
+    // get method.
 
     private SharedDocumentStack() {
     };

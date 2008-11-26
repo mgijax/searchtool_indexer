@@ -13,7 +13,7 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
 /**
  * The vocab display gatherer is responsible for gathering all the possible
  * display information for our various vocabulary data sources.  Like all
- * vocabulary related gatherers it is split into non AD and AD datasources.
+ * vocabulary related gatherers it is split into non AD and AD data sources.
  * 
  * @author mhall
  *
@@ -42,12 +42,12 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                         writeStart;
-    private Date                         writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
     // Instantiate the single VocabDisplay Lucene doc builder.
 
-    private VocabDisplayLuceneDocBuilder vocabDisplay = 
+    private VocabDisplayLuceneDocBuilder vdldb = 
         new VocabDisplayLuceneDocBuilder();
 
     private Logger log = 
@@ -61,9 +61,9 @@ public class VocabDisplayGatherer extends AbstractGatherer {
         super(config);
         
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");
-        hm.put("Mammalian Phenotype", "Phenotype");
-        hm.put("PIR Superfamily", "Protein Family");
-        hm.put("InterPro Domains", "Protein Domain");
+        hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
         hm.put(IndexConstants.AD_TYPE_NAME, "Expression");
@@ -147,8 +147,8 @@ public class VocabDisplayGatherer extends AbstractGatherer {
 
         /*
          * These documents are compound in nature, for each document we create,
-         * we are running several queries into the database This is most
-         * definately the single most complicated document that we create for
+         * we are running several queries into the database. This is most
+         * definitely the single most complicated document that we create for
          * the entire indexing process.
          * 
          */
@@ -160,30 +160,24 @@ public class VocabDisplayGatherer extends AbstractGatherer {
             if (place != rs_vocabTerm.getInt(1)) {
                 if (place != -1) {
 
-                    // We have, try to put it on the stack, waiting if the 
-                    // stack is busy.
-                    while (sis.size() > 100000) {
-                        Thread.sleep(1);
-                    }
-
                     // Place the current document on the stack.
 
-                    sis.push(vocabDisplay.getDocument());
+                    sis.push(vdldb.getDocument());
 
                     // Clear the document creation object, to ready it for the
                     // next doc.
 
-                    vocabDisplay.clear();
+                    vdldb.clear();
                 }
 
                 // Populate the document with information pertaining
                 // specifically to the vocab term we are now on.
 
-                vocabDisplay.setDb_key(rs_vocabTerm.getString("_Term_key"));
-                vocabDisplay.setVocabulary(rs_vocabTerm.getString("vocabName"));
-                vocabDisplay.setTypeDisplay(
+                vdldb.setDb_key(rs_vocabTerm.getString("_Term_key"));
+                vdldb.setVocabulary(rs_vocabTerm.getString("vocabName"));
+                vdldb.setTypeDisplay(
                         hm.get(rs_vocabTerm.getString("vocabName")));
-                vocabDisplay.setAcc_id(rs_vocabTerm.getString("accID"));
+                vdldb.setAcc_id(rs_vocabTerm.getString("accID"));
 
                 // Set the place to be the current terms object key, when this
                 // changes we know we are on a new document.
@@ -196,7 +190,7 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 while (!marker_display_rs.isAfterLast()
                         && marker_display_rs.getInt("_Term_key") <= place) {
                     if (marker_display_rs.getInt("_Term_key") == place) {
-                        vocabDisplay.appendGene_ids(marker_display_rs
+                        vdldb.appendGene_ids(marker_display_rs
                                 .getString("_Marker_key"));
                     }
                     marker_display_rs.next();
@@ -208,18 +202,18 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 while (!vocab_annot_rs.isAfterLast()
                         && vocab_annot_rs.getInt("_Term_key") <= place) {
 
-                    if (!vocabDisplay.getVocabulary().equals("OMIM")
-                            || (vocabDisplay.getVocabulary().equals("OMIM") 
+                    if (!vdldb.getVocabulary().equals("OMIM")
+                            || (vdldb.getVocabulary().equals("OMIM") 
                                     && vocab_annot_rs.getString("_MGIType_key")
                                     .equals("12"))) {
-                        vocabDisplay.setAnnotation_object_type(vocab_annot_rs
+                        vdldb.setAnnotation_object_type(vocab_annot_rs
                                 .getString("_MGIType_key"));
-                        vocabDisplay.setAnnotation_objects(vocab_annot_rs
+                        vdldb.setAnnotation_objects(vocab_annot_rs
                                 .getString("objectCount"));
-                        vocabDisplay.setAnnotation_count(vocab_annot_rs
+                        vdldb.setAnnotation_count(vocab_annot_rs
                                 .getString("annotCount"));
                     } else {
-                        vocabDisplay.setSecondary_object_count(vocab_annot_rs
+                        vdldb.setSecondary_object_count(vocab_annot_rs
                                 .getString("annotCount"));
                     }
                     vocab_annot_rs.next();
@@ -234,7 +228,7 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 }
                 if (!vocab_marker_count_rs.isAfterLast()
                         && vocab_marker_count_rs.getInt("_Term_key") == place) {
-                    vocabDisplay.setMarker_count(vocab_marker_count_rs
+                    vdldb.setMarker_count(vocab_marker_count_rs
                             .getString("marker_count"));
                 }
 
@@ -244,20 +238,20 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 while (!child_rs.isAfterLast() 
                         && child_rs.getInt("_AncestorObject_key") <= place) {
                     if (child_rs.getInt("_AncestorObject_key") == place) {
-                        vocabDisplay.appendChild_ids(
+                        vdldb.appendChild_ids(
                                 child_rs.getString("_DescendentObject_key"));
                     }
                     child_rs.next();
 
                 }
             }
-            vocabDisplay.setContents(rs_vocabTerm.getString("term"));
+            vdldb.setContents(rs_vocabTerm.getString("term"));
         }
 
         // Add the Final Document, that the loop kicked out on.
 
-        sis.push(vocabDisplay.getDocument());
-        vocabDisplay.clear();
+        sis.push(vdldb.getDocument());
+        vdldb.clear();
         
         // Clean up
         
@@ -339,22 +333,20 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 // document to the stack.
                 
                 if (place != -1) {
-                    sis.push(vocabDisplay.getDocument());
-                    vocabDisplay.clear();
+                    sis.push(vdldb.getDocument());
+                    vdldb.clear();
                 }
                 
                 // Populate the basic document information.
                 
-                vocabDisplay.setDb_key(rs_ad.getString("_Structure_key"));
-                vocabDisplay.setContents(rs_ad.getString("PrintName2"));
-                vocabDisplay.setVocabulary(rs_ad.getString("VocabName"));
-                vocabDisplay.setTypeDisplay(hm
-                        .get(rs_ad.getString("vocabName")));
-                vocabDisplay.setAnnotation_object_type(rs_ad
+                vdldb.setDb_key(rs_ad.getString("_Structure_key"));
+                vdldb.setContents(rs_ad.getString("PrintName2"));
+                vdldb.setVocabulary(rs_ad.getString("VocabName"));
+                vdldb.setTypeDisplay(hm.get(rs_ad.getString("vocabName")));
+                vdldb.setAnnotation_object_type(rs_ad
                         .getString("_MGIType_key"));
-                vocabDisplay.setAnnotation_objects(rs_ad
-                        .getString("objectCount"));
-                vocabDisplay.setAnnotation_count(rs_ad.getString("annotCount"));
+                vdldb.setAnnotation_objects(rs_ad.getString("objectCount"));
+                vdldb.setAnnotation_count(rs_ad.getString("annotCount"));
 
                 // Set the document place, when this changes we know we are on a
                 // new document.
@@ -366,7 +358,7 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 while (!ad_marker_display_rs.isAfterLast()
                         && ad_marker_display_rs.getInt("_Term_key") <= place) {
                     if (ad_marker_display_rs.getInt("_Term_key") == place) {
-                        vocabDisplay.appendGene_ids(ad_marker_display_rs
+                        vdldb.appendGene_ids(ad_marker_display_rs
                                 .getString("_Marker_key"));
                     }
                     ad_marker_display_rs.next();
@@ -380,17 +372,17 @@ public class VocabDisplayGatherer extends AbstractGatherer {
                 }
                 if (!vocab_marker_count_rs_ad.isAfterLast()
                         && vocab_marker_count_rs_ad.getInt("_Term_key") == place) {
-                    vocabDisplay.setMarker_count(vocab_marker_count_rs_ad
+                    vdldb.setMarker_count(vocab_marker_count_rs_ad
                             .getString("marker_count"));
                 }
 
-                // Grab the terms that are decendants of this term, by term 
+                // Grab the terms that are descendants of this term, by term 
                 // key order.
                 
                 while (!ad_child_rs.isAfterLast()
                         && ad_child_rs.getInt("_Structure_key") <= place) {
                     if (ad_child_rs.getInt("_Structure_key") == place) {
-                        vocabDisplay.appendChild_ids(ad_child_rs
+                        vdldb.appendChild_ids(ad_child_rs
                                 .getString("_Descendent_key"));
                     }
                     ad_child_rs.next();
@@ -401,7 +393,7 @@ public class VocabDisplayGatherer extends AbstractGatherer {
         // Push the last document onto the stack, the one the loop kicked 
         // out on.
         
-        sis.push(vocabDisplay.getDocument());
+        sis.push(vdldb.getDocument());
         
         // Clean up
         

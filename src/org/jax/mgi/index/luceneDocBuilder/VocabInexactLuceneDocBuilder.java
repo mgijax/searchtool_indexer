@@ -12,7 +12,8 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * 
  * @is A LuceneDocBuilder
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into a lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into 
+ * a lucene document.
  * 
  */
 
@@ -57,6 +58,9 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
     
     public Document getDocument() {
     
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
@@ -111,7 +115,8 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
     public static void main(String[] args) {
         // Set up the logger.
         
-        Logger log = Logger.getLogger(VocabInexactLuceneDocBuilder.class.getName());
+        Logger log = 
+            Logger.getLogger(VocabInexactLuceneDocBuilder.class.getName());
         
         log.info("VocabInexactLuceneDocBuilder Test Harness");
 
@@ -328,10 +333,23 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
         }
     }
 
+    /**
+     * Return the unique key for this document.  The key is used to join
+     * across indexes.
+     * @return
+     */
+    
     public String getUnique_key() {
         return unique_key;
     }
 
+    
+    /**
+     * Set the unique key for this document.  The key is used to join across
+     * indexes.
+     * @param unique_key
+     */
+    
     public void setUnique_key(String unique_key) {
         if (unique_key != null) {
             this.unique_key = unique_key;

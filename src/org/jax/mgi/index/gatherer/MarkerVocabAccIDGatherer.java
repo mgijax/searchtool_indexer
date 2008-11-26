@@ -22,10 +22,10 @@ public class MarkerVocabAccIDGatherer extends AbstractGatherer {
 
     // Class Variables
 
-    private Date                       writeStart;
-    private Date                       writeEnd;
+    private Date writeStart;
+    private Date writeEnd;
 
-    private VocabExactLuceneDocBuilder new_vocab =
+    private VocabExactLuceneDocBuilder veldb =
         new VocabExactLuceneDocBuilder();
 
     private Logger log = Logger.getLogger(
@@ -44,9 +44,9 @@ public class MarkerVocabAccIDGatherer extends AbstractGatherer {
          * take care of this relationship.
          */
         
-        hm.put("Mammalian Phenotype", "Phenotype");
-        hm.put("PIR Superfamily", "Protein Family");
-        hm.put("InterPro Domains", "Protein Domain");
+        hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
         hm.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
@@ -177,16 +177,19 @@ public class MarkerVocabAccIDGatherer extends AbstractGatherer {
         // Parse it
         
         while (!rs_acc_id.isAfterLast()) {
-            new_vocab.setData(rs_acc_id.getString("accId"));
-            new_vocab.setRaw_data(rs_acc_id.getString("term"));
-            new_vocab.setDb_key(rs_acc_id.getString("_Term_key"));
-            new_vocab.setVocabulary(rs_acc_id.getString("vocabName"));
-            new_vocab.setDataType(IndexConstants.VOC_ACCESSION_ID); 
-            new_vocab.setDisplay_type(hm.get(
+            veldb.setData(rs_acc_id.getString("accId"));
+            veldb.setRaw_data(rs_acc_id.getString("term"));
+            veldb.setDb_key(rs_acc_id.getString("_Term_key"));
+            veldb.setVocabulary(rs_acc_id.getString("vocabName"));
+            veldb.setDataType(IndexConstants.VOC_ACCESSION_ID); 
+            veldb.setDisplay_type(hm.get(
                     rs_acc_id.getString("vocabName")));
-            new_vocab.setProvider("("+rs_acc_id.getString("accId")+")");
-            sis.push(new_vocab.getDocument());
-            new_vocab.clear();
+            veldb.setProvider("("+rs_acc_id.getString("accId")+")");
+            
+            // Place the document on the stack.
+            
+            sis.push(veldb.getDocument());
+            veldb.clear();
             rs_acc_id.next();
         }
     

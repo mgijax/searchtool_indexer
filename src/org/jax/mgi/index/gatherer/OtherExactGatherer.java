@@ -19,14 +19,14 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * accession id's -> alleles, and probes -> sequences as well.
  * 
  * This class is also special in that it overwrites the cleanup method from
- * the AbstractGatherer class.  Since we need to have two seperately 
+ * the AbstractGatherer class.  Since we need to have two separately 
  * configurable connections, we need to override the cleanup method to close 
  * them both upon completion.
  * 
  * @author mhall
  *
  * @has A single instance of the OtherExactLuceneDocBuilder, which encapsulates
- * the data needed to populate the index.  This object can produce lucene 
+ * the data needed to populate the index.  This object can produce Lucene 
  * documents on demand.
  * 
  * A single instance of the ProviderHashMap gatherer, which is used to 
@@ -63,7 +63,7 @@ public class OtherExactGatherer extends AbstractGatherer {
 
     // The single LuceneDocBuilder for this Object.
 
-    private OtherExactLuceneDocBuilder otherExact =
+    private OtherExactLuceneDocBuilder oeldb =
         new OtherExactLuceneDocBuilder();
 
     private ProviderHashMapGatherer phmg;
@@ -75,15 +75,15 @@ public class OtherExactGatherer extends AbstractGatherer {
     public OtherExactGatherer(IndexCfg config) {
         super(config);
         phmg = new ProviderHashMapGatherer(config);
-        
+
         try {
             Class.forName(DB_DRIVER);
             String USER = config.get("MGI_PUBLICUSER");
             String PASSWORD = config.get("MGI_PUBLICPASSWORD");
             stack_max = new Integer(config.get("STACK_MAX"));
             log.debug("SNP_JDBC_URL: " + config.get("SNP_JDBC_URL"));
-            conSnp = DriverManager.getConnection(
-                    config.get("SNP_JDBC_URL"), USER, PASSWORD);
+            conSnp = DriverManager.getConnection(config.get("SNP_JDBC_URL"),
+                    USER, PASSWORD);
         } catch (Exception e) {
             log.error(e);
         }
@@ -201,25 +201,25 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_ref.isAfterLast()) {
 
-            otherExact.setType(rs_ref.getString("_MGIType_key"));
-            otherExact.setData(rs_ref.getString("accID"));
-            otherExact.setDb_key(rs_ref.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_ref.getString("_Accession_key"));
-            otherExact.setPreferred(rs_ref.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_ref
-                    .getString("_LogicalDB_key")));
+            oeldb.setType(rs_ref.getString("_MGIType_key"));
+            oeldb.setData(rs_ref.getString("accID"));
+            oeldb.setDb_key(rs_ref.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_ref.getString("_Accession_key"));
+            oeldb.setPreferred(rs_ref.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_ref.getString("_LogicalDB_key")));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
-            // log.info(new_other.getData());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_ref.next();
         }
 
@@ -262,24 +262,26 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_prb.isAfterLast()) {
 
-            otherExact.setType(rs_prb.getString("_MGIType_key"));
-            otherExact.setData(rs_prb.getString("accID"));
-            otherExact.setDb_key(rs_prb.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_prb.getString("_Accession_key"));
-            otherExact.setPreferred(rs_prb.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_prb
-                    .getString("_LogicalDB_key")));
+            oeldb.setType(rs_prb.getString("_MGIType_key"));
+            oeldb.setData(rs_prb.getString("accID"));
+            oeldb.setDb_key(rs_prb.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_prb.getString("_Accession_key"));
+            oeldb.setPreferred(rs_prb.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_prb.getString("_LogicalDB_key")));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
                 log.debug("We have now gathered " + total
                         + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_prb.next();
         }
 
@@ -320,24 +322,25 @@ public class OtherExactGatherer extends AbstractGatherer {
         // Parse it
 
         while (!rs_all.isAfterLast()) {
-            otherExact.setType(rs_all.getString("_MGIType_key"));
-            otherExact.setData(rs_all.getString("accID"));
-            otherExact.setDb_key(rs_all.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_all.getString("_Accession_key"));
-            otherExact.setPreferred(rs_all.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_all
-                    .getString("_LogicalDB_key")));
+            oeldb.setType(rs_all.getString("_MGIType_key"));
+            oeldb.setData(rs_all.getString("accID"));
+            oeldb.setDb_key(rs_all.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_all.getString("_Accession_key"));
+            oeldb.setPreferred(rs_all.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_all.getString("_LogicalDB_key")));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_all.next();
         }
 
@@ -378,22 +381,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_assay.isAfterLast()) {
 
-            otherExact.setType(rs_assay.getString("_MGIType_key"));
-            otherExact.setData(rs_assay.getString("accID"));
-            otherExact.setDb_key(rs_assay.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_assay.getString("_Accession_key"));
-            otherExact.setPreferred(rs_assay.getString("preferred"));
+            oeldb.setType(rs_assay.getString("_MGIType_key"));
+            oeldb.setData(rs_assay.getString("accID"));
+            oeldb.setDb_key(rs_assay.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_assay.getString("_Accession_key"));
+            oeldb.setPreferred(rs_assay.getString("preferred"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_assay.next();
         }
 
@@ -436,22 +441,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_anti.isAfterLast()) {
 
-            otherExact.setType(rs_anti.getString("_MGIType_key"));
-            otherExact.setData(rs_anti.getString("accID"));
-            otherExact.setDb_key(rs_anti.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_anti.getString("_Accession_key"));
-            otherExact.setPreferred(rs_anti.getString("preferred"));
+            oeldb.setType(rs_anti.getString("_MGIType_key"));
+            oeldb.setData(rs_anti.getString("accID"));
+            oeldb.setDb_key(rs_anti.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_anti.getString("_Accession_key"));
+            oeldb.setPreferred(rs_anti.getString("preferred"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the documents on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_anti.next();
         }
 
@@ -493,22 +500,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_antigen.isAfterLast()) {
 
-            otherExact.setType(rs_antigen.getString("_MGIType_key"));
-            otherExact.setData(rs_antigen.getString("accID"));
-            otherExact.setDb_key(rs_antigen.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_antigen.getString("_Accession_key"));
-            otherExact.setPreferred(rs_antigen.getString("preferred"));
+            oeldb.setType(rs_antigen.getString("_MGIType_key"));
+            oeldb.setData(rs_antigen.getString("accID"));
+            oeldb.setDb_key(rs_antigen.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_antigen.getString("_Accession_key"));
+            oeldb.setPreferred(rs_antigen.getString("preferred"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_antigen.next();
         }
 
@@ -531,8 +540,8 @@ public class OtherExactGatherer extends AbstractGatherer {
         // SQL for this Subsection
 
         String OTHER_EXPERIMENT_SEARCH = "SELECT distinct a._Accession_key, "
-                + "a.accID, a._Object_key, 'EXPERIMENT' as _MGIType_key, "
-                + "a.preferred" + " FROM ACC_Accession a"
+                + " a.accID, a._Object_key, 'EXPERIMENT' as _MGIType_key,"
+                + " a.preferred" + " FROM ACC_Accession a"
                 + " where a.private != 1 and a._MGIType_key = 4";
 
         // Gather the data
@@ -551,22 +560,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_exp.isAfterLast()) {
 
-            otherExact.setType(rs_exp.getString("_MGIType_key"));
-            otherExact.setData(rs_exp.getString("accID"));
-            otherExact.setDb_key(rs_exp.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_exp.getString("_Accession_key"));
-            otherExact.setPreferred(rs_exp.getString("preferred"));
+            oeldb.setType(rs_exp.getString("_MGIType_key"));
+            oeldb.setData(rs_exp.getString("accID"));
+            oeldb.setDb_key(rs_exp.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_exp.getString("_Accession_key"));
+            oeldb.setPreferred(rs_exp.getString("preferred"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_exp.next();
         }
 
@@ -588,9 +599,9 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
-        String OTHER_IMAGE_SEARCH = "SELECT distinct a._Accession_key, "
-                + "a.accID, a._Object_key, 'IMAGE' as _MGIType_key, "
-                + "a.preferred" + " FROM ACC_Accession a"
+        String OTHER_IMAGE_SEARCH = "SELECT distinct a._Accession_key,"
+                + " a.accID, a._Object_key, 'IMAGE' as _MGIType_key,"
+                + " a.preferred" + " FROM ACC_Accession a"
                 + " where a.private != 1 and a._MGIType_key =9";
 
         // Gather the data.
@@ -609,22 +620,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_image.isAfterLast()) {
 
-            otherExact.setType(rs_image.getString("_MGIType_key"));
-            otherExact.setData(rs_image.getString("accID"));
-            otherExact.setDb_key(rs_image.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_image.getString("_Accession_key"));
-            otherExact.setPreferred(rs_image.getString("preferred"));
+            oeldb.setType(rs_image.getString("_MGIType_key"));
+            oeldb.setData(rs_image.getString("accID"));
+            oeldb.setDb_key(rs_image.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_image.getString("_Accession_key"));
+            oeldb.setPreferred(rs_image.getString("preferred"));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_image.next();
         }
 
@@ -645,8 +658,8 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
-        String OTHER_SEQ_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
-                + "a._Object_key, '" + IndexConstants.OTHER_SEQUENCE
+        String OTHER_SEQ_SEARCH = "SELECT distinct a._Accession_key, a.accID,"
+                + " a._Object_key, '" + IndexConstants.OTHER_SEQUENCE
                 + "' as _MGIType_key, a.preferred, a._LogicalDB_key"
                 + " FROM ACC_Accession a, SEQ_Sequence s"
                 + " where a.private != 1 and a._MGIType_key = 19 and"
@@ -669,23 +682,24 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_seq.isAfterLast()) {
 
-            otherExact.setType(rs_seq.getString("_MGIType_key"));
-            otherExact.setData(rs_seq.getString("accID"));
-            otherExact.setDb_key(rs_seq.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_seq.getString("_Accession_key"));
-            otherExact.setPreferred(rs_seq.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_seq
-                    .getString("_LogicalDB_key")));
+            oeldb.setType(rs_seq.getString("_MGIType_key"));
+            oeldb.setData(rs_seq.getString("accID"));
+            oeldb.setDb_key(rs_seq.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_seq.getString("_Accession_key"));
+            oeldb.setPreferred(rs_seq.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_seq.getString("_LogicalDB_key")));
 
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
-            otherExact.clear();
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
+            oeldb.clear();
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
 
@@ -712,15 +726,15 @@ public class OtherExactGatherer extends AbstractGatherer {
         // SQL for this Subsection
 
         String OTHER_SEQ_BY_PROBE_SEARCH = "SELECT distinct a._Accession_key, "
-                + "ac.accID, a._Object_key, 'SEQUENCE' as _MGIType_key, "
-                + "a.preferred, ac._LogicalDB_key"
-                + " FROM ACC_Accession a, SEQ_Sequence s, "
-                + "SEQ_Probe_Cache spc, acc_accession ac"
-                + " where a.private != 1 and a._MGIType_key = 19 and "
-                + "a._Object_key = s._Sequence_key and s._Organism_key = 1"
-                + " and a._Object_key = spc._Sequence_key and "
-                + "spc._Probe_key = ac._Object_key and ac._MGIType_key = 3 "
-                + "and AC._LogicalDB_key != 9 and ac.private != 1";
+                + " ac.accID, a._Object_key, 'SEQUENCE' as _MGIType_key,"
+                + " a.preferred, ac._LogicalDB_key"
+                + " FROM ACC_Accession a, SEQ_Sequence s,"
+                + " SEQ_Probe_Cache spc, acc_accession ac"
+                + " where a.private != 1 and a._MGIType_key = 19 and"
+                + " a._Object_key = s._Sequence_key and s._Organism_key = 1"
+                + " and a._Object_key = spc._Sequence_key and"
+                + " spc._Probe_key = ac._Object_key and ac._MGIType_key = 3"
+                + " and AC._LogicalDB_key != 9 and ac.private != 1";
 
         // Gather the data
 
@@ -739,25 +753,26 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_seq_by_probe.isAfterLast()) {
 
-            otherExact.setType(rs_seq_by_probe.getString("_MGIType_key"));
-            otherExact.setData(rs_seq_by_probe.getString("accID"));
-            otherExact.setDb_key(rs_seq_by_probe.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_seq_by_probe
-                    .getString("_Accession_key"));
-            otherExact.setPreferred(rs_seq_by_probe.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_seq_by_probe
+            oeldb.setType(rs_seq_by_probe.getString("_MGIType_key"));
+            oeldb.setData(rs_seq_by_probe.getString("accID"));
+            oeldb.setDb_key(rs_seq_by_probe.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_seq_by_probe.getString("_Accession_key"));
+            oeldb.setPreferred(rs_seq_by_probe.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_seq_by_probe
                     .getString("_LogicalDB_key")));
 
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
-            otherExact.clear();
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
+            oeldb.clear();
 
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
 
@@ -782,8 +797,8 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
-        String OTHER_SNP_PRIME_SEARCH = "SELECT distinct _Accession_key, "
-                + "accID, _Object_key, 'SNP' as _MGIType_key, 1"
+        String OTHER_SNP_PRIME_SEARCH = "SELECT distinct _Accession_key,"
+                + " accID, _Object_key, 'SNP' as _MGIType_key, 1 as preferred"
                 + " FROM SNP_Accession" + " where _MGIType_key = 30";
 
         // Gather the data
@@ -802,27 +817,29 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_snp_prime.isAfterLast()) {
 
-            otherExact.setType(rs_snp_prime.getString(4));
-            otherExact.setData(rs_snp_prime.getString(2));
-            otherExact.setDb_key(rs_snp_prime.getString(3));
-            otherExact.setAccessionKey(rs_snp_prime.getString(1));
-            otherExact.setPreferred(rs_snp_prime.getString(5));
+            oeldb.setType(rs_snp_prime.getString("_MGIType_key"));
+            oeldb.setData(rs_snp_prime.getString("accID"));
+            oeldb.setDb_key(rs_snp_prime.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_snp_prime.getString("_Accession_key"));
+            oeldb.setPreferred(rs_snp_prime.getString("preferred"));
             
             // This is an odd case, as far as I can tell, this is hard coded
             // on the jsp page that this requirement was pulled from.
             
-            otherExact.setProvider("dbSNP");
+            oeldb.setProvider("dbSNP");
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_snp_prime.next();
         }
 
@@ -863,24 +880,26 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_snp_sub.isAfterLast()) {
 
-            otherExact.setType(rs_snp_sub.getString("_MGIType_key"));
-            otherExact.setData(rs_snp_sub.getString("accID"));
-            otherExact.setDb_key(rs_snp_sub.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_snp_sub.getString("_Accession_key"));
-            otherExact.setPreferred(rs_snp_sub.getString("prefered"));
+            oeldb.setType(rs_snp_sub.getString("_MGIType_key"));
+            oeldb.setData(rs_snp_sub.getString("accID"));
+            oeldb.setDb_key(rs_snp_sub.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_snp_sub.getString("_Accession_key"));
+            oeldb.setPreferred(rs_snp_sub.getString("prefered"));
             // This is the same odd case the the other SNP data.
-            otherExact.setProvider("dbSNP");
+            oeldb.setProvider("dbSNP");
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_snp_sub.next();
         }
 
@@ -901,14 +920,14 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
-        String OTHER_ORTHOLOG_SEARCH = "select distinct a._Accession_key, "
-                + "a.accID, nonmouse._Marker_key, 'ORTHOLOG' as _MGIType_key, "
-                + "a.preferred, a._LogicalDB_key, m.commonName"
-                + " from MRK_Homology_Cache nonmouse, ACC_Accession a, "
-                + "MGI_Organism m" + " where nonmouse._Organism_key != 1 and "
-                + "nonmouse._Marker_key = a._Object_key"
-                + " and a._MGIType_key = 2 and a.private = 0 "
-                + "and nonmouse._Organism_key = m._Organism_key";
+        String OTHER_ORTHOLOG_SEARCH = "select distinct a._Accession_key,"
+                + " a.accID, nonmouse._Marker_key, 'ORTHOLOG' as _MGIType_key,"
+                + " a.preferred, a._LogicalDB_key, m.commonName"
+                + " from MRK_Homology_Cache nonmouse, ACC_Accession a,"
+                + " MGI_Organism m" + " where nonmouse._Organism_key != 1 and"
+                + " nonmouse._Marker_key = a._Object_key"
+                + " and a._MGIType_key = 2 and a.private = 0"
+                + " and nonmouse._Organism_key = m._Organism_key";
 
         // gather the data
 
@@ -926,27 +945,29 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_orthologs.isAfterLast()) {
 
-            otherExact.setType(rs_orthologs.getString("_MGIType_key"));
-            otherExact.setData(rs_orthologs.getString("accID"));
-            otherExact.setDb_key(rs_orthologs.getString("_Marker_key"));
-            otherExact
-                    .setAccessionKey(rs_orthologs.getString("_Accession_key"));
-            otherExact.setPreferred(rs_orthologs.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_orthologs
-                    .getString("_LogicalDB_key"))
+            oeldb.setType(rs_orthologs.getString("_MGIType_key"));
+            oeldb.setData(rs_orthologs.getString("accID"));
+            oeldb.setDb_key(rs_orthologs.getString("_Marker_key"));
+            oeldb.setAccessionKey(rs_orthologs.getString("_Accession_key"));
+            oeldb.setPreferred(rs_orthologs.getString("preferred"));
+            
+            // This has a realized provider string, we add in the species.
+            
+            oeldb.setProvider(phmg.get(rs_orthologs.getString("_LogicalDB_key"))
                     + " - " + initCap(rs_orthologs.getString("commonName")));
 
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
             
-            sis.push(otherExact.getDocument());
-            otherExact.clear();
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
+            oeldb.clear();
 
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
             
@@ -994,24 +1015,25 @@ public class OtherExactGatherer extends AbstractGatherer {
 
         while (!rs_ama.isAfterLast()) {
 
-            otherExact.setType(rs_ama.getString("_MGIType_key"));
-            otherExact.setData(rs_ama.getString("accID"));
-            otherExact.setDb_key(rs_ama.getString("_Object_key"));
-            otherExact.setAccessionKey(rs_ama.getString("_Accession_key"));
-            otherExact.setPreferred(rs_ama.getString("preferred"));
-            otherExact.setProvider(phmg.get(rs_ama
-                    .getString("_LogicalDB_key")));
+            oeldb.setType(rs_ama.getString("_MGIType_key"));
+            oeldb.setData(rs_ama.getString("accID"));
+            oeldb.setDb_key(rs_ama.getString("_Object_key"));
+            oeldb.setAccessionKey(rs_ama.getString("_Accession_key"));
+            oeldb.setPreferred(rs_ama.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_ama.getString("_LogicalDB_key")));
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_ama.next();
         }
 
@@ -1057,25 +1079,26 @@ public class OtherExactGatherer extends AbstractGatherer {
         // Parse it
         
         while (!rs_escell.isAfterLast()) {
-            otherExact.setType(rs_escell.getString("_MGIType_key"));
-            otherExact.setData(rs_escell.getString("accID"));
-            otherExact.setDb_key(rs_escell.getString("_Allele_key"));
-            otherExact.setAccessionKey(rs_escell.getString("_Accession_key"));
-            otherExact.setPreferred(rs_escell.getString("preferred"));
-            otherExact.setProvider(
-                    phmg.get(rs_escell.getString("_LogicalDB_key")));
-            otherExact.setDisplay_type("Cell Line ID");
+            oeldb.setType(rs_escell.getString("_MGIType_key"));
+            oeldb.setData(rs_escell.getString("accID"));
+            oeldb.setDb_key(rs_escell.getString("_Allele_key"));
+            oeldb.setAccessionKey(rs_escell.getString("_Accession_key"));
+            oeldb.setPreferred(rs_escell.getString("preferred"));
+            oeldb.setProvider(phmg.get(rs_escell.getString("_LogicalDB_key")));
+            oeldb.setDisplay_type("Cell Line ID");
             while (sis.size() > stack_max) {
                 Thread.sleep(1);
             }
-            sis.push(otherExact.getDocument());
+            
+            // Place the document on the stack.
+            
+            sis.push(oeldb.getDocument());
             total++;
             if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
+                log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            otherExact.clear();
+            oeldb.clear();
             rs_escell.next();
         }
 

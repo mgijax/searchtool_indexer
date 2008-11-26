@@ -19,7 +19,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
 
     // Instantiate the single VocabDisplay Lucene doc builder.
 
-    private MarkerVocabDagLuceneDocBuilder vocabDisplay =
+    private MarkerVocabDagLuceneDocBuilder mvdldb =
         new MarkerVocabDagLuceneDocBuilder();
 
     private Logger log = Logger.getLogger(
@@ -31,9 +31,9 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
         super(config);
         
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");
-        hm.put("Mammalian Phenotype", "Phenotype");
-        hm.put("PIR Superfamily", "Protein Family");
-        hm.put("InterPro Domains", "Protein Domain");
+        hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
         hm.put(IndexConstants.AD_TYPE_NAME, "Expression");
@@ -58,8 +58,8 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
 
     /**
      * Gather up all of the display information for non AD vocab terms.  
-     * We do this seperately for each vocabulary type, so if requirements 
-     * change for any specific type, we can change them independantly.
+     * We do this individually for each vocabulary type, so if requirements 
+     * change for any specific type, we can change them independently.
      * 
      * @throws SQLException
      * @throws InterruptedException
@@ -106,8 +106,8 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 + " tv.vocabName"
                 + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 5"
-                + " and vacc.annotType = 'Mammalian Phenotype/Genotype' "
-                + "and vacc._Term_key = tv._Term_key" + " order by _Term_key";
+                + " and vacc.annotType = 'Mammalian Phenotype/Genotype'"
+                + " and vacc._Term_key = tv._Term_key" + " order by _Term_key";
         
         String MP_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
                 + " _Marker_key " + "from VOC_Marker_Cache"
@@ -117,14 +117,14 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
 
         String MP_DAG_KEY = "select dc._AncestorObject_key,"
                 + " dc._DescendentObject_key"
-                + " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
+                + " from DAG_Closure dc, VOC_Annot_Count_Cache vacc,"
                 + " VOC_Term vt, VOC_AnnotType vat"
                 + " where dc._MGIType_key = 13"
                 + " and dc._DescendentObject_key = vacc._Term_key"
                 + " and vt._Term_key =dc._DescendentObject_key "
                 + " and vt._Vocab_key = vat._Vocab_key and vat.name ="
-                + " vacc.annotType "
-                + "and vacc.annotType = 'Mammalian Phenotype/Genotype'"
+                + " vacc.annotType"
+                + " and vacc.annotType = 'Mammalian Phenotype/Genotype'"
                 + " order by dc._AncestorObject_key, dc._DescendentObject_key";
         
         doNonADVocab(MP_VOC_KEY, MP_MARKER_DISPLAY_KEY, MP_DAG_KEY);
@@ -147,7 +147,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
         
         doNonADVocab(INTERPRO_VOC_KEY, INTERPRO_MARKER_DISPLAY_KEY);
         
-       // PIRSF
+        // PIRSF
         
         log.info("Collecting PIRSF Records!");
         
@@ -176,11 +176,11 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 + " tv._Term_key" + " order by _Term_key";
 
         String OMIM_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
-                + " vmc._Marker_key "
-                + "from VOC_Marker_Cache vmc, mrk_label ml"
+                + " vmc._Marker_key"
+                + " from VOC_Marker_Cache vmc, mrk_label ml"
                 + " where annotType = 'OMIM/Genotype' and vmc._Marker_key = "
-                + " ml._Marker_key and ml.label not like 'tg%cre%' and "
-                + "ml.labelType = 'MS'" + " order by _Term_key";
+                + " ml._Marker_key and ml.label not like 'tg%cre%' and"
+                + " ml.labelType = 'MS'" + " order by _Term_key";
         
         doNonADVocab(OMIM_VOC_KEY, OMIM_MARKER_DISPLAY_KEY);
         
@@ -195,12 +195,12 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 + " order by _Term_key";
 
         String OMIM_HUMAN_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
-                + "vmc._Marker_key "
-                + "from VOC_Marker_Cache vmc, mrk_label ml"
-                + " where annotType = 'OMIM/Human Marker' "
-                + "and vmc._Marker_key ="
-                + " ml._Marker_key and ml.label not like 'tg%cre%' and "
-                + "ml.labelType = 'MS'" + " order by _Term_key";
+                + "vmc._Marker_key"
+                + " from VOC_Marker_Cache vmc, mrk_label ml"
+                + " where annotType = 'OMIM/Human Marker'"
+                + " and vmc._Marker_key ="
+                + " ml._Marker_key and ml.label not like 'tg%cre%' and"
+                + " ml.labelType = 'MS'" + " order by _Term_key";
         
         doNonADVocab(OMIM_HUMAN_VOC_KEY, OMIM_HUMAN_MARKER_DISPLAY_KEY);
         
@@ -212,6 +212,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
      * Gather up all of the AD Term's display information, please note 
      * that while similar to non ad terms, AD is special in that it
      * doesn't possess Accession ID's.  
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -272,18 +273,17 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 // document to the stack.
                 
                 if (place != -1) {
-                    sis.push(vocabDisplay.getDocument());
-                    vocabDisplay.clear();
+                    sis.push(mvdldb.getDocument());
+                    mvdldb.clear();
                 }
                 
                 // Populate the basic document information.
                 
-                vocabDisplay.setDb_key(rs_ad.getString("_Structure_key"));
-                vocabDisplay.setContents(rs_ad.getString("PrintName2"));
-                vocabDisplay.setVocabulary(rs_ad.getString("VocabName"));
-                vocabDisplay.setTypeDisplay(hm.get(
-                        rs_ad.getString("VocabName")));
-                vocabDisplay.setUnique_key(rs_ad.getString("_Structure_key")
+                mvdldb.setDb_key(rs_ad.getString("_Structure_key"));
+                mvdldb.setContents(rs_ad.getString("PrintName2"));
+                mvdldb.setVocabulary(rs_ad.getString("VocabName"));
+                mvdldb.setTypeDisplay(hm.get(rs_ad.getString("VocabName")));
+                mvdldb.setUnique_key(rs_ad.getString("_Structure_key")
                         +rs_ad.getString("vocabName"));
 
                 // Set the document place, when this changes we know we are
@@ -296,22 +296,21 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 while (!ad_marker_display_rs.isAfterLast()
                         && ad_marker_display_rs.getInt("_Term_key") <= place) {
                     if (ad_marker_display_rs.getInt("_Term_key") == place) {
-                        vocabDisplay.appendGene_ids(ad_marker_display_rs
+                        mvdldb.appendGene_ids(ad_marker_display_rs
                                 .getString("_Marker_key"));
                     }
                     ad_marker_display_rs.next();
                 }
                 
-                // Grab the terms that are decendants of this term, by term
+                // Grab the terms that are descendants of this term, by term
                 // key order.
                 
                 while (!ad_child_rs.isAfterLast()
                         && ad_child_rs.getInt("_Structure_key") <= place) {
                     if (ad_child_rs.getInt("_Structure_key") == place) {
-                        vocabDisplay.appendChild_ids(
+                        mvdldb.appendChild_ids(
                                 ad_child_rs.getString("_Descendent_key"));
                     }
-                    // child_place = ad_child_rs.getInt(1);
                     ad_child_rs.next();
                 }
             }
@@ -320,7 +319,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
         // Push the last document onto the stack, the one the loop kicked
         // out on.
         
-        sis.push(vocabDisplay.getDocument());
+        sis.push(mvdldb.getDocument());
         
         // Clean up
         
@@ -337,6 +336,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
      * one to define the term itself, one to define the set of markers to
      * assign to terms for a given vocabulary, and one to define the
      * children of the given term.
+     * 
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -364,7 +364,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
         /*
          * These documents are compound in nature, for each document we create,
          * we are running several queries into the database This is most
-         * definately the single most complicated document that we create for
+         * easily the single most complicated document that we create for
          * the entire indexing process.
          * 
          */
@@ -384,23 +384,23 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
     
                     // Place the current document on the stack.
     
-                    sis.push(vocabDisplay.getDocument());
+                    sis.push(mvdldb.getDocument());
     
                     // Clear the document creation object, to ready it for the
                     // next doc.
     
-                    vocabDisplay.clear();
+                    mvdldb.clear();
                 }
     
                 // Populate the document with information pertaining
                 // specifically to the vocab term we are now on.
     
-                vocabDisplay.setDb_key(rs_vocabTerm.getString("_Term_key"));
-                vocabDisplay.setVocabulary(rs_vocabTerm.getString("vocabName"));
-                vocabDisplay.setTypeDisplay(hm.get(
+                mvdldb.setDb_key(rs_vocabTerm.getString("_Term_key"));
+                mvdldb.setVocabulary(rs_vocabTerm.getString("vocabName"));
+                mvdldb.setTypeDisplay(hm.get(
                         rs_vocabTerm.getString("vocabName")));
-                vocabDisplay.setAcc_id(rs_vocabTerm.getString("accID"));
-                vocabDisplay.setUnique_key(rs_vocabTerm.getString("_Term_key")
+                mvdldb.setAcc_id(rs_vocabTerm.getString("accID"));
+                mvdldb.setUnique_key(rs_vocabTerm.getString("_Term_key")
                         +rs_vocabTerm.getString("vocabName"));
     
                 // Set the place to be the current terms object key, when this
@@ -414,7 +414,7 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 while (!marker_display_rs.isAfterLast()
                         && marker_display_rs.getInt("_Term_key") <= place) {
                     if (marker_display_rs.getInt("_Term_key") == place) {
-                        vocabDisplay.appendGene_ids(marker_display_rs
+                        mvdldb.appendGene_ids(marker_display_rs
                                 .getString("_Marker_key"));
                     }
                     marker_display_rs.next();
@@ -426,20 +426,20 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 while (!child_rs.isAfterLast()
                         && child_rs.getInt("_AncestorObject_key") <= place) {
                     if (child_rs.getInt("_AncestorObject_key") == place) {
-                        vocabDisplay.appendChild_ids(child_rs
+                        mvdldb.appendChild_ids(child_rs
                                 .getString("_DescendentObject_key"));
                     }
                     child_rs.next();
     
                 }
             }
-            vocabDisplay.setContents(rs_vocabTerm.getString("term"));
+            mvdldb.setContents(rs_vocabTerm.getString("term"));
         }
     
         // Add the Final Document, that the loop kicked out on.
     
-        sis.push(vocabDisplay.getDocument());
-        vocabDisplay.clear();
+        sis.push(mvdldb.getDocument());
+        mvdldb.clear();
         
         // Clean up
         
@@ -499,23 +499,23 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
     
                     // Place the current document on the stack.
     
-                    sis.push(vocabDisplay.getDocument());
+                    sis.push(mvdldb.getDocument());
     
                     // Clear the document creation object, to ready it for the
                     // next doc.
     
-                    vocabDisplay.clear();
+                    mvdldb.clear();
                 }
     
                 // Populate the document with information pertaining
                 // specifically to the vocab term we are now on.
     
-                vocabDisplay.setDb_key(rs_vocabTerm.getString("_Term_key"));
-                vocabDisplay.setVocabulary(rs_vocabTerm.getString("vocabName"));
-                vocabDisplay.setTypeDisplay(hm.get(
+                mvdldb.setDb_key(rs_vocabTerm.getString("_Term_key"));
+                mvdldb.setVocabulary(rs_vocabTerm.getString("vocabName"));
+                mvdldb.setTypeDisplay(hm.get(
                         rs_vocabTerm.getString("vocabName")));
-                vocabDisplay.setAcc_id(rs_vocabTerm.getString("accID"));
-                vocabDisplay.setUnique_key(rs_vocabTerm.getString("_Term_key")
+                mvdldb.setAcc_id(rs_vocabTerm.getString("accID"));
+                mvdldb.setUnique_key(rs_vocabTerm.getString("_Term_key")
                         +rs_vocabTerm.getString("vocabName"));
     
                 // Set the place to be the current terms object key, when this
@@ -529,20 +529,20 @@ public class MarkerVocabDagGatherer extends AbstractGatherer {
                 while (!marker_display_rs.isAfterLast()
                         && marker_display_rs.getInt("_Term_key") <= place) {
                     if (marker_display_rs.getInt("_Term_key") == place) {
-                        vocabDisplay.appendGene_ids(marker_display_rs
+                        mvdldb.appendGene_ids(marker_display_rs
                                 .getString("_Marker_key"));
                     }
                     marker_display_rs.next();
                 }
     
             }
-            vocabDisplay.setContents(rs_vocabTerm.getString("term"));
+            mvdldb.setContents(rs_vocabTerm.getString("term"));
         }
     
         // Add the Final Document, that the loop kicked out on.
     
-        sis.push(vocabDisplay.getDocument());
-        vocabDisplay.clear();
+        sis.push(mvdldb.getDocument());
+        mvdldb.clear();
         
         // Clean up
         

@@ -45,7 +45,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
 
     // Instantiate the single doc builder that this object will use.
 
-    private MarkerInexactLuceneDocBuilder markerInexact =
+    private MarkerInexactLuceneDocBuilder mildb =
         new MarkerInexactLuceneDocBuilder();
 
     private Logger log =
@@ -58,9 +58,10 @@ public class MarkerInexactGatherer extends AbstractGatherer {
         super(config);
 
         /*
-         * Please notice that three of these hashmap values come from strings
-         * that are not contained in the index constants. This is because the
-         * code that we use for them is generated in this objects Doc Builder.
+         * Please notice that three of these hashmap values are from a slightly
+         * different source than the others.  Interpro, pirsf and mp can have
+         * a longer type name in some tables.  For this dataset we need to use
+         * the longer names.
          */
 
         hm.put(IndexConstants.MARKER_SYMBOL, "Marker Symbol");
@@ -73,9 +74,9 @@ public class MarkerInexactGatherer extends AbstractGatherer {
         hm.put(IndexConstants.ORTHOLOG_NAME, "Ortholog Name");
         hm.put(IndexConstants.ORTHOLOG_SYNONYM, "Ortholog Synonym");
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");
-        hm.put("Mammalian Phenotype", "Phenotype");
-        hm.put("PIR Superfamily", "Protein Family");
-        hm.put("InterPro Domains", "Protein Domain");
+        hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Family");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Domain");
         hm.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
@@ -148,11 +149,11 @@ public class MarkerInexactGatherer extends AbstractGatherer {
             
             displayType = initCap(rs.getString("labelTypeName"));
             
-            markerInexact.setData(rs.getString("label"));
-            markerInexact.setRaw_data(rs.getString("label"));
-            markerInexact.setDb_key(rs.getString("_Marker_key"));
-            markerInexact.setVocabulary(IndexConstants.MARKER_TYPE_NAME);
-            markerInexact.setUnique_key(rs.getString("_Label_key") 
+            mildb.setData(rs.getString("label"));
+            mildb.setRaw_data(rs.getString("label"));
+            mildb.setDb_key(rs.getString("_Marker_key"));
+            mildb.setVocabulary(IndexConstants.MARKER_TYPE_NAME);
+            mildb.setUnique_key(rs.getString("_Label_key") 
                     + IndexConstants.MARKER_TYPE_NAME);
 
             // Check for Marker Ortholog Synonyms
@@ -160,7 +161,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
             if (rs.getString("labelType").equals(IndexConstants.MARKER_SYNOYNM)
                     && rs.getString("_OrthologOrganism_key") != null) {
                 if (!rs.getString("_Label_Status_key").equals("1")) {
-                    markerInexact.setIsCurrent("0");
+                    mildb.setIsCurrent("0");
                     
                     /*
                      * Putting this in for the future, currently in the 
@@ -168,14 +169,13 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                      * legal, so may as well cover it now.
                      */
                     
-                    markerInexact.setDataType(markerInexact.getDataType()+"O");
+                    mildb.setDataType(mildb.getDataType()+"O");
                 }
 
-                markerInexact.setDataType(IndexConstants.ORTHOLOG_SYNONYM);
-                markerInexact.setDisplay_type(displayType);
+                mildb.setDataType(IndexConstants.ORTHOLOG_SYNONYM);
+                mildb.setDisplay_type(displayType);
 
-                markerInexact
-                        .setOrganism(rs.getString("_OrthologOrganism_key"));
+                mildb.setOrganism(rs.getString("_OrthologOrganism_key"));
             } 
             
             // We want to specially label Human and Rat Ortholog Symbols
@@ -184,17 +184,17 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                     IndexConstants.ORTHOLOG_SYMBOL)) {
                 String organism = rs.getString("_OrthologOrganism_key");
                 if (organism != null && organism.equals("2")) {
-                    markerInexact.setDataType(
+                    mildb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
                 }
                 else if (organism != null && organism.equals("44")) {
-                    markerInexact.setDataType(
+                    mildb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_RAT);
                 }
                 else {
-                    markerInexact.setDataType(rs.getString("labelType"));  
+                    mildb.setDataType(rs.getString("labelType"));  
                 }
-                markerInexact.setDisplay_type(displayType);
+                mildb.setDisplay_type(displayType);
             }
             
             // If we have an ortholog symbol or name, set its organism
@@ -204,21 +204,21 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                         IndexConstants.ORTHOLOG_SYMBOL)
                         || rs.getString("labelType").equals(
                                 IndexConstants.ORTHOLOG_NAME)) {
-                    markerInexact.setOrganism(rs
+                    mildb.setOrganism(rs
                             .getString("_OrthologOrganism_key"));
                 }
 
-                markerInexact.setDataType(rs.getString("labelType"));
+                mildb.setDataType(rs.getString("labelType"));
 
                 if (!rs.getString("_Label_Status_key").equals("1")) {
-                    markerInexact.setIsCurrent("0");
+                    mildb.setIsCurrent("0");
                     
                     // We want to manufacture new label types, if the status
                     // shows that they are old.  Looking at the database
                     // the only possibly things that this can hit at the moment
                     // are Marker Name and Marker Symbol
                     
-                    markerInexact.setDataType(markerInexact.getDataType()+"O");
+                    mildb.setDataType(mildb.getDataType()+"O");
                 }
                 
                 // Manually remove the word current from two special cases.
@@ -229,12 +229,14 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                 if (displayType.equals("Current Name")) {
                     displayType = "Name";
                 }
-                markerInexact.setDisplay_type(displayType);
+                mildb.setDisplay_type(displayType);
 
                 }
 
-            sis.push(markerInexact.getDocument());
-            markerInexact.clear();
+            // Add the document to the stack
+            
+            sis.push(mildb.getDocument());
+            mildb.clear();
             rs.next();
         }
 
@@ -257,6 +259,10 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     private void doVocabTerm() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
+        
+        // Since all of this SQL is marker related, we do a join to the 
+        // vocab annotated count cache, and only bring back vocabulary 
+        // records that have markers annotated to them or thier children.
 
         log.info("Collecting GO Terms");
         
@@ -334,7 +340,9 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     private void doVocabSynonym() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-
+        // Since this is a marker related index, only bring back vocab items
+        // that have markers actually annotated to them, or their children.
+        
         log.info("Collecintg GO Synonyms");
         
         String GO_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
@@ -397,8 +405,10 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     private void doVocabNotes() throws SQLException, InterruptedException {
 
         // SQL for this subsection, please note that the order by clause is
-        // important
-        // for these sql statement.
+        // important for these sql statements.
+        
+        // Also since this is a marker related index only bring back notes for
+        // terms who have annotations to markers.
 
         log.info("Collecting GO Notes/Definitions");
         
@@ -437,11 +447,16 @@ public class MarkerInexactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
 
+        // Also since this is a marker related index only bring back notes for
+        // terms who have annotations to markers.
+        
         log.info("Collecting AD Terms");
         
         String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
-                + "s.printName, 'AD' as vocabName" + " from GXD_Structure s"
-                + " where s._Parent_key != null";
+                + "s.printName, 'AD' as vocabName"
+                + " from GXD_Structure s, VOC_Annot_Count_Cache vacc"
+                + " where s._Parent_key != null and vacc.annotType = 'AD'"
+                + " and vacc._Term_key = s._Structure_key";
 
         // Gather the data
 
@@ -462,26 +477,24 @@ public class MarkerInexactGatherer extends AbstractGatherer {
             // For AD specifically we are adding in multiple ways for something
             // to match inexactly.
 
-            markerInexact.setData("TS" + rs_ad_term.getString("_Stage_key")
-                    + " "
+            mildb.setData("TS" + rs_ad_term.getString("_Stage_key") + " "
                     + rs_ad_term.getString("printName").replaceAll(";", " "));
-            markerInexact.setRaw_data("TS" + rs_ad_term.getString("_Stage_key")
-                    + ": "
+            mildb.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": "
                     + rs_ad_term.getString("printName").replaceAll(";", "; "));
-            markerInexact.setDb_key(rs_ad_term.getString("_Structure_key"));
-            markerInexact.setUnique_key(rs_ad_term.getString("_Structure_key")
+            mildb.setDb_key(rs_ad_term.getString("_Structure_key"));
+            mildb.setUnique_key(rs_ad_term.getString("_Structure_key")
                     +rs_ad_term.getString("vocabName"));
-            markerInexact.setVocabulary(rs_ad_term.getString("vocabName"));
-            markerInexact.setDisplay_type(hm.get(rs_ad_term
+            mildb.setVocabulary(rs_ad_term.getString("vocabName"));
+            mildb.setDisplay_type(hm.get(rs_ad_term
                     .getString("vocabName")));
-            markerInexact.setDataType(IndexConstants.VOCAB_TERM);
-            sis.push(markerInexact.getDocument());
+            mildb.setDataType(IndexConstants.VOCAB_TERM);
+            sis.push(mildb.getDocument());
             // Transformed version, w/o TS
-            markerInexact.setData(rs_ad_term.getString("printName").replaceAll(
+            mildb.setData(rs_ad_term.getString("printName").replaceAll(
                     ";", " "));
-            sis.push(markerInexact.getDocument());
+            sis.push(mildb.getDocument());
 
-            markerInexact.clear();
+            mildb.clear();
             rs_ad_term.next();
         }
 
@@ -501,14 +514,20 @@ public class MarkerInexactGatherer extends AbstractGatherer {
 
         // SQL for this Subsection
         
-        log.info("Collecting GO Synonyms");
+        // Also since this is a marker related index only bring back notes for
+        // terms who have annotations to markers.
+        
+        log.info("Collecting AD Synonyms");
         
         String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
                 + "'AD' as vocabName"
-                + " from dbo.GXD_Structure s, GXD_StructureName sn"
+                + " from dbo.GXD_Structure s, GXD_StructureName sn,"
+                + " VOC_Annot_Count_Cache vacc"
                 + " where s._parent_key != null"
-                + " and s._Structure_key = sn._Structure_key and "
-                + "s._StructureName_key != sn._StructureName_key";
+                + " and s._Structure_key = sn._Structure_key and"
+                + " s._StructureName_key != sn._StructureName_key"
+                + " and vacc.annotType='AD' and vacc._Term_key ="
+                + " s._Structure_key";
 
         // Gather the data
         
@@ -526,18 +545,21 @@ public class MarkerInexactGatherer extends AbstractGatherer {
         
         while (!rs_ad_syn.isAfterLast()) {
 
-            markerInexact.setData(rs_ad_syn.getString("Structure"));
-            markerInexact.setRaw_data(rs_ad_syn.getString("Structure"));
-            markerInexact.setDb_key(rs_ad_syn.getString("_Structure_key"));
-            markerInexact.setUnique_key(rs_ad_syn.getString("_Structure_key")
+            mildb.setData(rs_ad_syn.getString("Structure"));
+            mildb.setRaw_data(rs_ad_syn.getString("Structure"));
+            mildb.setDb_key(rs_ad_syn.getString("_Structure_key"));
+            mildb.setUnique_key(rs_ad_syn.getString("_Structure_key")
                     +rs_ad_syn.getString("Structure")
                     +rs_ad_syn.getString("vocabName"));
-            markerInexact.setVocabulary(rs_ad_syn.getString("vocabName"));
-            markerInexact.setDisplay_type(hm.get(
+            mildb.setVocabulary(rs_ad_syn.getString("vocabName"));
+            mildb.setDisplay_type(hm.get(
                     rs_ad_syn.getString("vocabName")));
-            markerInexact.setDataType(IndexConstants.VOCAB_SYNONYM);
-            sis.push(markerInexact.getDocument());
-            markerInexact.clear();
+            mildb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            
+            // Place the document onto the stack.
+            
+            sis.push(mildb.getDocument());
+            mildb.clear();
             rs_ad_syn.next();
         }
 
@@ -581,17 +603,19 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     
         while (!rs.isAfterLast()) {
             
-            markerInexact.setData(rs.getString("label"));
-            markerInexact.setRaw_data(rs.getString("label"));
-            markerInexact.setDb_key(rs.getString("_Marker_key"));
-            markerInexact.setUnique_key(rs.getString("_Marker_key")
+            mildb.setData(rs.getString("label"));
+            mildb.setRaw_data(rs.getString("label"));
+            mildb.setDb_key(rs.getString("_Marker_key"));
+            mildb.setUnique_key(rs.getString("_Marker_key")
                     +rs.getString("label") + IndexConstants.MARKER_TYPE_NAME);
-            markerInexact.setVocabulary(IndexConstants.MARKER_TYPE_NAME); 
-            markerInexact.setDataType(rs.getString("labelType"));
-            markerInexact.setDisplay_type(hm.get(rs.getString("labelType")));
+            mildb.setVocabulary(IndexConstants.MARKER_TYPE_NAME); 
+            mildb.setDataType(rs.getString("labelType"));
+            mildb.setDisplay_type(hm.get(rs.getString("labelType")));
     
-            sis.push(markerInexact.getDocument());
-            markerInexact.clear();
+            // Place the document on the stack.
+            
+            sis.push(mildb.getDocument());
+            mildb.clear();
             rs.next();
         }
     
@@ -629,17 +653,20 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     
         while (!rs_term.isAfterLast()) {
     
-            markerInexact.setData(rs_term.getString("term"));
-            markerInexact.setRaw_data(rs_term.getString("term"));
-            markerInexact.setDb_key(rs_term.getString("_Term_key"));
-            markerInexact.setUnique_key(rs_term.getString("_Term_key")
+            mildb.setData(rs_term.getString("term"));
+            mildb.setRaw_data(rs_term.getString("term"));
+            mildb.setDb_key(rs_term.getString("_Term_key"));
+            mildb.setUnique_key(rs_term.getString("_Term_key")
                     +rs_term.getString("vocabName"));
-            markerInexact.setVocabulary(rs_term.getString("vocabName"));
-            markerInexact.setDisplay_type(hm.get(
+            mildb.setVocabulary(rs_term.getString("vocabName"));
+            mildb.setDisplay_type(hm.get(
                     rs_term.getString("vocabName")));
-            markerInexact.setDataType(IndexConstants.VOCAB_TERM);
-            sis.push(markerInexact.getDocument());
-            markerInexact.clear();
+            mildb.setDataType(IndexConstants.VOCAB_TERM);
+            
+            // Place the document on the stack.
+            
+            sis.push(mildb.getDocument());
+            mildb.clear();
             rs_term.next();
         }
     
@@ -673,18 +700,21 @@ public class MarkerInexactGatherer extends AbstractGatherer {
     
         while (!rs_syn.isAfterLast()) {
     
-            markerInexact.setData(rs_syn.getString("synonym"));
-            markerInexact.setRaw_data(rs_syn.getString("synonym"));
-            markerInexact.setDb_key(rs_syn.getString("_Term_key"));
-            markerInexact.setUnique_key(rs_syn.getString("_Synonym_key")
+            mildb.setData(rs_syn.getString("synonym"));
+            mildb.setRaw_data(rs_syn.getString("synonym"));
+            mildb.setDb_key(rs_syn.getString("_Term_key"));
+            mildb.setUnique_key(rs_syn.getString("_Synonym_key")
                     +IndexConstants.VOCAB_SYNONYM
                     +rs_syn.getString("vocabName"));
-            markerInexact.setVocabulary(rs_syn.getString("vocabName"));
-            markerInexact
+            mildb.setVocabulary(rs_syn.getString("vocabName"));
+            mildb
                     .setDisplay_type(hm.get(rs_syn.getString("vocabName")));
-            markerInexact.setDataType(IndexConstants.VOCAB_SYNONYM);
-            sis.push(markerInexact.getDocument());
-            markerInexact.clear();
+            mildb.setDataType(IndexConstants.VOCAB_SYNONYM);
+            
+            // Place the document on the stock.
+            
+            sis.push(mildb.getDocument());
+            mildb.clear();
             rs_syn.next();
         }
     
@@ -718,26 +748,29 @@ public class MarkerInexactGatherer extends AbstractGatherer {
         int place = -1;
     
         // Since notes are compound rows in the database, we have to
-        // contruct the searchable field.
+        // construct the searchable field.
     
         while (!rs_note.isAfterLast()) {
             if (place != rs_note.getInt(1)) {
                 if (place != -1) {
-                    markerInexact.setRaw_data(markerInexact.getData());
-                    sis.push(markerInexact.getDocument());
-                    markerInexact.clear();
+                    mildb.setRaw_data(mildb.getData());
+                    
+                    // Place the document on the stack.
+                    
+                    sis.push(mildb.getDocument());
+                    mildb.clear();
                 }
-                markerInexact.setDb_key(rs_note.getString("_Term_key"));
-                markerInexact.setUnique_key(rs_note.getString("_Term_key")
+                mildb.setDb_key(rs_note.getString("_Term_key"));
+                mildb.setUnique_key(rs_note.getString("_Term_key")
                         +IndexConstants.VOCAB_NOTE
                         +rs_note.getString("vocabName"));
-                markerInexact.setVocabulary(rs_note.getString("vocabName"));
-                markerInexact.setDisplay_type(hm.get(rs_note
+                mildb.setVocabulary(rs_note.getString("vocabName"));
+                mildb.setDisplay_type(hm.get(rs_note
                         .getString("vocabName")));
-                markerInexact.setDataType(IndexConstants.VOCAB_NOTE);
+                mildb.setDataType(IndexConstants.VOCAB_NOTE);
                 place = rs_note.getInt("_Term_key");
             }
-            markerInexact.appendData(rs_note.getString("note"));
+            mildb.appendData(rs_note.getString("note"));
             rs_note.next();
         }
     

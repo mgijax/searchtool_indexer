@@ -9,7 +9,7 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * Object that encapsulates the data used to create the MarkerDisplay index.
  * 
  * @author mhall
- * @is a LuceneDocBuilder
+ * 
  * @has Nothing
  * @does Knows how to turn the data values inside of it into a Lucene document.
  */
@@ -52,6 +52,9 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
 
     public Document getDocument() {
 
+        // Do we have an error? If so dump the contents of this object to the
+        // logs.
+        
         if (hasError) {
             log.error("Error while indexing: " +this.toString());
         }
@@ -135,6 +138,7 @@ public class MarkerDisplayLuceneDocBuilder implements LuceneDocBuilder {
      * 
      * @return String representation of the marker symbol.
      */
+    
     public String getSymbol() {
         return symbol;
     }

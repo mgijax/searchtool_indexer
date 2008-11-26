@@ -16,7 +16,7 @@ import org.jax.mgi.shr.config.IndexCfg;
  * @author mhall
  * 
  * @has MarkerDisplayLuceneDocBuilder which is used to encapsulate all of the
- * information for this object, and then generate lucene documents on demand.
+ * information for this object, and then generate Lucene documents on demand.
  * 
  * @does Gathers information, and creates Lucene documents for the marker
  * display type, it then populates the shared document stack with these
@@ -33,7 +33,7 @@ public class MarkerDisplayGatherer extends AbstractGatherer {
 
     // Create our ONLY doc builder.
 
-    private MarkerDisplayLuceneDocBuilder markerDisplay =
+    private MarkerDisplayLuceneDocBuilder mdldb =
         new MarkerDisplayLuceneDocBuilder();
 
     private Logger log = 
@@ -111,14 +111,17 @@ public class MarkerDisplayGatherer extends AbstractGatherer {
         // Parse the results.
 
         while (rs.next()) {
-            markerDisplay.setDb_key(rs.getString("_Marker_key"));
-            markerDisplay.setName(rs.getString("markername"));
-            markerDisplay.setSymbol(rs.getString("markersymbol"));
-            markerDisplay.setMarker_type(rs.getString("markertype"));
-            markerDisplay.setChr(rs.getString("chromosome"));
-            markerDisplay.setAcc_id(rs.getString("accID"));
-            sis.push(markerDisplay.getDocument());
-            markerDisplay.clear();
+            mdldb.setDb_key(rs.getString("_Marker_key"));
+            mdldb.setName(rs.getString("markername"));
+            mdldb.setSymbol(rs.getString("markersymbol"));
+            mdldb.setMarker_type(rs.getString("markertype"));
+            mdldb.setChr(rs.getString("chromosome"));
+            mdldb.setAcc_id(rs.getString("accID"));
+            
+            // Place the document on the stack
+            
+            sis.push(mdldb.getDocument());
+            mdldb.clear();
 
         }
 

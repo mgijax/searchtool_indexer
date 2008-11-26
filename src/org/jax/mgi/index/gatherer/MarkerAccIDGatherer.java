@@ -10,7 +10,7 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gathering up and information we might need in
+ * This is responsible for gathering up and information we might need in
  * the MarkerAccID index.
  * 
  * @author mhall
@@ -99,6 +99,10 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         log.info("Gathering Accession ID's for Markers");
         
+        // Please note that this SQL specifically ignores accession id's
+        // that have been annotated to markers, but are also annotated to 
+        // es cell line's.
+        
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
@@ -119,8 +123,7 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         String provider = "";
         
-        log.info(
-                "Time taken to gather marker's accession id result set: "
+        log.info("Time taken to gather marker's accession id result set: "
                         + (writeEnd.getTime() - writeStart.getTime()));
 
         // Parse it
@@ -140,6 +143,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             } else {
                 maldb.setProvider(provider);
             }
+            
+            // Place the document on the stack
+            
             sis.push(maldb.getDocument());
             maldb.clear();
             rs_acc.next();
@@ -191,6 +197,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setDb_key(rs_all_acc.getString("_Marker_key"));
             maldb.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
             maldb.setDisplay_type("Allele ID");
+            
+            // Place the document on the stack.
+            
             sis.push(maldb.getDocument());
             maldb.clear();
             rs_all_acc.next();
@@ -256,6 +265,9 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             maldb.setProvider("("+phmg.get(
                     rs_orth_acc.getString("_LogicalDB_key")) + " - " 
                     + initCap(rs_orth_acc.getString("commonName"))+")");
+            
+            // Place the document on the stack.
+            
             sis.push(maldb.getDocument());
             maldb.clear();
 
@@ -297,8 +309,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         writeStart = new Date();
 
-        ResultSet rs_es_acc = execute(ES_CELL_LINE_TO_MARKER_ACC_ID);
-        rs_es_acc.next();
+        ResultSet rs_es_acc_by_allele = execute(ES_CELL_LINE_TO_MARKER_ACC_ID);
+        rs_es_acc_by_allele.next();
 
         writeEnd = new Date();
 
@@ -307,21 +319,24 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         // Parse it
 
-        while (!rs_es_acc.isAfterLast()) {
-            maldb.setData(rs_es_acc.getString("accID"));
-            maldb.setDb_key(rs_es_acc.getString("_Marker_key"));
+        while (!rs_es_acc_by_allele.isAfterLast()) {
+            maldb.setData(rs_es_acc_by_allele.getString("accID"));
+            maldb.setDb_key(rs_es_acc_by_allele.getString("_Marker_key"));
             maldb.setDataType(IndexConstants.ES_ACCESSION_ID);
             maldb.setDisplay_type("Cell Line ID");
-            maldb.setProvider("("+phmg.get(rs_es_acc
+            maldb.setProvider("("+phmg.get(rs_es_acc_by_allele
                     .getString("_LogicalDB_key"))+")");
+            
+            // Place the document on the stack.
+            
             sis.push(maldb.getDocument());
             maldb.clear();
-            rs_es_acc.next();
+            rs_es_acc_by_allele.next();
         }
 
         // Clean up
 
-        rs_es_acc.close();
+        rs_es_acc_by_allele.close();
         log.info("Done ES Cell Line Accession ID's!");
     }
 
@@ -356,8 +371,8 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         writeStart = new Date();
 
-        ResultSet rs_acc = execute(GENE_ACC_KEY);
-        rs_acc.next();
+        ResultSet rs_es_acc_by_marker = execute(GENE_ACC_KEY);
+        rs_es_acc_by_marker.next();
 
         writeEnd = new Date();
 
@@ -369,13 +384,13 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
 
         // Parse it
 
-        while (!rs_acc.isAfterLast()) {
+        while (!rs_es_acc_by_marker.isAfterLast()) {
 
-            maldb.setData(rs_acc.getString("accID"));
-            maldb.setDb_key(rs_acc.getString("_Object_key"));
+            maldb.setData(rs_es_acc_by_marker.getString("accID"));
+            maldb.setDb_key(rs_es_acc_by_marker.getString("_Object_key"));
             maldb.setDataType(IndexConstants.ES_ACCESSION_ID);
             maldb.setDisplay_type("Cell Line ID");
-            provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
+            provider = phmg.get(rs_es_acc_by_marker.getString("_LogicalDB_key"));
             
             // Again, if we have a blank case, blank out the provider. 
             
@@ -384,15 +399,18 @@ public class MarkerAccIDGatherer extends AbstractGatherer {
             } else {
                 maldb.setProvider(provider);
             }
+            
+            // Place the document on the stack
+            
             sis.push(maldb.getDocument());
             maldb.clear();
-            rs_acc.next();
+            rs_es_acc_by_marker.next();
 
         }
 
         // Clean up
 
-        rs_acc.close();
+        rs_es_acc_by_marker.close();
         log.info("Done Accession ID's for Markers!");
     }
 }

@@ -17,14 +17,13 @@ import org.jax.mgi.shr.config.IndexCfg;
  * 
  * @does A singleton, that upon instantiation will populate itself with the
  * display text for the various logical providers, with special handling for
- * certian providers.
+ * certain providers.
  * 
  */
 
 public class ProviderHashMapGatherer extends AbstractGatherer {
 
-    public HashMap<String, String> providerHash = 
-        new HashMap<String, String>();
+    public HashMap<String, String> providerHash = new HashMap<String, String>();
 
     private String PROVIDER_SQL = "select _LogicalDB_key, name"
             + " from ACC_LogicalDB";
@@ -34,16 +33,16 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
             + " group by _LogicalDB_key" + " having count(*) > 1"
             + " order by _LogicalDB_key, name desc";
 
-    private static Logger log = 
-        Logger.getLogger(ProviderHashMapGatherer.class.getName());
-    
+    private static Logger log = Logger.getLogger(ProviderHashMapGatherer.class
+            .getName());
+
     /**
      * Constructor, this calls the super class constructor, and then invokes
      * the init method which populates this object.
      * 
      * @param config
      */
-    
+
     public ProviderHashMapGatherer(IndexCfg config) {
         super(config);
         init();
@@ -52,20 +51,21 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
     /**
      * Populate this object with the providers.
      */
-    
-    public void run () {}
-    
+
+    public void run() {
+    }
+
     private void init() {
 
-        // This is the standard case, each provider directly coorelates 
+        // This is the standard case, each provider directly correlates 
         // to a logical db key.
-        
+
         ResultSet provider_set = execute(PROVIDER_SQL);
         try {
             provider_set.next();
 
             while (!provider_set.isAfterLast()) {
-                providerHash.put(provider_set.getString("_LogicalDB_key"), 
+                providerHash.put(provider_set.getString("_LogicalDB_key"),
                         provider_set.getString("name"));
                 provider_set.next();
             }
@@ -73,8 +73,7 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
             e.printStackTrace();
         }
 
-        // Here are the exceptions, these are compound providers, which are
-        // really annoying.
+        // Here are the exceptions, these are compound providers, 
         // Since this is a map, we will simply overwrite the values from the
         // original sql.
 
@@ -113,13 +112,13 @@ public class ProviderHashMapGatherer extends AbstractGatherer {
     }
 
     // Get a logical DB display name
-    
+
     public String get(String logicalDB) {
         return providerHash.get(logicalDB);
     }
 
     // Add in a new logical db display name (or overwrite)
-    
+
     public void put(String key, String logicalDB) {
         providerHash.put(key, logicalDB);
     }
