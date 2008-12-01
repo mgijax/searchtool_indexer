@@ -391,7 +391,7 @@ public class MarkerInexactLuceneDocBuilder implements LuceneDocBuilder {
      * Returns the unique key for this document.  This key is used as a join 
      * point across indexes at display time.
      * 
-     * @return
+     * @return String with this objects unique key.
      */
     
     public String getUnique_key() {

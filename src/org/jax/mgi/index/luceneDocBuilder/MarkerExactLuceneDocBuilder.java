@@ -251,7 +251,7 @@ public class MarkerExactLuceneDocBuilder implements LuceneDocBuilder {
      * Return the calculated unique key for this object.  This is in place to 
      * allow a join between indexes at display time.
      * 
-     * @return
+     * @return String with this objects unique key.
      */
     
     public String getUnique_key() {

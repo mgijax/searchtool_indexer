@@ -338,7 +338,7 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
     /**
      * Return the unique key for this document.  The key is used to join
      * across indexes.
-     * @return
+     * @return String with this objects unique key.
      */
     
     public String getUnique_key() {

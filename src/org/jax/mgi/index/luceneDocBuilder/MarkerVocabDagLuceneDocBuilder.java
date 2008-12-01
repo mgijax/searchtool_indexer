@@ -395,7 +395,7 @@ public class MarkerVocabDagLuceneDocBuilder implements LuceneDocBuilder {
     
     /**
      * Returns the unique key.  This is used as a join point across indexes,
-     * @return
+     * @return String with this objects unique key.
      */
     
 
