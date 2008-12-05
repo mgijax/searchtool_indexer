@@ -133,7 +133,7 @@ public class MarkerSymbolGatherer extends AbstractGatherer {
                     meldb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
                 }
-                else if (organism != null && organism.equals("44")) {
+                else if (organism != null && organism.equals("40")) {
                     meldb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_RAT);
                 }

@@ -187,7 +187,7 @@ public class MarkerInexactGatherer extends AbstractGatherer {
                     mildb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_HUMAN);
                 }
-                else if (organism != null && organism.equals("44")) {
+                else if (organism != null && organism.equals("40")) {
                     mildb.setDataType(
                             IndexConstants.ORTHOLOG_SYMBOL_RAT);
                 }
