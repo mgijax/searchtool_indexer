@@ -75,8 +75,8 @@ public class MarkerInexactGatherer extends AbstractGatherer {
         hm.put(IndexConstants.ORTHOLOG_SYNONYM, "Ortholog Synonym");
         hm.put(IndexConstants.GO_TYPE_NAME, "Gene Ontology");
         hm.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
-        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Family");
-        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Domain");
+        hm.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
+        hm.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
         hm.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
         hm.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
         hm.put(IndexConstants.GO_TYPE_NAME, "Function");
