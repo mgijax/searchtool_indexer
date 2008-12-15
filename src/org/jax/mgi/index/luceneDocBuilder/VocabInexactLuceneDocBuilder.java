@@ -71,14 +71,14 @@ public class VocabInexactLuceneDocBuilder implements LuceneDocBuilder {
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         
         doc.add(new Field(IndexConstants.COL_DATA,
-                this.getData().replaceAll("\\W", " "),
+                this.getData().replaceAll("[\\W_]", " "),
                 Field.Store.YES, Field.Index.TOKENIZED));
         
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.getRaw_data(),
                 Field.Store.YES, Field.Index.NO));
         
         doc.add(new Field(IndexConstants.COL_SDATA,
-                this.getData().replaceAll("\\W", " "),
+                this.getData().replaceAll("[\\W_]", " "),
                 Field.Store.YES, Field.Index.TOKENIZED));
         
         doc.add(new Field(IndexConstants.COL_VOCABULARY, this.getVocabulary(),
