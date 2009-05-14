@@ -40,8 +40,8 @@ public class MarkerInexactGatherer extends DatabaseGatherer {
     private MarkerInexactLuceneDocBuilder builder =
         new MarkerInexactLuceneDocBuilder();
     
-    public static HashMap<String, String> providerMap =
-        new HashMap<String, String>();
+    public static HashMap <String, String> providerMap =
+        new HashMap <String, String>();
 
     public MarkerInexactGatherer(IndexCfg config) {
         super(config);
