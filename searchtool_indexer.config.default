@@ -13,18 +13,24 @@ fi
 CONFIG_MASTER=${MGICONFIG}/master.config.sh
 export CONFIG_MASTER
 
+# Number of threads that will take documents off the shared document stack.
 NUMBER_OF_THREADS=4
+# How many indexing files to create before merging them into one larger file.
 MERGE_FACTOR=100
+# How many files the IndexWriter will buffer before flushing out to IO.
 MAX_BUFFERED_DOCS=10000
+# Collapse the indexes into a smaller physical file structure.
 USE_COMPOUND_DOCS=false
+# How large can the stack get before blocking.
 STACK_MAX=1000000
+# The Jconn JDBC Driver
 DB_DRIVER=com.sybase.jdbc3.jdbc.SybDriver
 
 # Play around with JAVA_HOME
 
-JAVA_HOME=/usr/jdk/jdk1.6.0_07/
+JAVA_HOME=/usr/mgijava6/
 
-CLASSPATH=$CLASSPATH:${SEARCHTOOL_INDEXER}/qs_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
+CLASSPATH=$CLASSPATH:${SEARCHTOOL_INDEXER}/searchtool_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
 
 PATH=/usr/mgijava6/bin/:/usr/local/apache-ant-1.7.1/bin/:${PATH}
 export PATH

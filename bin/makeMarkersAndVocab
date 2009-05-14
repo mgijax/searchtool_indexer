@@ -2,7 +2,14 @@
 
 cd `dirname $0`
 
+# The location of the config file
 INDEX_CONFIG=../searchtool_indexer.config
+
+# What is the memory footprint we want for the jvm for these indexes.
+MEMORY_ARGS="-Xms128m -Xmx512m"
+
+# Where is the base indexing directory
+BASE_INDEX_DIR=/data/searchtool/build/
 
 if [ ! -r ${INDEX_CONFIG} ]
 then
@@ -11,41 +18,45 @@ then
 fi
 . ${INDEX_CONFIG}
 
+# The basic indexing command, w/ the BASE_INDEX_DIR argument
+
+COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${BASE_INDEX_DIR}"
+
 ###########################
 # Make the Marker Indexes
 ###########################
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerInexact/index/ g
+${COMMAND}markerInexact/index/ g
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerDisplay/index/ gd
+${COMMAND}markerDisplay/index/ gd
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerExact/index/ ge
+${COMMAND}markerExact/index/ ge
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerAccID/index/ ga
+${COMMAND}markerAccID/index/ ga
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerSymbol/index/ gs
+${COMMAND}markerSymbol/index/ gs
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabExact/index/ gve
+${COMMAND}markerVocabExact/index/ gve
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabDag/index/ gvd
+${COMMAND}markerVocabDag/index/ gvd
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/markerVocabAccID/index/ gva
+${COMMAND}markerVocabAccID/index/ gva
 
 ###########################
 # Make the Vocab Indexes
 ###########################
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabInexact/index/ v
+${COMMAND}vocabInexact/index/ v
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabDisplay/index/ vd
+${COMMAND}vocabDisplay/index/ vd
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabExact/index/ ve
+${COMMAND}vocabExact/index/ ve
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx512m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/vocabAccID/index/ va
+${COMMAND}vocabAccID/index/ va
 
 ##################################################
 # Make the Token Existance Index
 ##################################################
 
-java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -Xms128m -Xmx2049m org.jax.mgi.index.index.MakeIndex /data/searchtool/build/nonIDToken/index/ t
+${COMMAND}nonIDToken/index/ t
 
