@@ -51,11 +51,11 @@ public class OtherExactGatherer extends DatabaseGatherer {
     private OtherExactLuceneDocBuilder builder =
         new OtherExactLuceneDocBuilder();
 
-    private ProviderHashMap phmg;
+    private ProviderHashMap phm;
 
     public OtherExactGatherer(IndexCfg config) {
         super(config);
-        phmg = new ProviderHashMap(config);
+        phm = new ProviderHashMap(config);
     }
     
     /**
@@ -78,7 +78,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             doSnps();
             doSubSnps();
             doOrthologs();
-            doAMA();
+            doAMA(); 
             doESCellLines();
     }
 
@@ -117,7 +117,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_ref.getString("_Object_key"));
             builder.setAccessionKey(rs_ref.getString("_Accession_key"));
             builder.setPreferred(rs_ref.getString("preferred"));
-            builder.setProvider(phmg.get(rs_ref.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_ref.getString("_LogicalDB_key")));
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
@@ -176,7 +176,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_prb.getString("_Object_key"));
             builder.setAccessionKey(rs_prb.getString("_Accession_key"));
             builder.setPreferred(rs_prb.getString("preferred"));
-            builder.setProvider(phmg.get(rs_prb.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_prb.getString("_LogicalDB_key")));
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
@@ -234,7 +234,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_all.getString("_Object_key"));
             builder.setAccessionKey(rs_all.getString("_Accession_key"));
             builder.setPreferred(rs_all.getString("preferred"));
-            builder.setProvider(phmg.get(rs_all.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_all.getString("_LogicalDB_key")));
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
@@ -583,7 +583,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_seq.getString("_Object_key"));
             builder.setAccessionKey(rs_seq.getString("_Accession_key"));
             builder.setPreferred(rs_seq.getString("preferred"));
-            builder.setProvider(phmg.get(rs_seq.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_seq.getString("_LogicalDB_key")));
 
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
@@ -654,7 +654,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_seq_by_probe.getString("_Object_key"));
             builder.setAccessionKey(rs_seq_by_probe.getString("_Accession_key"));
             builder.setPreferred(rs_seq_by_probe.getString("preferred"));
-            builder.setProvider(phmg.get(rs_seq_by_probe
+            builder.setProvider(phm.get(rs_seq_by_probe
                     .getString("_LogicalDB_key")));
 
             while (documentStore.size() > stack_max) {
@@ -756,9 +756,10 @@ public class OtherExactGatherer extends DatabaseGatherer {
         
         // gather up the snp accession ids
 
-        String OTHER_SNP_SECONDARY_SEARCH = "SELECT distinct _Accession_key, "
-                + "accID, _Object_key, 'SUBSNP' as _MGIType_key, 0 as prefered"
-                + " FROM SNP_Accession" + " where _MGIType_key = 31";
+        String OTHER_SNP_SECONDARY_SEARCH = "SELECT distinct sa._Accession_key, sa.accID, sss._ConsensusSnp_key " +
+        		"as _Object_key, 'SNP' as _MGIType_key, 0 as prefered " +
+                "FROM SNP_Accession sa, SNP_SubSnp sss " +
+                "where _MGIType_key = 31 and sa._Object_key = sss._SubSnp_key";
 
         // Gather the data
 
@@ -843,7 +844,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             
             // This has a realized provider string, we add in the species.
             
-            builder.setProvider(phmg.get(rs_orthologs.getString("_LogicalDB_key"))
+            builder.setProvider(phm.get(rs_orthologs.getString("_LogicalDB_key"))
                     + " - " + InitCap.initCap(rs_orthologs.getString("commonName")));
 
             while (documentStore.size() > stack_max) {
@@ -909,7 +910,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_ama.getString("_Object_key"));
             builder.setAccessionKey(rs_ama.getString("_Accession_key"));
             builder.setPreferred(rs_ama.getString("preferred"));
-            builder.setProvider(phmg.get(rs_ama.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_ama.getString("_LogicalDB_key")));
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
@@ -951,12 +952,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // in the database, not es cell lines that have been directly associated
         // to markers.
 
-        String OTHER_ES_CELL_LINE_SEARCH = "SELECT distinct a._Accession_key, "
-                + "a.accID, aa._Allele_key, 'ESCELL' as _MGIType_key, "
-                + "a.preferred, a._LogicalDB_key"
-                + " FROM ACC_Accession a, all_allele aa"
-                + " where a.private != 1 and a._MGIType_key = 28 and "
-                + "a._Object_key = aa._MutantESCellLine_key";
+        String OTHER_ES_CELL_LINE_SEARCH = "SELECT distinct a._Accession_key,"
+                + " a.accID, aa._Allele_key, 'ESCELL' as _MGIType_key,"
+                + " a.preferred, a._LogicalDB_key"
+                + " FROM ACC_Accession a, all_allele aa, ALL_Allele_Cellline aac"
+                + " where a.private != 1 and a._MGIType_key = 28 and"
+                + " aa._Allele_key = aac._Allele_key and"
+                + " a._Object_key = aac._MutantCellLine_key";
 
         // Gather the data
 
@@ -974,7 +976,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_escell.getString("_Allele_key"));
             builder.setAccessionKey(rs_escell.getString("_Accession_key"));
             builder.setPreferred(rs_escell.getString("preferred"));
-            builder.setProvider(phmg.get(rs_escell.getString("_LogicalDB_key")));
+            builder.setProvider(phm.get(rs_escell.getString("_LogicalDB_key")));
             builder.setDisplay_type("Cell Line ID");
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);

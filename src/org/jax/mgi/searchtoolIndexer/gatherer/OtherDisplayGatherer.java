@@ -839,13 +839,14 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         String OTHER_ES_CELL_LINE_DISPLAY = "select distinct av._Allele_key, '"
                 + IndexConstants.OTHER_ESCELL
                 + "' as type, av.symbol, av.name, ml.label, vt.term"
-                + " from ALL_Allele_View av, VOC_Term vt, "
-                + "MRK_Label ml, acc_accession ac"
-                + " where av._Allele_Type_key = vt._Term_key "
-                + "and av._Marker_key = ml._Marker_key and "
+                + " from ALL_Allele av, VOC_Term vt, "
+                + "MRK_Label ml, acc_accession ac, ALL_Allele_Cellline aac" 
+                + " where av._Allele_key = aac._Allele_key"
+                + " and av._Allele_Type_key = vt._Term_key "
+                + "and av._Marker_key *= ml._Marker_key and "
                 + "ml._Label_Status_key = 1"
                 + " and ac._MGIType_key = 28 and ac.private != 1 "
-                + "and ac._Object_key = av._MutantESCellLine_key"
+                + "and ac._Object_key = aac._MutantCellLine_key"
                 + " and ml.labelType = 'MN'";
 
         // Gather the data
@@ -867,9 +868,15 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             
             String symbol = new String(rs_es_cell.getString("symbol"));
             String name = new String(rs_es_cell.getString("name"));
-            String marker_name = new String(rs_es_cell.getString("label"));
+            String marker_name = rs_es_cell.getString("label");
 
-            builder.setName(symbol + ", " + marker_name + "; " + name);
+            if (marker_name != null) {
+                builder.setName(symbol + ", " + name);
+            }
+            else {
+                builder.setName(symbol + ", " + marker_name + "; " + name);    
+            }
+            
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }

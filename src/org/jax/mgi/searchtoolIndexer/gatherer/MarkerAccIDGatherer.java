@@ -53,15 +53,7 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
     /**
      * This method encapsulates the algorithm used for gathering the data 
      * needed to create the MarkerExact documents.
-     * 
-     * Of special note is the way the es cell line id's are handled.
-     * 
-     * First in the doMarkerAccession method, there is special logic that 
-     * removes any marker id's that are actually es cell line id's
-     * 
-     * Then in doESCellLineAccessionViaMarkers we place these id's into the index
-     * with thier own special encoding.
-     * 
+     *  
      */
 
     public void runLocal() throws Exception {
@@ -69,7 +61,6 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
             doAlleleAccession();
             doOrthologAccession();
             doESCellLineAccessionViaAllele();
-            doESCellLineAccessionViaMarkers();
     }
 
     /**
@@ -90,18 +81,11 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
         // not private, where its for the mouse, and the marker has not
         // been withdrawn.
         
-        // Please note that this SQL specifically ignores accession id's
-        // that have been annotated to markers, but are also annotated to 
-        // es cell line's.
-        
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
                 + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2"
-                + " and accID not in (SELECT a.accID"
-                + " FROM dbo.ACC_Accession a"
-                + " where private = 0 and _MGIType_key = 28)";
+                + " and m._Marker_Status_key != 2";
 
         // Gather the data
 
@@ -283,14 +267,18 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
         
         String ES_CELL_LINE_TO_MARKER_ACC_ID = "select al._Marker_key,"
                 + " ac.accID, ac._LogicalDB_key"
-                + " from ALL_Allele al, ACC_Accession ac, MRK_Marker m"
-                + " where al._Marker_key != null"
+                + " from ALL_Allele al, ACC_Accession ac, MRK_Marker m," 
+                + " ALL_Allele_CellLine aac"
+                + " where al._Marker_key != null" 
+                + " and al._Allele_key = aac._Allele_key"
                 + " and ac._MGIType_key = 28  and ac._Object_key ="
-                + " al._MutantESCellLine_key and al._Marker_key ="
+                + " aac._MutantCellLine_key and al._Marker_key ="
                 + " m._Marker_key and m._Marker_Status_key !=2";
 
         // Gather the data
 
+        log.info(ES_CELL_LINE_TO_MARKER_ACC_ID);
+        
         ResultSet rs_es_acc_by_allele = executor.executeMGD(ES_CELL_LINE_TO_MARKER_ACC_ID);
         rs_es_acc_by_allele.next();
 
@@ -318,78 +306,5 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
 
         rs_es_acc_by_allele.close();
         log.info("Done ES Cell Line Accession ID's!");
-    }
-
-    /**
-     * Grab ESCellLine Accession ID's that have been associated to Markers via
-     * a direct relationship to a marker record.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-    
-    private void doESCellLineAccessionViaMarkers() throws SQLException,
-            InterruptedException {
-    
-        // SQL for this Subsection
-
-        log.info("Gathering Accession ID's for ES Cell Lines Via Markers");
-        
-        // Grab any marker acc id records, whose acc id also directly matches
-        // an es cell line accid record.
-        // This specifically is overriding what has been done in the 
-        // doMarkerAccession() method.
-        
-        String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
-                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
-                + " where private = 0 and _MGIType_key = 2 and"
-                + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2"
-                + " and accID in (SELECT a.accID"
-                + " FROM dbo.ACC_Accession a"
-                + " where private = 0 and _MGIType_key = 28)";
-
-        // Gather the data
-
-        ResultSet rs_es_acc_by_marker = executor.executeMGD(GENE_ACC_KEY);
-        rs_es_acc_by_marker.next();
-
-        String provider = "";
-        
-        log.info(
-                "Time taken to gather marker's accession id result set: "
-                        + executor.getTiming());
-
-        // Parse it
-
-        while (!rs_es_acc_by_marker.isAfterLast()) {
-
-            builder.setData(rs_es_acc_by_marker.getString("accID"));
-            builder.setDb_key(rs_es_acc_by_marker.getString("_Object_key"));
-            builder.setDataType(IndexConstants.ES_ACCESSION_ID);
-            builder.setDisplay_type("Cell Line ID");
-            provider = 
-                phmg.get(rs_es_acc_by_marker.getString("_LogicalDB_key"));
-            
-            // Again, if we have a blank case, blank out the provider. 
-            
-            if (!provider.equals("")) {
-                builder.setProvider("(" + provider + ")");
-            } else {
-                builder.setProvider(provider);
-            }
-            
-            // Place the document on the stack
-            
-            documentStore.push(builder.getDocument());
-            builder.clear();
-            rs_es_acc_by_marker.next();
-
-        }
-
-        // Clean up
-
-        rs_es_acc_by_marker.close();
-        log.info("Done Accession ID's for Markers!");
     }
 }

@@ -158,9 +158,10 @@ public class MarkerExactGatherer extends DatabaseGatherer {
         
             String ALLELE_SYNONYM_KEY = "select distinct gag._Marker_key, "
                 + "al.label, al.labelType, al.labelTypeName"
-                + " from all_label al, GXD_AlleleGenotype gag"
+                + " from all_label al, ALL_Allele gag"
                 + " where al.labelType = 'AY' and al._Allele_key = "
-                + "gag._Allele_key and al._Label_Status_key != 0";
+                + "gag._Allele_key and al._Label_Status_key != 0 " +
+                		"and gag._Marker_key != null";
         
             // Gather the data
         

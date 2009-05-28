@@ -54,6 +54,8 @@ public class SQLExecutor {
         password = config.get("MGI_PUBLICPASSWORD");
         mgdJDBCUrl = config.get("MGD_JDBC_URL");
         snpJDBCUrl = config.get("SNP_JDBC_URL");
+        log.info("MGD JDBC URL: " + config.get("MGD_JDBC_URL"));
+        log.info("SNP JDBC URL: " + config.get("SNP_JDBC_URL"));
         }
         catch (Exception e) {log.error(e);}
     }
