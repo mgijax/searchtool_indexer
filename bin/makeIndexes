@@ -1,5 +1,16 @@
 #!/bin/sh
 
+cd `dirname $0`
+
+INDEX_CONFIG=../searchtool_indexer.config
+
+if [ ! -r ${INDEX_CONFIG} ]
+then
+    echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
+    exit 1
+fi
+. ${INDEX_CONFIG}
+
 # Create the Marker and Vocab Related Indexes
 
 makeMarkersAndVocab
