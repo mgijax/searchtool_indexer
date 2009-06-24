@@ -1,4 +1,9 @@
 TAG: searchtool_indexer-codereview-2
+DATE: 6/24/2009
+STAFF: mhall
+CHANGES: Removed a couple of mistaken e.printStackTrace() calls, and replace them with log.error
+
+TAG: searchtool_indexer-codereview-2
 DATE: 6/01/2009
 STAFF: mhall
 CHANGES: New tag to fix a couple of smaller issues.
