@@ -104,7 +104,7 @@ public class SQLExecutor {
             end = new Date();
             return set;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
             System.exit(1);
             return null;
         }
@@ -141,7 +141,7 @@ public class SQLExecutor {
             end = new Date();
             return set;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
             System.exit(1);
             return null;
         }
