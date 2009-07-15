@@ -1,3 +1,23 @@
+TAG: searchtool_indexer-4-3-0-1
+DATE: 7/15/2009
+STAFF: mhall
+CHANGES: Alpha Build tag + Merge to Trunk. 
+
+TAG: searchtool_indexer-codereview-3
+DATE: 6/24/2009
+STAFF: mhall
+CHANGES: Removed a couple of mistaken e.printStackTrace() calls, and replace them with log.error
+
+TAG: searchtool_indexer-codereview-2
+DATE: 6/01/2009
+STAFF: mhall
+CHANGES: New tag to fix a couple of smaller issues.
+
+TAG: searchtool_indexer-codereview-1
+DATE: 5/28/2009
+STAFF: mhall
+CHANGES: Dev build for GTLF + Codereview Changes
+
 TAG: searchtool_indexer-codereview-BP
 DATE: 2/24/2009
 STAFF: mhall

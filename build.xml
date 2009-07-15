@@ -23,7 +23,7 @@
   </target>
 
   <target name="jar" depends="compile">
-	<jar destfile="qs_indexer.jar" basedir="${build}">
+	<jar destfile="searchtool_indexer.jar" basedir="${build}">
 	<fileset file="${conf}/log4j.xml" />
 	</jar>
   </target>
