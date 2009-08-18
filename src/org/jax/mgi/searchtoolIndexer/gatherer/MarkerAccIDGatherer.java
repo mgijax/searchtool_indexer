@@ -277,8 +277,6 @@ public class MarkerAccIDGatherer extends DatabaseGatherer {
 
         // Gather the data
 
-        log.info(ES_CELL_LINE_TO_MARKER_ACC_ID);
-        
         ResultSet rs_es_acc_by_allele = executor.executeMGD(ES_CELL_LINE_TO_MARKER_ACC_ID);
         rs_es_acc_by_allele.next();
 
