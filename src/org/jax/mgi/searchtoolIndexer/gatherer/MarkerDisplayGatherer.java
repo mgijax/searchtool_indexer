@@ -67,7 +67,8 @@ public class MarkerDisplayGatherer extends DatabaseGatherer {
 
         String MARKER_DISPLAY_KEY = "select distinct m1._Marker_key, m1.label"
                 + " as markername, m2.Label as markersymbol,"
-                + " mt.name as markertype, mlc.chromosome, a.accID"
+                + " mt.name as markertype, mlc.chromosome, a.accID,"
+                + " mlc.startCoordinate, mlc.endCoordinate, mlc.strand"
                 + " from MRK_label m1, mrk_marker mrk, mrk_label m2,"
                 + " mrk_location_cache mlc, MRK_Types mt, acc_accession a"
                 + " where m1._Organism_key = 1 and m1._Label_Status_key = 1"
@@ -96,6 +97,9 @@ public class MarkerDisplayGatherer extends DatabaseGatherer {
             builder.setMarker_type(rs.getString("markertype"));
             builder.setChr(rs.getString("chromosome"));
             builder.setAcc_id(rs.getString("accID"));
+            builder.setStartCoord(rs.getString("startCoordinate"));
+            builder.setStopCoord(rs.getString("stopCoordinate"));
+            builder.setStrand(rs.getString("strand"));
             
             // Place the document on the stack
             

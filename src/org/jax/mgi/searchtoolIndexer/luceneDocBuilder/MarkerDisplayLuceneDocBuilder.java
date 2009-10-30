@@ -24,6 +24,9 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
     private String name        = "";
     private String marker_type = "";
     private String acc_id      = "";
+    private String startCoord  = "";
+    private String stopCoord   = "";
+    private String strand      = "";
     
     /**
      * Returns the MarkerDisplay object to its default state. This enables the
@@ -36,6 +39,9 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         this.marker_type    = "";
         this.name           = "";
         this.acc_id         = "";
+        this.startCoord     = "";
+        this.stopCoord      = "";
+        this.strand         = "";
     }
 
     /**
@@ -58,6 +64,12 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_MGI_ID, this.acc_id,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_START_POS, this.startCoord,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_STOP_POS, this.stopCoord,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_STRAND, this.strand,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
 
@@ -69,7 +81,9 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         return "Symbol: " + this.symbol + "DB Key: " + this.db_key
                 + " Name: " + this.name + " Chromosome: " + this.chr
                 + " Marker Type: " + this.marker_type + " Acc ID: "
-                + this.acc_id;
+                + this.acc_id + " Start Coordinates" + this.startCoord 
+                + " End Coordinates" + this.stopCoord
+                + " Strand" + this.strand;
     }
 
     /**
@@ -195,6 +209,30 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         }
     }
 
+    public String getStartCoord() {
+        return startCoord;
+    }
+
+    public void setStartCoord(String startCoord) {
+            this.startCoord = startCoord;
+    }
+
+    public String getStopCoord() {
+        return stopCoord;
+    }
+
+    public void setStopCoord(String stopCoord) {
+        this.stopCoord = stopCoord;
+    }
+
+    public String getStrand() {
+        return strand;
+    }
+
+    public void setStrand(String strand) {
+        this.strand = strand;
+    }
+
     /**
      * This main program is a stub for a test harness that can be built to 
      * specifically test this object.
@@ -204,7 +242,7 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
     
     public static void main(String[] args) {
         // Set up the logger.
-
+    
         MarkerDisplayLuceneDocBuilder builder = 
             new MarkerDisplayLuceneDocBuilder();
         
