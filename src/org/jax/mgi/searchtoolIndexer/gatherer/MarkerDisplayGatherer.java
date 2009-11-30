@@ -97,6 +97,8 @@ public class MarkerDisplayGatherer extends DatabaseGatherer {
 
         // Parse the results.
         while (rs.next()) {
+
+            // standard entries
             builder.setDb_key(rs.getString("_Marker_key"));
             builder.setName(rs.getString("markername"));
             builder.setSymbol(rs.getString("markersymbol"));
@@ -105,23 +107,34 @@ public class MarkerDisplayGatherer extends DatabaseGatherer {
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
 
+            // derive display values for location
             startCoord  = rs.getString("startCoord");
             stopCoord   = rs.getString("endCoord");
             offset      = rs.getString("offset");
             cytoOffset  = rs.getString("cytogeneticOffset");
 
-            if (startCoord != null) {
+            if (startCoord != null && stopCoord != null) { // use coords
               //trim off trailing ".0" and set display value
               startCoord = startCoord.substring(0, startCoord.length() -2);
               stopCoord = stopCoord.substring(0, stopCoord.length() -2);
               builder.setLocDisplay(startCoord + "-" + stopCoord);
-            }else if (offset != null){
-              if (!offset.equals("-999.0")) {
-                builder.setLocDisplay(offset + " cM");
+            }
+            else if (offset != null){
+              if (!offset.equals("-999.0")) { // not undetermined offset
+                if (offset.equals("-1.0") && cytoOffset == null) {
+                  builder.setLocDisplay("Syntenic");
+                }
+                else if (offset.equals("-1.0") && cytoOffset != null) {
+                  //use cyto offset in this case
+                  builder.setLocDisplay("cytoband " + cytoOffset);
+                }
+                else {
+                  builder.setLocDisplay(offset + " cM");
+                }
               }
             }
             else {
-              builder.setLocDisplay(cytoOffset);
+              builder.setLocDisplay("cytoband " + cytoOffset);
             }
 
 
