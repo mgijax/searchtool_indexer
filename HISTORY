@@ -8,12 +8,7 @@ TAG: searchtool_indexer-tr9924-2
 TAG: searchtool_indexer-tr9924-1
 DATE: 10/30/2009
 STAFF: pf
-CHANGES: tags for 4.32 dev builds
-
-TAG: searchtool_indexer-tr9924-BP
-DATE: 10/30/2009
-STAFF: mhall
-CHANGES: Branch Point tag for TR9924
+CHANGES: Branch Point and tags for 4.32 dev builds
 
 TAG: searchtool_indexer-4-3-0-1
 DATE: 7/15/2009
@@ -21,51 +16,19 @@ STAFF: mhall
 CHANGES: Alpha Build tag + Merge to Trunk. 
 
 TAG: searchtool_indexer-codereview-3
-DATE: 6/24/2009
-STAFF: mhall
-CHANGES: Removed a couple of mistaken e.printStackTrace() calls, and replace them with log.error
-
 TAG: searchtool_indexer-codereview-2
-DATE: 6/01/2009
-STAFF: mhall
-CHANGES: New tag to fix a couple of smaller issues.
-
 TAG: searchtool_indexer-codereview-1
-DATE: 5/28/2009
-STAFF: mhall
-CHANGES: Dev build for GTLF + Codereview Changes
-
 TAG: searchtool_indexer-codereview-BP
 DATE: 2/24/2009
 STAFF: mhall
-CHANGES: Branch point for Code Review Changes
+CHANGES: Branch point and tags for code review changes
 
 TAG: searchtool_indexer-4-2-0-6
-DATE: 12/15/2008
-STAFF: mhall
-CHANGES: Alpha Build Tag 2
-
 TAG: searchtool_indexer-4-2-0-5
-DATE: 12/12/2008
-STAFF: mhall
-CHANGES: Alpha Build Tag 2
-
 TAG: searchtool_indexer-4-2-0-4
-DATE: 12/05/2008
-STAFF: mhall
-CHANGES: Alpha Build Tag
-
 TAG: searchtool_indexer-4-2-0-3
-DATE: 11/25/2008
-STAFF: mhall
-CHANGES: Dev build tag, much refactoring/javadoc updating. 
-
 TAG: searchtool_indexer-4-2-0-2
-DATE: 11/25/2008
-STAFF: dbm
-CHANGES: Configuration tweaks
-
 TAG: searchtool_indexer-4-2-0-1
 DATE: 11/24/2008
 STAFF: mhall
-CHANGES: Initial Testing tag
+CHANGES: Initial release tags
