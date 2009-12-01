@@ -1,7 +1,24 @@
+TAG: searchtool_indexer-4-3-2-0
+DATE: 12/2/2009
+STAFF: pf
+CHANGES: 4.32 release tags
+
+TAG: searchtool_indexer-tr9924-3
+TAG: searchtool_indexer-tr9924-2
+TAG: searchtool_indexer-tr9924-1
+DATE: 10/30/2009
+STAFF: pf
+CHANGES: tags for 4.32 dev builds
+
 TAG: searchtool_indexer-tr9924-BP
 DATE: 10/30/2009
 STAFF: mhall
 CHANGES: Branch Point tag for TR9924
+
+TAG: searchtool_indexer-4-3-0-1
+DATE: 7/15/2009
+STAFF: mhall
+CHANGES: Alpha Build tag + Merge to Trunk. 
 
 TAG: searchtool_indexer-codereview-3
 DATE: 6/24/2009
