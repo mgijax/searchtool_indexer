@@ -1,0 +1,41 @@
+#!/bin/sh
+
+cd `dirname $0`
+
+# The location of the config file
+INDEX_CONFIG=../searchtool_indexer.config
+
+# What is the memory footprint we want for the jvm for these indexes.
+MEMORY_ARGS="-Xms1g -Xmx1g"
+
+# Where is the base indexing directory
+BASE_INDEX_DIR=/data/searchtool/build/
+
+if [ ! -r ${INDEX_CONFIG} ]
+then
+    echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
+    exit 1
+fi
+. ${INDEX_CONFIG}
+
+# The basic indexing command, w/ the BASE_INDEX_DIR argument
+
+COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${BASE_INDEX_DIR}"
+
+
+###########################
+# Make the Vocab Indexes
+###########################
+
+#${COMMAND}vocabInexact/index/ v
+echo "Finished vocabInexact index"
+
+#${COMMAND}vocabDisplay/index/ vd
+echo "Finished vocabDisplay index"
+
+#${COMMAND}vocabExact/index/ ve
+echo "Finished vocabExact index"
+
+#${COMMAND}vocabAccID/index/ va
+echo "Finished vocabAccID index"
+
