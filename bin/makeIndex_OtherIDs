@@ -27,9 +27,9 @@ COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.
 ###########################
 
 
-#${COMMAND}otherExact/index/ o
+${COMMAND}otherExact/index/ o
 echo "Finished otherExact index"
 
-#${COMMAND}otherDisplay/index/ od
+${COMMAND}otherDisplay/index/ od
 echo "Finished otherDisplay index"
 

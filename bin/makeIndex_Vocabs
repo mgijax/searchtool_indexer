@@ -27,15 +27,15 @@ COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.m
 # Make the Vocab Indexes
 ###########################
 
-#${COMMAND}vocabInexact/index/ v
+${COMMAND}vocabInexact/index/ v
 echo "Finished vocabInexact index"
 
-#${COMMAND}vocabDisplay/index/ vd
+${COMMAND}vocabDisplay/index/ vd
 echo "Finished vocabDisplay index"
 
-#${COMMAND}vocabExact/index/ ve
+${COMMAND}vocabExact/index/ ve
 echo "Finished vocabExact index"
 
-#${COMMAND}vocabAccID/index/ va
+${COMMAND}vocabAccID/index/ va
 echo "Finished vocabAccID index"
 

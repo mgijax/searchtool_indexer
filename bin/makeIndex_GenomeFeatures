@@ -28,27 +28,27 @@ COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.m
 ##################################################
 
 
-#${COMMAND}genomeFeatureInexact/index/ g
+${COMMAND}genomeFeatureInexact/index/ g
 echo "Finished genomeFeatureInexact index"
 
-#${COMMAND}genomeFeatureDisplay/index/ gd
+${COMMAND}genomeFeatureDisplay/index/ gd
 echo "Finished genomeFeatureDisplay index"
 
-#${COMMAND}genomeFeatureExact/index/ ge
+${COMMAND}genomeFeatureExact/index/ ge
 echo "Finished genomeFeatureExact index"
 
-#${COMMAND}genomeFeatureAccID/index/ ga
+${COMMAND}genomeFeatureAccID/index/ ga
 echo "Finished genomeFeatureAccID index"
 
-#${COMMAND}genomeFeatureSymbol/index/ gs
+${COMMAND}genomeFeatureSymbol/index/ gs
 echo "Finished genomeFeatureSymbol index"
 
-#${COMMAND}genomeFeatureVocabExact/index/ gve
+${COMMAND}genomeFeatureVocabExact/index/ gve
 echo "Finished genomeFeatureVocabExact index"
 
-#${COMMAND}genomeFeatureVocabDag/index/ gvd
+${COMMAND}genomeFeatureVocabDag/index/ gvd
 echo "Finished genomeFeatureVocabDag index"
 
-#${COMMAND}genomeFeatureVocabAccID/index/ gva
+${COMMAND}genomeFeatureVocabAccID/index/ gva
 echo "Finished genomeFeatureVocabAccID index"
 

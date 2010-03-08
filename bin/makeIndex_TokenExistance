@@ -28,5 +28,5 @@ COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.m
 ##################################################
 
 
-#${COMMAND}nonIDToken/index/ t
+${COMMAND}nonIDToken/index/ t
 echo "Finished nonIdToken index"
