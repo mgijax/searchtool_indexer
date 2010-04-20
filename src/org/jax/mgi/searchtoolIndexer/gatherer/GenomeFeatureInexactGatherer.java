@@ -79,7 +79,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
             doVocabNotes();
             doVocabADTerm();
             doVocabADSynonym();
-            doAlleleSynonym();
+            doAlleleNomen();
     }
 
     /**
@@ -102,7 +102,8 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
                 + "ml._Label_Status_key, ml.labelTypeName, ml._Label_key"
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where ml._Organism_key = 1 and ml._Marker_key = "
-                + "m._Marker_key and m._Marker_Status_key !=2 ";
+                + "m._Marker_key and m._Marker_Status_key !=2 "
+                + " and labelType not in ('AS','AN') ";
 
         // Gather the data
 
@@ -219,6 +220,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
         log.info("Done Marker Labels!");
 
     }
+
 
     /**
      * Gather Vocab terms, non AD.  This method goes each vocabulary one at a
@@ -573,33 +575,32 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
     }
 
     /**
-     * Gather the marker labels.
+     * Gather the allele labels.
      * @throws SQLException
      * @throws InterruptedException
      */
 
-    private void doAlleleSynonym() throws SQLException, InterruptedException {
+    private void doAlleleNomen() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
 
-        log.info("Collecting Allele Synonyms");
+        log.info("Collecting Allele Nomenclature");
 
-        // Gather up allele synonyms, since they are in thier own table.
-        // Also this should likely be changed to ALL_Allele as per TR 9501
+        // Gather up allele nomenclature
 
-        String ALLELE_SYNONYM_KEY = "select distinct gag._Marker_key, " +
+        String ALLELE_NOMEN_KEY = "select distinct aa._Allele_key, " +
         		"al.label, al.labelType, al.labelTypeName"+
-        		" from all_label al, ALL_Allele gag"+
-        		" where al.labelType = 'AY' and al._Allele_key =" +
-        		" gag._Allele_key and al._Label_Status_key != 0 " +
-        		"and gag._Marker_key != null";
+        		" from all_label al, ALL_Allele aa"+
+        		" where al._Allele_key =" +
+        		" aa._Allele_key and al._Label_Status_key != 0 " +
+        		" and aa.isWildType != 1";
 
         // Gather the data
 
-        ResultSet rs = executor.executeMGD(ALLELE_SYNONYM_KEY);
+        ResultSet rs = executor.executeMGD(ALLELE_NOMEN_KEY);
         rs.next();
 
-        log.info("Time taken gather allele synonym result set "
+        log.info("Time taken gather allele nomenclature result set "
                 + executor.getTiming());
 
         // Parse it
@@ -608,10 +609,10 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
             builder.setData(rs.getString("label"));
             builder.setRaw_data(rs.getString("label"));
-            builder.setDb_key(rs.getString("_Marker_key"));
-            builder.setUnique_key(rs.getString("_Marker_key")
-                    +rs.getString("label") + IndexConstants.MARKER_TYPE_NAME);
-            builder.setVocabulary(IndexConstants.MARKER_TYPE_NAME);
+            builder.setDb_key(rs.getString("_Allele_key"));
+            builder.setUnique_key(rs.getString("_Allele_key")
+                    +rs.getString("label") + rs.getString("labelType") + IndexConstants.ALLELE_TYPE_NAME);
+            builder.setVocabulary(IndexConstants.ALLELE_TYPE_NAME);
             builder.setDataType(rs.getString("labelType"));
             builder.setDisplay_type(providerMap.get(rs.getString("labelType")));
 
@@ -625,7 +626,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
         // Clean up
 
         rs.close();
-        log.info("Done Allele Synonyms!");
+        log.info("Done Allele Nomenclature!");
 
     }
 

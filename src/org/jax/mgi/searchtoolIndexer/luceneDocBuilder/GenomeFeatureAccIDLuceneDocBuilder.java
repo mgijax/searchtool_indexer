@@ -26,6 +26,7 @@ public class GenomeFeatureAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder
     private String data_type    = "";
     private String provider     = "";
     private String display_type = "";
+    private String object_type  = "";
 
     /**
      * Resets this object back to its default state. This allows the object to
@@ -36,6 +37,7 @@ public class GenomeFeatureAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder
         this.data_type      = "";
         this.provider       = "";
         this.display_type   = "";
+        this.object_type    = "";
     }
 
     /**
@@ -64,6 +66,8 @@ public class GenomeFeatureAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type,
                 Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_OBJ_TYPE, this.object_type,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
 
@@ -150,6 +154,14 @@ public class GenomeFeatureAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder
         else {
             this.hasError = true;
         }
+    }
+
+    public String getObject_type() {
+        return object_type;
+    }
+
+    public void setObject_type(String objectType) {
+        object_type = objectType;
     }
 
     /**

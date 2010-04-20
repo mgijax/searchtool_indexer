@@ -67,8 +67,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
     public void runLocal() throws Exception {
             doReferences();
             doProbes();
-            doAlleles();
-            doAllelesBySequence();
+            //doAllelesBySequence();
             doAssays();
             doAntibodies();
             doAntigens();
@@ -80,7 +79,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             doSubSnps();
             doOrthologs();
             doAMA(); 
-            doAllelesByESCellLines();
+            //doAllelesByESCellLines();
     }
 
     /**
@@ -201,69 +200,12 @@ public class OtherExactGatherer extends DatabaseGatherer {
         rs_prb.close();
     }
 
-    /**
-     * Gather the allele data.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-    
-    private void doAlleles() throws SQLException, InterruptedException {
-    
-        // SQL for this Subsection
-    
-        // gather up the non private accession id's for alleles
-        
-        String OTHER_ALL_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
-                + "a._Object_key, 'ALLELE' as _MGIType_key, a.preferred, "
-                + "a._LogicalDB_key" + " FROM ACC_Accession a"
-                + " where a.private != 1 and a._MGIType_key = 11";
-    
-        // Gather the data
-    
-        ResultSet rs_all = executor.executeMGD(OTHER_ALL_SEARCH);
-        rs_all.next();
-    
-        log.info("Time taken gather allele data set: "
-                + executor.getTiming());
-    
-        // Parse it
-    
-        while (!rs_all.isAfterLast()) {
-            builder.setType(rs_all.getString("_MGIType_key"));
-            builder.setData(rs_all.getString("accID"));
-            builder.setDb_key(rs_all.getString("_Object_key"));
-            builder.setAccessionKey(rs_all.getString("_Accession_key"));
-            builder.setPreferred(rs_all.getString("preferred"));
-            builder.setProvider(phm.get(rs_all.getString("_LogicalDB_key")));
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_all.next();
-        }
-    
-        // Clean up
-    
-        log.info("Done creating documents for alleles!");
-        rs_all.close();
-    }
-
-    /**
+/*    *//**
      * Gather the allele by sequence data.
      * 
      * @throws SQLException
      * @throws InterruptedException
-     */
+     *//*
 
     private void doAllelesBySequence() throws SQLException, InterruptedException {
 
@@ -315,7 +257,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
         log.info("Done creating documents for alleles!");
         rs_all.close();
-    }
+    }*/
 
     /**
      * Gather the assay data.
@@ -994,7 +936,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     }
 
-    /**
+/*    *//**
      * Gather the ES Cell Line data.  Please note, we only gather 
      * Accession ID's for this data type if they have a direct relationship 
      * to an allele.
@@ -1003,7 +945,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
      * 
      * @throws SQLException
      * @throws InterruptedException
-     */
+     *//*
     
     private void doAllelesByESCellLines() throws SQLException, InterruptedException {
 
@@ -1058,5 +1000,5 @@ public class OtherExactGatherer extends DatabaseGatherer {
         
         log.info("Done creating documents for es cell lines!");
         rs_escell.close();
-    }
+    }*/
 }

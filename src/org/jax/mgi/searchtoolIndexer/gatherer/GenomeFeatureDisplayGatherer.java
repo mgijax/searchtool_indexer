@@ -2,6 +2,7 @@ package org.jax.mgi.searchtoolIndexer.gatherer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.GenomeFeatureDisplayLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
@@ -48,8 +49,87 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 
     public void runLocal() throws Exception {
             doMarkerDisplay();
+            doAlleleDisplay();
     }
 
+    /** 
+     * Create a hashmap of the allele locations
+     * 
+     * @return HashMap containing the values;
+     */
+    
+    private HashMap doAlleleLocations() throws SQLException, InterruptedException {
+        
+        // Intialize the hashmap
+        HashMap <String, Location> results = new HashMap <String, Location> ();
+        
+        log.info("Gathering Allele Location Information");        
+        
+        String ALL_LOC_KEY = "select a._Allele_key, mlc.chromosome, " +
+        		    " convert(varchar(50), mlc.startCoordinate) as startCoordinate, " +
+        		    " convert(varchar(50), mlc.endCoordinate) as endCoordinate, mlc.strand," +
+        		    " 'MARKER' as source" + 
+                    " from all_allele a, MRK_Location_Cache mlc" + 
+                    " where a._Marker_key = mlc._Marker_key" + 
+                    " union" + 
+                    " select a._Allele_key, scc.chromosome, " +
+                    " convert(varchar(50), scc.startCoordinate) as startCoordinate," +
+                    " convert(varchar(50), scc.endCoordinate) as endCoordinate," +
+                    " scc.strand, 'SEQUENCE'" + 
+                    " from all_allele a, SEQ_Allele_Assoc saa, SEQ_Coord_Cache scc" + 
+                    " where a._Allele_key = saa._Allele_key" + 
+                    " and saa._Sequence_key = scc._Sequence_key" + 
+                    " and a.isMixed != 1" + 
+                    " and saa._Qualifier_key = 3983018" + 
+                    " order by a._Allele_key";            
+        
+        ResultSet rs = executor.executeMGD(ALL_LOC_KEY);
+
+        log.info("Time taken gather Allele Location result set: "
+                + executor.getTiming());
+        
+        while (rs.next()) {
+        
+            String allele_key = rs.getString("_Allele_key");
+            String chr = rs.getString("chromosome");
+            String startCoord = rs.getString("startCoordinate");
+            String endCoord = rs.getString("endCoordinate");
+            String strand = rs.getString("strand");
+            String source = rs.getString("source");
+            
+            if (results.containsKey(allele_key)) {
+                Location current = results.get(allele_key);
+                if (current.getSource().equals("MARKER") && current.getChromosome().equals("UN") && ! chr.equals("UN")) {
+                    current.setChromosome(chr);
+                    current.setStart_coordinate(startCoord);
+                    current.setEnd_coordinate(endCoord);
+                    current.setStrand(strand);
+                    current.setSource(source);
+                    
+                    results.put(allele_key, current);
+                }
+            }
+            else {
+                Location current = new Location();
+                
+                current.setChromosome(chr);
+                current.setStart_coordinate(startCoord);
+                current.setEnd_coordinate(endCoord);
+                current.setStrand(strand);
+                current.setSource(source);
+                
+                results.put(allele_key, current);
+            }
+            
+        }
+        
+        rs.close();
+        
+        log.info("Done gathering the Allele Location information.");
+        
+        return results;
+    }
+    
     /**
      * Grab the Marker Display Information.
      *
@@ -106,6 +186,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             builder.setChr(rs.getString("chromosome"));
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
+            builder.setObjectType("MARKER");
 
             // derive display values for location
             startCoord  = rs.getString("startCoord");
@@ -136,6 +217,115 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             else {
               builder.setLocDisplay("cytoband " + cytoOffset);
             }
+
+
+
+
+            // Place the document on the stack
+            documentStore.push(builder.getDocument());
+            builder.clear();
+
+        }
+
+        // Clean up
+        rs.close();
+        log.info("Done gather Marker Display!");
+
+    }
+
+    private void doAlleleDisplay() throws SQLException, InterruptedException {
+
+        log.info("Gathering Display Information for Alleles");
+
+/*        String startCoord;
+        String stopCoord;
+        String offset;
+        String cytoOffset;*/
+
+
+        // Pull in all the Allele related information including the following:
+        // allele name, allele label, allele symbol, chromosome and accession
+        // id
+
+        String ALLELE_DISPLAY_KEY = "select aa._Allele_key, aa.name, aa.symbol, " + 
+                                    "vt.term as alleletype, '' as chromosome, a.accID, " + 
+                                    "'' as startCoord, '' as endCoord, '' as strand, '' " + 
+                                    "as offset, '' as cytogeneticOffset " + 
+                                    "from all_allele aa, voc_term vt, acc_accession a " +
+                                    "where aa._Allele_Type_key = vt._Term_key and aa._Allele_key " + 
+                                    "*= a._Object_key and a.private != 1 and a.preferred = 1 " + 
+                                    "and a.prefixPart = 'MGI:' and a._LogicalDB_key = 1 and " + 
+                                    "a._MGIType_key = 2 and aa.isWildType != 1";
+
+        // Grab the result set
+        ResultSet rs = executor.executeMGD(ALLELE_DISPLAY_KEY);
+
+        log.info("Time taken gather Marker Display result set: "
+                + executor.getTiming());
+
+        HashMap <String, Location> locationMap = doAlleleLocations();
+        
+        // Parse the results.
+        while (rs.next()) {
+
+            // standard entries
+            String allele_key = rs.getString("_Allele_key");
+            
+            builder.setDb_key(allele_key);
+            builder.setName(rs.getString("name"));
+            builder.setSymbol(rs.getString("symbol"));
+            builder.setMarker_type(rs.getString("alleletype"));
+            builder.setChr(rs.getString("chromosome"));
+            builder.setAcc_id(rs.getString("accID"));
+            builder.setStrand(rs.getString("strand"));
+            builder.setObjectType("ALLELE");
+
+            if (locationMap.containsKey(allele_key)) {
+
+                String start = locationMap.get(allele_key).getStart_coordinate();
+                String end = locationMap.get(allele_key).getEnd_coordinate();
+                
+                String location = "";
+                
+                if (start != null) {
+                    location = start.replace(".0", "") 
+                        + "-" + end.replace(".0", "");
+                }
+                
+                builder.setStrand(locationMap.get(allele_key).getStrand());
+                builder.setChr(locationMap.get(allele_key).getChromosome());
+                builder.setLocDisplay(location);
+            }
+            
+            // derive display values for location
+/*            startCoord  = rs.getString("startCoord");
+            stopCoord   = rs.getString("endCoord");
+            offset      = rs.getString("offset");
+            cytoOffset  = rs.getString("cytogeneticOffset");*/
+
+/*            if (startCoord != null && stopCoord != null) { // use coords
+              //trim off trailing ".0" and set display value
+              startCoord = startCoord.substring(0, startCoord.length() -2);
+              stopCoord = stopCoord.substring(0, stopCoord.length() -2);
+              builder.setLocDisplay(startCoord + "-" + stopCoord);
+            }
+            else if (offset != null){
+              if (!offset.equals("-999.0")) { // not undetermined offset
+                if (offset.equals("-1.0") && cytoOffset == null) {
+                  builder.setLocDisplay("Syntenic");
+                }
+                else if (offset.equals("-1.0") && cytoOffset != null) {
+                  //use cyto offset in this case
+                  builder.setLocDisplay("cytoband " + cytoOffset);
+                }
+                else {
+                  builder.setLocDisplay(offset + " cM");
+                }
+              }
+            }
+            else {
+              builder.setLocDisplay("cytoband " + cytoOffset);
+            }*/
 
 
 

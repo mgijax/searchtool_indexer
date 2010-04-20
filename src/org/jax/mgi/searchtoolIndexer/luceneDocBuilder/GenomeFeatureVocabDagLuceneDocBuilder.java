@@ -22,8 +22,8 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
     private String vocabulary   = "";
     private String child_ids    = "";
     private String acc_id       = "";
-    private String type_display = "";
     private String unique_key   = "";
+    private String object_type  = "";
 
     /**
      * Returns the object to its default state.
@@ -34,8 +34,8 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
         this.vocabulary     = "";
         this.child_ids      = "";
         this.acc_id         = "";
-        this.type_display   = "";
         this.unique_key     = "";
+        this.object_type    = "";
     }
 
     /**
@@ -52,22 +52,16 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
         doc.add(new Field(IndexConstants.COL_VOCABULARY, this.vocabulary,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
 
-        doc.add(new Field(IndexConstants.COL_CONTENTS, this.data,
-                Field.Store.YES, Field.Index.NO));
-
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.data,
-                Field.Store.YES, Field.Index.NO));
-
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.type_display,
-                Field.Store.YES, Field.Index.NO));
-
-        doc.add(new Field(IndexConstants.COL_GENE_IDS, this.gene_ids,
+        doc.add(new Field(IndexConstants.COL_FEATURE_IDS, this.gene_ids,
                 Field.Store.YES, Field.Index.NO));
 
         doc.add(new Field(IndexConstants.COL_CHILD_IDS, this.child_ids,
                 Field.Store.YES, Field.Index.NO));
 
         doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        
+        doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.object_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         return doc;
@@ -79,8 +73,8 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
      */
 
     public String toString() {
-        return "Data: " + this.data + " Database Key: "
-                + this.db_key + " Vocabulary: " + this.vocabulary
+        return " Database Key: " + this.db_key + " Vocabulary: " 
+                + this.vocabulary
                 + " Gene Ids: " + this.gene_ids + " Child Ids: "
                 + this.child_ids + " Accession Id: " + this.acc_id;
     }
@@ -255,31 +249,6 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
     }
 
     /**
-     * Returns the provider
-     *
-     * @return String representation of the acc_id field.
-     */
-
-    public String getTypeDisplay() {
-        return type_display;
-    }
-
-    /**
-     * Sets the provider
-     *
-     * @param type_display
-     * String
-     */
-    public void setTypeDisplay(String type_display) {
-        if (type_display != null) {
-            this.type_display = type_display;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
-
-    /**
      * Returns the unique key.  This is used as a join point across indexes,
      * @return String with this objects unique key.
      */
@@ -301,6 +270,14 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
         else {
             this.hasError = true;
         }
+    }
+
+    public String getObject_type() {
+        return object_type;
+    }
+
+    public void setObject_type(String objectType) {
+        object_type = objectType;
     }
 
     /**

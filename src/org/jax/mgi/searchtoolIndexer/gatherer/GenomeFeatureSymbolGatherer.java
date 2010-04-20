@@ -54,6 +54,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
     public void runLocal() throws Exception {
             doSymbols();
+            doAlleleSymbols();
     }
 
     /**
@@ -74,7 +75,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where  ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2"
-                + "and ml.labelType in ('MS', 'AS', 'OS')";
+                + "and ml.labelType in ('MS', 'OS')";
 
         // Gather the data
 
@@ -121,9 +122,11 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
             }
 
             builder.setData(rs_label.getString("label"));
+            builder.setRaw_data(rs_label.getString("label"));
             builder.setDb_key(rs_label.getString("_Marker_key"));
             builder.setUnique_key(rs_label.getString("_Label_key")
                     + IndexConstants.MARKER_TYPE_NAME);
+            builder.setObject_type("MARKER");
             displayType = InitCap.initCap(rs_label.getString("labelTypeName"));
             if (displayType.equals("Current Symbol")) {
                 displayType = "Symbol";
@@ -141,6 +144,85 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
         rs_label.close();
 
+        log.info("Done Labels!");
+    }
+
+    /**
+     * Grab all labels associated with markers (Alleles and orthologs included)
+     *
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    
+    private void doAlleleSymbols() throws SQLException, InterruptedException {
+    
+        // Gather up all the marker, allele and ortholog symbols, where the
+        // symbol is for mouse, and the marker has not been withdrawn.
+    
+        String GENE_LABEL_EXACT = "select distinct aa._Allele_key, " +
+            "al.label, al.labelType, al.labelTypeName, al._Label_Status_key "+
+            " from all_label al, ALL_Allele aa"+
+            " where al._Allele_key =" +
+            " aa._Allele_key and al._Label_Status_key != 0 " +
+            " and al.labelType = 'AS' and aa.isWildType != 1"; 
+    
+        // Gather the data
+    
+        ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
+        rs_label.next();
+    
+        log.info("Time taken to gather allele label's result set: "
+                + executor.getTiming());
+    
+        // Parse it
+    
+        String displayType = "";
+    
+        while (!rs_label.isAfterLast()) {
+    
+
+            builder.setDataType(rs_label.getString("labelType"));
+    
+            // If we have an old symbol, we need to create a custom type.
+    
+            if (!rs_label.getString("_Label_Status_key").equals("1")) {
+    
+                builder.setDataType(builder.getDataType()+"O");
+            }
+    
+            String label = rs_label.getString("label");
+            
+            builder.setData(label);
+            builder.setRaw_data(label);
+            builder.setDb_key(rs_label.getString("_Allele_key"));
+            builder.setUnique_key(rs_label.getString("_Allele_key")
+                    +rs_label.getString("label") + rs_label.getString("labelType") + IndexConstants.ALLELE_TYPE_NAME);
+            builder.setObject_type("ALLELE");
+            displayType = InitCap.initCap(rs_label.getString("labelTypeName"));
+            if (displayType.equals("Current Symbol")) {
+                displayType = "Symbol";
+            }
+            builder.setDisplay_type(displayType);
+    
+            // Place the document on the stack.
+    
+            documentStore.push(builder.getDocument());
+            
+            String fixedLabel = rs_label.getString("label").replace("<", "").replace(">", "");
+
+            if (!fixedLabel.equals(label)) {
+                builder.setData(fixedLabel);
+                builder.setRaw_data(label);
+                documentStore.push(builder.getDocument());
+            }
+            builder.clear();
+            rs_label.next();
+        }
+    
+        // Clean up
+    
+        rs_label.close();
+    
         log.info("Done Labels!");
     }
 }

@@ -105,6 +105,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_acc.getString("_Object_key"));
             builder.setDataType(IndexConstants.ACCESSION_ID);
             builder.setDisplay_type("ID");
+            builder.setObject_type("MARKER");
             provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
 
             // Set the provider, blanking it out if needed.
@@ -144,12 +145,11 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
         // Gather up all allele accession ID's and the markers they are
         // related to, as long as the marker hasn't been withdrawn.
 
-        String ALLELE_TO_MARKER_EXACT = "select al._Marker_key,  ac.accID"
-                + " from ALL_Allele al, ACC_Accession ac, MRK_Marker m"
-                + " where al._Marker_key != null and al._Allele_key"
-                + " = ac._Object_key and ac._MGIType_key = 11"
-                + " and al._Marker_key = m._Marker_key"
-                + " and m._Marker_Status_key !=2";
+        String ALLELE_TO_MARKER_EXACT = "select al._allele_key,  ac.accID"
+                                + " from ALL_Allele al, ACC_Accession ac"
+                                + " where al._Allele_key = ac._Object_key and" 
+                                + " ac._MGIType_key = 11 " 
+                                + " and al.isWildType != 1";
 
         // Gather the data
 
@@ -163,9 +163,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
         while (!rs_all_acc.isAfterLast()) {
             builder.setData(rs_all_acc.getString("accID"));
-            builder.setDb_key(rs_all_acc.getString("_Marker_key"));
+            builder.setDb_key(rs_all_acc.getString("_allele_key"));
             builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
             builder.setDisplay_type("Allele ID");
+            builder.setObject_type("ALLELE");
 
             // Place the document on the stack.
 
@@ -225,6 +226,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             builder.setDb_key(rs_orth_acc.getString("_Marker_key"));
             builder.setDataType(IndexConstants.ORTH_ACCESSION_ID);
             builder.setDisplay_type("ID");
+            builder.setObject_type("MARKER");
 
             // Another special case for the provider hash map.  We must append
             // the organism's name for these cases.
@@ -292,6 +294,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             builder.setDisplay_type("Cell Line ID");
             builder.setProvider("("+phmg.get(rs_es_acc_by_allele
                     .getString("_LogicalDB_key"))+")");
+            builder.setObject_type("MARKER");
 
             // Place the document on the stack.
 

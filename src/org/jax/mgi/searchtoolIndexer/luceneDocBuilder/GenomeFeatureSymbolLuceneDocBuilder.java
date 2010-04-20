@@ -25,6 +25,8 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
     private String  data_type    = "";
     private String  display_type = "";
     private String  unique_key   = "";
+    private String  object_type  = "";
+    private String  raw_data     = "";
 
     /**
      * Resets this object back to its default state. This allows the object to
@@ -35,6 +37,8 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
         this.data_type    = "";
         this.display_type = "";
         this.unique_key   = "";
+        this.object_type  = "";
+        this.raw_data     = "";
     }
 
     /**
@@ -60,7 +64,7 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
         // As such it remains in for now, but perhaps could be redesigned
         // at some later point.
 
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.data,
+        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data,
                 Field.Store.YES, Field.Index.NO));
 
         doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
@@ -73,6 +77,9 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
                 Field.Store.YES, Field.Index.NO));
 
         doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        
+        doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.object_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         return doc;
@@ -112,6 +119,14 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
         else {
             this.hasError = true;
         }
+    }
+
+    public String getObject_type() {
+        return object_type;
+    }
+
+    public void setObject_type(String objectType) {
+        object_type = objectType;
     }
 
     /**
@@ -164,6 +179,14 @@ public class GenomeFeatureSymbolLuceneDocBuilder extends AbstractLuceneDocBuilde
         else {
             this.hasError = true;
         }
+    }
+
+    public String getRaw_data() {
+        return raw_data;
+    }
+
+    public void setRaw_data(String rawData) {
+        raw_data = rawData;
     }
 
     /**

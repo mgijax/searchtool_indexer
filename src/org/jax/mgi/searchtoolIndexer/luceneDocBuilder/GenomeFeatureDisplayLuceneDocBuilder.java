@@ -23,10 +23,11 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
     private String name        = "";
     private String marker_type = "";
     private String acc_id      = "";
-    private String startCoord  = "";
-    private String stopCoord   = "";
+/*    private String startCoord  = "";
+    private String stopCoord   = "";*/
     private String strand      = "";
     private String locDisplay  = "";
+    private String objectType  = "";
 
     /**
      * Returns the MarkerDisplay object to its default state. This enables the
@@ -40,6 +41,7 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         this.acc_id         = "";
         this.strand         = "";
         this.locDisplay     = "";
+        this.objectType     = "";
     }
 
     /**
@@ -64,6 +66,8 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         doc.add(new Field(IndexConstants.COL_STRAND, this.strand,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_LOC_DISPLAY, this.locDisplay,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.objectType,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
@@ -195,15 +199,21 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
      * @param acc_id String to set the accession id to.
      */
 
-    public void setAcc_id(String acc_id) {
+/*    public void setAcc_id(String acc_id) {
         if (acc_id != null) {
             this.acc_id = acc_id;
         }
         else {
             this.hasError = true;
         }
-    }
+    }*/
 
+    public void setAcc_id(String acc_id) {
+        if (acc_id != null) {
+            this.acc_id = acc_id;
+        }
+    }    
+    
     public String getStrand() {
         return strand;
     }
@@ -224,7 +234,13 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         }
     }
 
+    public String getObjectType() {
+        return objectType;
+    }
 
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
+    }
 
 
     /**

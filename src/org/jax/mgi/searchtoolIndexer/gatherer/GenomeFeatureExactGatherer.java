@@ -52,7 +52,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
     public void runLocal() throws Exception {
             doLabels();
-            doAlleleSynonym();
+            doAlleleLabels();
     }
 
     /**
@@ -77,7 +77,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where  ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2"
-                + "and ml.labelType not in ('MS', 'AS', 'OS')";
+                + "and ml.labelType not in ('MS', 'AS', 'OS', 'AN')";
 
         // Gather the data
 
@@ -113,6 +113,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
             builder.setData(rs_label.getString("label"));
             builder.setDb_key(rs_label.getString("_Marker_key"));
+            builder.setObject_type("MARKER");
             builder.setUnique_key(rs_label.getString("_Label_key")
                     + IndexConstants.MARKER_TYPE_NAME);
             displayType = InitCap.initCap(rs_label.getString("labelTypeName"));
@@ -141,62 +142,93 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
     }
 
     /**
-     * Gather the Allele Synonyms, since they are in a different table.
+     * Grab all non symbol labels associated with markers (Alleles and
+     * orthologs included)
      *
      * @throws SQLException
      * @throws InterruptedException
      */
+    
+    private void doAlleleLabels() throws SQLException, InterruptedException {
+    
+        // Grav marker key, label, label type and the type name for all
+        // marker, alleles and orthologs, but not the symbols.
+        // Also only do this for the mouse related items, where the marker
+        // has not been withdrawn.
+    
+        String ALLELE_LABEL_EXACT = "select distinct aa._Allele_key, m.name, " +
+                "al.label, al.labelType, al.labelTypeName, al._Label_Status_key "+
+                " from all_label al, ALL_Allele aa, mrk_marker m"+
+                " where al._Allele_key =" +
+                " aa._Allele_key and al._Label_Status_key != 0 " +
+                " and al.labelType in ('AN', 'AY') " +
+                " and aa.isWildType != 1 " +
+                " and aa._Marker_key *= m._Marker_key";
+    
+        // Gather the data
+    
+        ResultSet rs_label = executor.executeMGD(ALLELE_LABEL_EXACT);
+        rs_label.next();
+    
+        log.info("Time taken to gather label's result set: "
+                + executor.getTiming());
+    
+        // Parse it
+    
+        String displayType = "";
+        String dataType ="";
+        while (!rs_label.isAfterLast()) {
+    
+            dataType = rs_label.getString("labelType");
+    
 
-        private void doAlleleSynonym()
-            throws SQLException, InterruptedException {
+            builder.setDataType(dataType);
 
-            // Since Allele synonyms as in thier own table, we need to directly
-            // relate them to markers ourselves.
-            // Please note that this is currently using the wrong table
-            // as described in TR 9501.  Changing this table over to
-            // ALL_Allele should fix this issue.
-
-            String ALLELE_SYNONYM_KEY = "select distinct gag._Marker_key, "
-                + "al.label, al.labelType, al.labelTypeName"
-                + " from all_label al, ALL_Allele gag"
-                + " where al.labelType = 'AY' and al._Allele_key = "
-                + "gag._Allele_key and al._Label_Status_key != 0 " +
-                		"and gag._Marker_key != null";
-
-            // Gather the data
-
-            ResultSet rs = executor.executeMGD(ALLELE_SYNONYM_KEY);
-            rs.next();
-
-            log.info("Time taken gather allele synonym result set "
-                    + executor.getTiming());
-
-            // Parse it
-
-            while (!rs.isAfterLast()) {
-
-                builder.setData(rs.getString("label"));
-                builder.setDb_key(rs.getString("_Marker_key"));
-                builder.setDataType(rs.getString("labelType"));
-
-                // Since this is the Allele Synonym Section, set its type.
-
-                builder.setDisplay_type("Allele Synonym");
-                builder.setUnique_key(rs.getString("_Marker_key")
-                        +rs.getString("label")
-                        + IndexConstants.MARKER_TYPE_NAME);
-
-                // Add the document to the stack
-
-                documentStore.push(builder.getDocument());
-                builder.clear();
-                rs.next();
+            if (!rs_label.getString("_Label_Status_key").equals("1")) {
+    
+                // If we have an old bit of nomen, we need to create a
+                // custom type.
+    
+                builder.setDataType(builder.getDataType()+"O");
             }
-
-            // Clean up
-
-            rs.close();
-            log.info("Done Marker Labels!");
-
+    
+            builder.setData(rs_label.getString("label"));
+            builder.setDb_key(rs_label.getString("_Allele_key"));
+            builder.setObject_type("ALLELE");
+            builder.setUnique_key(rs_label.getString("_allele_key")
+                    + rs_label.getString("label")+rs_label.getString("labelType")
+                    + IndexConstants.ALLELE_TYPE_NAME);
+            displayType = InitCap.initCap(rs_label.getString("labelTypeName"));
+    
+            // A manual adjustment of the display type for a special case.
+    
+            if (displayType.equals("Current Name")) {
+                displayType = "Name";
+            }
+    
+            builder.setDisplay_type(displayType);
+    
+            // Add the document to the stack
+    
+            documentStore.push(builder.getDocument());
+            
+            if (rs_label.getString("labelType").equals("AN")) {
+                
+                if (rs_label.getString("name") != null && (! rs_label.getString("name").equals(rs_label.getString("label")))) {
+                    builder.setData(rs_label.getString("name") + "; " + rs_label.getString("label"));
+                    documentStore.push(builder.getDocument());
+                }
+            }
+            
+            builder.clear();
+            rs_label.next();
         }
+    
+        // Clean up
+    
+        rs_label.close();
+    
+        log.info("Done Labels!");
+    
+    }
 }
