@@ -156,7 +156,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
                 + " tv.vocabName"
                 + " FROM dbo.VOC_Term_View tv, VOC_Allele_Cache vac"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 5"
-                + " and vac.annotType = 'Mammalian Phenotype/Genotype/Alleles'"
+                + " and vac.annotType = 'Mammalian Phenotype/Genotype'"
                 + " and vac._Term_key = tv._Term_key" + " order by _Term_key";
 
         vsMPAllele.setVoc_key(MP_VOC_ALLELE_KEY);
@@ -165,7 +165,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         String MP_ALLELE_DISPLAY_KEY = "select distinct _Term_key,"
                 + " _Allele_key as _Marker_key" + " from VOC_Allele_Cache"
-                + " where annotType = 'Mammalian Phenotype/Genotype/Alleles'"
+                + " where annotType = 'Mammalian Phenotype/Genotype'"
                 + " order by _Term_key";
 
         vsMPAllele.setDisplay_key(MP_ALLELE_DISPLAY_KEY);
@@ -179,9 +179,9 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
                 + " where dc._MGIType_key = 13"
                 + " and dc._DescendentObject_key = vac._Term_key"
                 + " and vt._Term_key =dc._DescendentObject_key "
-                + " and vt._Vocab_key = vat._Vocab_key and vat.name + '/Alleles'="
+                + " and vt._Vocab_key = vat._Vocab_key and vat.name ="
                 + " vac.annotType"
-                + " and vac.annotType = 'Mammalian Phenotype/Genotype/Alleles'"
+                + " and vac.annotType = 'Mammalian Phenotype/Genotype'"
                 + " order by dc._AncestorObject_key, dc._DescendentObject_key";
 
         vsMPAllele.setDag_key(MP_ALLELE_DAG_KEY);
@@ -289,7 +289,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
                 + " tv.vocabName"
                 + " FROM dbo.VOC_Term_View tv, VOC_Allele_Cache vac"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
-                + " and vac.annotType = 'OMIM/Genotype/Allele' and vac._Term_key ="
+                + " and vac.annotType = 'OMIM/Genotype' and vac._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
 
         vsOMIMAllele.setVoc_key(OMIM_VOC_ALLELE_KEY);
@@ -299,7 +299,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         String OMIM_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key,"
                 + " vac._Allele_key as _Marker_key"
                 + " from VOC_Allele_Cache vac, all_label al"
-                + " where annotType = 'OMIM/Genotype/Allele' and vac._Allele_key = "
+                + " where annotType = 'OMIM/Genotype' and vac._Allele_key = "
                 + " al._Allele_key and al.labelType = 'AS'" 
                 + " order by _Term_key";
 
