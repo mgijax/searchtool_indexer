@@ -103,7 +103,8 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
                 + " from MRK_Label ml, MRK_Marker m"
                 + " where ml._Organism_key = 1 and ml._Marker_key = "
                 + "m._Marker_key and m._Marker_Status_key !=2 "
-                + " and labelType not in ('AS','AN') ";
+                + " and labelType not in ('AS','AN') " 
+                + " and m._Marker_Type_key != 12";
 
         // Gather the data
 

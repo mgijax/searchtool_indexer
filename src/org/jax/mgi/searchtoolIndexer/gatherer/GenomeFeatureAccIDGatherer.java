@@ -61,6 +61,8 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             doAlleleAccession();
             doOrthologAccession();
             doESCellLineAccessionViaAllele();
+            doAllelesByESCellLines();
+            doAllelesBySequence();
     }
 
     /**
@@ -85,7 +87,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
                 + " FROM dbo.ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
                 + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2";
+                + " and m._Marker_Status_key != 2 and m._Marker_Type_key != 12";
 
         // Gather the data
 
@@ -208,7 +210,8 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
                 + " and mouse._Marker_key = mm._Marker_key"
                 + " and mm._Marker_Status_key !=2"
                 + " and nonmouse._Organism_key = m._Organism_key"
-                + " and a._MGIType_key = 2 and a.private = 0";
+                + " and a._MGIType_key = 2 and a.private = 0" 
+                + " and mm._Marker_Type_key != 12";
 
         // Gather the data
 
@@ -275,7 +278,8 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
                 + " and al._Allele_key = aac._Allele_key"
                 + " and ac._MGIType_key = 28  and ac._Object_key ="
                 + " aac._MutantCellLine_key and al._Marker_key ="
-                + " m._Marker_key and m._Marker_Status_key !=2";
+                + " m._Marker_key and m._Marker_Status_key !=2 " 
+                + " and m._Marker_Type_key != 12";
 
         // Gather the data
 
@@ -308,4 +312,112 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
         rs_es_acc_by_allele.close();
         log.info("Done ES Cell Line Accession ID's!");
     }
+    
+    /**
+     * Gather the ES Cell Line data.  Please note, we only gather 
+     * Accession ID's for this data type if they have a direct relationship 
+     * to an allele.
+     * 
+     * These are then placed into the index as allele objects. 
+     * 
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    
+    private void doAllelesByESCellLines() throws SQLException, InterruptedException {
+
+        // SQL for this Subsection
+        
+        // Gather up the accession id's for es cell that are related to
+        // alleles.
+
+        String OTHER_ES_CELL_LINE_SEARCH = "SELECT distinct a._Accession_key,"
+                + " a.accID, aa._Allele_key, 'ALLELE' as _MGIType_key,"
+                + " a.preferred, a._LogicalDB_key"
+                + " FROM ACC_Accession a, all_allele aa, ALL_Allele_Cellline aac"
+                + " where a.private != 1 and a._MGIType_key = 28 and"
+                + " aa._Allele_key = aac._Allele_key and"
+                + " a._Object_key = aac._MutantCellLine_key";
+
+        // Gather the data
+
+        ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
+        rs_escell.next();
+
+        log.info("Time taken gather es cell line data set: "
+                + executor.getTiming());
+
+        // Parse it
+        
+        while (!rs_escell.isAfterLast()) {
+            builder.setData(rs_escell.getString("accID"));
+            builder.setDb_key(rs_escell.getString("_Allele_key"));
+            builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
+            builder.setDisplay_type("Allele ID");
+            builder.setObject_type("ALLELE");
+            builder.setProvider(phmg.get(rs_escell.getString("_LogicalDB_key")));
+
+            documentStore.push(builder.getDocument());
+            
+            builder.clear();
+            rs_escell.next();
+        }
+
+        // Clean up
+        
+        log.info("Done creating documents for es cell lines!");
+        rs_escell.close();
+    }
+    
+    /*    *//**
+     * Gather the allele by sequence data.
+     * 
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+
+    private void doAllelesBySequence() throws SQLException, InterruptedException {
+
+        // SQL for this Subsection
+
+        // gather up the non private accession id's for alleles
+        
+        String OTHER_ALL_BY_SEQUENCE_SEARCH = "select distinct a._Accession_key, a.accID," +
+                " saa._Allele_key, 'ALLELE' as _MGIType_key," +
+                " a.preferred, a._LogicalDB_key" +
+                " from ACC_Accession a, SEQ_Allele_Assoc saa"+
+                " where a._MGIType_key = 19 and a.private != 1"+
+                " and saa._Sequence_key = a._Object_key and saa._Allele_key != null";
+
+        // Gather the data
+
+        ResultSet rs_all = executor.executeMGD(OTHER_ALL_BY_SEQUENCE_SEARCH);
+        rs_all.next();
+
+        log.info("Time taken gather allele by sequence data set: "
+                + executor.getTiming());
+
+        // Parse it
+
+        while (!rs_all.isAfterLast()) {
+
+            builder.setData(rs_all.getString("accID"));
+            builder.setDb_key(rs_all.getString("_Allele_key"));
+            builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
+            builder.setDisplay_type("Allele ID");
+            builder.setObject_type("ALLELE");
+            builder.setProvider(phmg.get(rs_all.getString("_LogicalDB_key")));
+            
+            documentStore.push(builder.getDocument());
+            
+            builder.clear();
+            rs_all.next();
+        }
+
+        // Clean up
+
+        log.info("Done creating documents for alleles!");
+        rs_all.close();
+    }
+    
 }

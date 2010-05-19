@@ -72,7 +72,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             doAssays();
             doReferences();
             doSequences();
-            doAlleles();
             doOrthologs();
             doAntibodies();
             doAntigens();
@@ -81,7 +80,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             doSnps();
             doSubSnps();
             doAMA();
-            //doESCellLines();
     }
 
     /**
@@ -307,77 +305,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
         log.info("Done Sequences!");
         rs_seq.close();
-    }
-
-    /**
-     * Gather the alleles data.  Please note that this has a realized display
-     * field.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-
-    private void doAlleles() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection.
-
-        // gather up allele symbol, name, key, label and type.
-        
-        String OTHER_ALL_DISPLAY_KEY = "select distinct av._Allele_key, '"
-                + IndexConstants.OTHER_ALLELE
-                + "' as type, av.symbol, av.name, ml.label, vt.term"
-                + " from ALL_Allele_View av, VOC_Term vt, MRK_Label ml"
-                + " where av._Allele_Type_key = vt._Term_key and"
-                + " av._Marker_key *= ml._Marker_key"
-                + " and ml._Label_Status_key = 1 and ml.labelType = 'MN'";
-
-        // Gather the data.
-
-        ResultSet rs_all = executor.executeMGD(OTHER_ALL_DISPLAY_KEY);
-        rs_all.next();
-        log.info("Time taken gather allele result set: "
-                + executor.getTiming());
-
-        // Parse the data
-
-        while (!rs_all.isAfterLast()) {
-
-            builder.setDb_key(rs_all.getString("_Allele_key"));
-            builder.setDataType(rs_all.getString("type"));
-            builder.setQualifier(rs_all.getString("term"));
-            
-            // The name for Alleles is a realized field.
-            
-            String symbol = new String(rs_all.getString("symbol"));
-            String name = new String(rs_all.getString("name"));
-            String marker_name = rs_all.getString("label");
-            if (marker_name == null) {
-                builder.setName(symbol + ", " + name);
-            }
-            else {
-                builder.setName(symbol + ", " + marker_name + "; " + name);    
-            }
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_all.next();
-        }
-
-        // Clean up
-
-        log.info("Done Alleles!");
-        rs_all.close();
-
     }
 
     /**

@@ -58,7 +58,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
      * @return HashMap containing the values;
      */
     
-    private HashMap doAlleleLocations() throws SQLException, InterruptedException {
+    private HashMap <String, Location> doAlleleLocations() throws SQLException, InterruptedException {
         
         // Intialize the hashmap
         HashMap <String, Location> results = new HashMap <String, Location> ();
@@ -167,7 +167,8 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
                 + " and m1._Marker_key = mlc._Marker_key"
                 + " and mrk._Marker_Type_key = mt._Marker_Type_key "
                 + "and m1._Marker_key = a._Object_key and a._LogicalDB_key = 1"
-                + " and a.preferred = 1 and a._MGIType_key = 2";
+                + " and a.preferred = 1 and a._MGIType_key = 2 " 
+                + " and mrk._Marker_Type_key != 12";
 
         // Grab the result set
         ResultSet rs = executor.executeMGD(MARKER_DISPLAY_KEY);
@@ -187,6 +188,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
             builder.setObjectType("MARKER");
+            builder.setBatchValue(rs.getString("markerSymbol"));
 
             // derive display values for location
             startCoord  = rs.getString("startCoord");
@@ -247,15 +249,17 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
         // allele name, allele label, allele symbol, chromosome and accession
         // id
 
-        String ALLELE_DISPLAY_KEY = "select aa._Allele_key, aa.name, aa.symbol, " + 
+        String ALLELE_DISPLAY_KEY = "select aa._Allele_key, aa.name as allele_name, aa.symbol, " + 
                                     "vt.term as alleletype, '' as chromosome, a.accID, " + 
                                     "'' as startCoord, '' as endCoord, '' as strand, '' " + 
-                                    "as offset, '' as cytogeneticOffset " + 
-                                    "from all_allele aa, voc_term vt, acc_accession a " +
+                                    "as offset, '' as cytogeneticOffset, m.symbol as marker_symbol, " +
+                                    "m.name as marker_name " + 
+                                    "from all_allele aa, voc_term vt, acc_accession a, mrk_marker m " +
                                     "where aa._Allele_Type_key = vt._Term_key and aa._Allele_key " + 
                                     "*= a._Object_key and a.private != 1 and a.preferred = 1 " + 
                                     "and a.prefixPart = 'MGI:' and a._LogicalDB_key = 1 and " + 
-                                    "a._MGIType_key = 2 and aa.isWildType != 1";
+                                    "a._MGIType_key = 2 and aa.isWildType != 1 " +
+                                    "and aa._Marker_key *= m._Marker_key";
 
         // Grab the result set
         ResultSet rs = executor.executeMGD(ALLELE_DISPLAY_KEY);
@@ -272,13 +276,39 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             String allele_key = rs.getString("_Allele_key");
             
             builder.setDb_key(allele_key);
-            builder.setName(rs.getString("name"));
+
+            if (rs.getString("marker_name") != null && (! rs.getString("marker_name").equals(rs.getString("allele_name")))) {
+                builder.setName(rs.getString("marker_name") + "; " + rs.getString("allele_name"));
+            }
+            else {
+                builder.setName(rs.getString("allele_name"));
+            }
+            
             builder.setSymbol(rs.getString("symbol"));
-            builder.setMarker_type(rs.getString("alleletype"));
+            String all_type = rs.getString("alleletype");
+            
+            if (all_type.equals("Not Specified") || all_type.equals("Not Applicable")) {
+                all_type = "";
+            }
+            else if (all_type.startsWith("Targeted")) {
+                all_type = "Targeted allele";
+            }
+            else if (all_type.startsWith("Transgenic")) {
+                all_type = "Transgene";
+            }
+            else if (all_type.startsWith("Chemically")) {
+                all_type = "Chemically induced allele";
+            }
+            else {
+                all_type = all_type + " allele";
+            }
+            
+            builder.setMarker_type(all_type);
             builder.setChr(rs.getString("chromosome"));
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
             builder.setObjectType("ALLELE");
+            builder.setBatchValue(rs.getString("marker_symbol"));
 
             if (locationMap.containsKey(allele_key)) {
 
@@ -297,38 +327,6 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
                 builder.setLocDisplay(location);
             }
             
-            // derive display values for location
-/*            startCoord  = rs.getString("startCoord");
-            stopCoord   = rs.getString("endCoord");
-            offset      = rs.getString("offset");
-            cytoOffset  = rs.getString("cytogeneticOffset");*/
-
-/*            if (startCoord != null && stopCoord != null) { // use coords
-              //trim off trailing ".0" and set display value
-              startCoord = startCoord.substring(0, startCoord.length() -2);
-              stopCoord = stopCoord.substring(0, stopCoord.length() -2);
-              builder.setLocDisplay(startCoord + "-" + stopCoord);
-            }
-            else if (offset != null){
-              if (!offset.equals("-999.0")) { // not undetermined offset
-                if (offset.equals("-1.0") && cytoOffset == null) {
-                  builder.setLocDisplay("Syntenic");
-                }
-                else if (offset.equals("-1.0") && cytoOffset != null) {
-                  //use cyto offset in this case
-                  builder.setLocDisplay("cytoband " + cytoOffset);
-                }
-                else {
-                  builder.setLocDisplay(offset + " cM");
-                }
-              }
-            }
-            else {
-              builder.setLocDisplay("cytoband " + cytoOffset);
-            }*/
-
-
-
 
             // Place the document on the stack
             documentStore.push(builder.getDocument());

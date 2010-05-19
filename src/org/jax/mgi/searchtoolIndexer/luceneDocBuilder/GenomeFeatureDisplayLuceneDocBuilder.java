@@ -28,6 +28,9 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
     private String strand      = "";
     private String locDisplay  = "";
     private String objectType  = "";
+    private String batchValue  = "";
+
+
 
     /**
      * Returns the MarkerDisplay object to its default state. This enables the
@@ -42,6 +45,7 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         this.strand         = "";
         this.locDisplay     = "";
         this.objectType     = "";
+        this.batchValue     = "";
     }
 
     /**
@@ -68,6 +72,8 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         doc.add(new Field(IndexConstants.COL_LOC_DISPLAY, this.locDisplay,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.objectType,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_BATCH_FORWARD_VALUE, this.batchValue,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
@@ -185,6 +191,26 @@ public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuild
         }
     }
 
+    /**
+     * Get the value that will be passed ot the batch query form.
+     * @return String
+     */
+    
+    public String getBatchValue() {
+        return batchValue;
+    }
+
+    /**
+     * Set the value to be returned to the batch query form.
+     * @param batchValue
+     */
+    
+    public void setBatchValue(String batchValue) {
+        if (batchValue != null) {
+            this.batchValue = batchValue;            
+        }
+    }    
+    
     /**
      * Get the accession id/
      * @return String representing the accession id.

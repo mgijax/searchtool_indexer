@@ -67,7 +67,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
     public void runLocal() throws Exception {
             doReferences();
             doProbes();
-            //doAllelesBySequence();
             doAssays();
             doAntibodies();
             doAntigens();
@@ -79,7 +78,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
             doSubSnps();
             doOrthologs();
             doAMA(); 
-            //doAllelesByESCellLines();
     }
 
     /**
@@ -199,65 +197,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
         log.info("Done creating documents for probes!");
         rs_prb.close();
     }
-
-/*    *//**
-     * Gather the allele by sequence data.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     *//*
-
-    private void doAllelesBySequence() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection
-
-        // gather up the non private accession id's for alleles
-        
-        String OTHER_ALL_BY_SEQUENCE_SEARCH = "select distinct a._Accession_key, a.accID," +
-        		" saa._Allele_key, 'ALLELE' as _MGIType_key," +
-                " a.preferred, a._LogicalDB_key" +
-                " from ACC_Accession a, SEQ_Allele_Assoc saa"+
-                " where a._MGIType_key = 19 and a.private != 1"+
-                " and saa._Sequence_key = a._Object_key and saa._Allele_key != null";
-
-        // Gather the data
-
-        ResultSet rs_all = executor.executeMGD(OTHER_ALL_BY_SEQUENCE_SEARCH);
-        rs_all.next();
-
-        log.info("Time taken gather allele by sequence data set: "
-                + executor.getTiming());
-
-        // Parse it
-
-        while (!rs_all.isAfterLast()) {
-            builder.setType(rs_all.getString("_MGIType_key"));
-            builder.setData(rs_all.getString("accID"));
-            builder.setDb_key(rs_all.getString("_Allele_key"));
-            builder.setAccessionKey(rs_all.getString("_Accession_key"));
-            builder.setPreferred(rs_all.getString("preferred"));
-            builder.setProvider(phm.get(rs_all.getString("_LogicalDB_key")));
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_all.next();
-        }
-
-        // Clean up
-
-        log.info("Done creating documents for alleles!");
-        rs_all.close();
-    }*/
 
     /**
      * Gather the assay data.
@@ -936,69 +875,5 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     }
 
-/*    *//**
-     * Gather the ES Cell Line data.  Please note, we only gather 
-     * Accession ID's for this data type if they have a direct relationship 
-     * to an allele.
-     * 
-     * These are then placed into the index as allele objects. 
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     *//*
-    
-    private void doAllelesByESCellLines() throws SQLException, InterruptedException {
 
-        // SQL for this Subsection
-        
-        // Gather up the accession id's for es cell that are related to
-        // alleles.
-
-        String OTHER_ES_CELL_LINE_SEARCH = "SELECT distinct a._Accession_key,"
-                + " a.accID, aa._Allele_key, 'ALLELE' as _MGIType_key,"
-                + " a.preferred, a._LogicalDB_key"
-                + " FROM ACC_Accession a, all_allele aa, ALL_Allele_Cellline aac"
-                + " where a.private != 1 and a._MGIType_key = 28 and"
-                + " aa._Allele_key = aac._Allele_key and"
-                + " a._Object_key = aac._MutantCellLine_key";
-
-        // Gather the data
-
-        ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
-        rs_escell.next();
-
-        log.info("Time taken gather es cell line data set: "
-                + executor.getTiming());
-
-        // Parse it
-        
-        while (!rs_escell.isAfterLast()) {
-            builder.setType(rs_escell.getString("_MGIType_key"));
-            builder.setData(rs_escell.getString("accID"));
-            builder.setDb_key(rs_escell.getString("_Allele_key"));
-            builder.setAccessionKey(rs_escell.getString("_Accession_key"));
-            builder.setPreferred(rs_escell.getString("preferred"));
-            builder.setProvider(phm.get(rs_escell.getString("_LogicalDB_key")));
-
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_escell.next();
-        }
-
-        // Clean up
-        
-        log.info("Done creating documents for es cell lines!");
-        rs_escell.close();
-    }*/
 }
