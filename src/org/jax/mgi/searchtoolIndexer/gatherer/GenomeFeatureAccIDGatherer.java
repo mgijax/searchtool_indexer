@@ -353,9 +353,18 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             builder.setData(rs_escell.getString("accID"));
             builder.setDb_key(rs_escell.getString("_Allele_key"));
             builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
-            builder.setDisplay_type("Allele ID");
+            builder.setDisplay_type("Cell Line ID");
             builder.setObject_type("ALLELE");
-            builder.setProvider(phmg.get(rs_escell.getString("_LogicalDB_key")));
+            
+            String provider = phmg.get(rs_escell.getString("_LogicalDB_key"));
+
+            // Set the provider, blanking it out if needed.
+
+            if (!provider.equals("")) {
+                builder.setProvider("(" + provider + ")");
+            } else {
+                builder.setProvider(provider);
+            }
 
             documentStore.push(builder.getDocument());
             
@@ -404,10 +413,19 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
             builder.setData(rs_all.getString("accID"));
             builder.setDb_key(rs_all.getString("_Allele_key"));
             builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
-            builder.setDisplay_type("Allele ID");
+            builder.setDisplay_type("ID");
             builder.setObject_type("ALLELE");
-            builder.setProvider(phmg.get(rs_all.getString("_LogicalDB_key")));
             
+            String provider = phmg.get(rs_all.getString("_LogicalDB_key"));
+
+            // Set the provider, blanking it out if needed.
+
+            if (!provider.equals("")) {
+                builder.setProvider("(" + provider + ")");
+            } else {
+                builder.setProvider(provider);
+            }
+         
             documentStore.push(builder.getDocument());
             
             builder.clear();

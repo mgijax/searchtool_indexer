@@ -308,7 +308,9 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
             builder.setObjectType("ALLELE");
-            builder.setBatchValue(rs.getString("marker_symbol"));
+            if (! all_type.equals("Transgene")) {
+                builder.setBatchValue(rs.getString("marker_symbol"));
+            }
 
             if (locationMap.containsKey(allele_key)) {
 
