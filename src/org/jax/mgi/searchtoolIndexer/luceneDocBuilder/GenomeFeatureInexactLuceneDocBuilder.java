@@ -6,18 +6,18 @@ import org.apache.lucene.document.Field;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * Container Class that encapsulates the data needed to create 
+ * Container Class that encapsulates the data needed to create
  * markerInexact index documents.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into 
+ * @does Knows how to take the data contained inside of it, and turn it into
  * a lucene document.
- * 
+ *
  */
 
-public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
+public class GenomeFeatureInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     private String data_type    = "";
     private String isCurrent    = "1";
@@ -38,15 +38,15 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
         this.vocabulary     = "";
         this.raw_data       = "";
         this.display_type   = "";
-        this.unique_key     = "";   
+        this.unique_key     = "";
         }
 
     /**
      * Returns a lucene document.
-     * 
+     *
      * This performs a special transformation, and replaces any non standard
      * whitespace character with a single blank space.
-     * 
+     *
      * @return A Lucene Document representing a MarkerAndVocabByField record.
      */
 
@@ -54,17 +54,17 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
         doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DATA, 
-                this.data.replaceAll("[\\W_]", " "), 
+        doc.add(new Field(IndexConstants.COL_DATA,
+                this.data.replaceAll("[\\W_]", " "),
                 Field.Store.YES, Field.Index.TOKENIZED));
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data,
                 Field.Store.YES, Field.Index.NO));
         doc.add(new Field(IndexConstants.COL_SDATA,
-        	 	this.data.replaceAll("[\\W_]", " "), 
+        	 	this.data.replaceAll("[\\W_]", " "),
                 Field.Store.YES, Field.Index.TOKENIZED));
         doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_IS_CURRENT, 
+        doc.add(new Field(IndexConstants.COL_IS_CURRENT,
                 this.isCurrent, Field.Store.YES, Field.Index.NO));
         doc.add(new Field(IndexConstants.COL_ORGANISM, this.organism,
                 Field.Store.YES, Field.Index.TOKENIZED));
@@ -92,9 +92,9 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Appends to the data field. Some of our fields are split up in the
-     * database, so they have to be put back together manually at indexing 
+     * database, so they have to be put back together manually at indexing
      * time.
-     * 
+     *
      * @param data
      */
 
@@ -108,7 +108,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Returns the data_type.
-     * 
+     *
      * @return Returns a string representation of the term type.
      */
 
@@ -118,7 +118,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the datatype. Defaults to an empty string.
-     * 
+     *
      * @param type
      */
 
@@ -133,7 +133,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Returns the whether or not this object is current in the database.
-     * 
+     *
      * @return String representation of the isCurrent field.
      */
 
@@ -143,7 +143,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the isCurrent field. This defaults to 1, or true.
-     * 
+     *
      * @param isCurrent
      */
 
@@ -158,7 +158,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Gets the organism field.
-     * 
+     *
      * @return String representation of the organism field.
      */
     public String getOrganism() {
@@ -167,7 +167,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the organism field Defaults to 1, which represents mouse.
-     * 
+     *
      * @param organism
      */
 
@@ -182,7 +182,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Gets the vocabulary type.
-     * 
+     *
      * @return vocabulary type
      */
 
@@ -192,7 +192,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets that vocabulary type. Defaults to an empty string.
-     * 
+     *
      * @param type
      * Takes the type from the database, and records it into the object. If the
      * type is Mammalian Phenotype it does a conversion into MP
@@ -218,7 +218,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Get the raw data field, this is the raw value from the database
-     * 
+     *
      * @return raw data String.
      */
 
@@ -227,9 +227,9 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Sets the raw data field, this is used at display time to see an 
+     * Sets the raw data field, this is used at display time to see an
      * unaltered form of the item we are matching on.
-     * 
+     *
      * @param raw_data
      * String
      */
@@ -242,12 +242,12 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
             this.hasError = true;
         }
     }
-    
+
     /**
      * Append to the raw data field.
      * @param data
      */
-    
+
     public void appendRaw_data(String data) {
         if (this.raw_data.equals("")) {
             this.raw_data = data;
@@ -258,7 +258,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Gets the display type
-     * 
+     *
      * @return Display Type String
      */
 
@@ -268,7 +268,7 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the display type.
-     * 
+     *
      * @param display_type
      * String
      */
@@ -283,12 +283,12 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Returns the unique key for this document.  This key is used as a join 
+     * Returns the unique key for this document.  This key is used as a join
      * point across indexes at display time.
-     * 
+     *
      * @return String with this objects unique key.
      */
-    
+
     public String getUnique_key() {
         return unique_key;
     }
@@ -296,10 +296,10 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     /**
      * Sets the unique key for this document.  This key is used as a join point
      * across indexes.
-     * 
+     *
      * @param unique_key
      */
-    
+
     public void setUnique_key(String unique_key) {
         if (unique_key != null) {
             this.unique_key = unique_key;
@@ -311,35 +311,35 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Test harness for this object.
-     * 
+     *
      * @param args
      */
-    
+
     public static void main(String[] args) {
        // Set up the logger.
-        
-        MarkerInexactLuceneDocBuilder builder = 
-            new MarkerInexactLuceneDocBuilder();
-        
-        Logger log = 
+
+        GenomeFeatureInexactLuceneDocBuilder builder =
+            new GenomeFeatureInexactLuceneDocBuilder();
+
+        Logger log =
             Logger.getLogger(builder.getClass().getName());
-        
+
         log.info(builder.getClass().getName() + " Test Harness");
-        
+
         // Should result in an error being printed!, but the lucene document
         // should still come through.
-        
+
         builder.setData(null);
         Document doc = builder.getDocument();
-        
+
         // Reset the doc builder for the next object.
-        
+
         builder.clear();
-        
+
         log.info("Lucene document: " + doc);
-        
+
         // Should work properly, resulting in a Lucene document being returned.
-    
+
         builder.setData("test");
         builder.setDb_key("123");
         builder.setDataType("test type");
@@ -347,15 +347,15 @@ public class MarkerInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
         builder.setUnique_key("123test_type");
         builder.setOrganism("test organism");
         builder.setVocabulary("MARKER");
-        
+
         doc = builder.getDocument();
-    
+
         // Should print out the toString() version of the doc builder.
-        
+
         log.info(builder);
-        
+
         log.info("Lucene document: " + doc);
-    
+
     }
 }
 

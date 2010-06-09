@@ -6,27 +6,28 @@ import org.apache.lucene.document.Field;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * Object that encapsulates the data needed to create the markerAccID index 
+ * Object that encapsulates the data needed to create the markerAccID index
  * documents.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has Nothing
  * @does Knows how to take the data contained inside of it, and turn it into a
  *  lucene document.
- * 
+ *
  * Note: this document outputs a field raw_data, that simply doesn't lower case
  * the text from the data field.
- * 
+ *
  */
-public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
+public class GenomeFeatureAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     // Internal private variables, which contain the data during runtime usage.
 
     private String data_type    = "";
     private String provider     = "";
     private String display_type = "";
-    
+    private String object_type  = "";
+
     /**
      * Resets this object back to its default state. This allows the object to
      * be reused during the indexing process.
@@ -36,23 +37,24 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
         this.data_type      = "";
         this.provider       = "";
         this.display_type   = "";
+        this.object_type    = "";
     }
 
     /**
      * Returns a Lucene document.
-     * 
+     *
      * This object also proforms some transformation on the data itself,
      * removing all extra whitespace from the data, and lowercasing it.
-     * 
-     * @return A Lucene document representing the data contained in this 
+     *
+     * @return A Lucene document representing the data contained in this
      * object.
      */
 
     protected Document prepareDocument() {
-        
-        doc.add(new Field(IndexConstants.COL_DATA, 
+
+        doc.add(new Field(IndexConstants.COL_DATA,
                 this.data.replaceAll("\\s+", " ").replaceAll("^\\s", "")
-                .replaceAll("\\s$", "").toLowerCase(), 
+                .replaceAll("\\s$", "").toLowerCase(),
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.data,
                 Field.Store.YES, Field.Index.NO));
@@ -64,6 +66,8 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type,
                 Field.Store.YES, Field.Index.NO));
+        doc.add(new Field(IndexConstants.COL_OBJ_TYPE, this.object_type,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
 
@@ -80,7 +84,7 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Returns the data type.
-     * 
+     *
      * @return String representation of the data_type field.
      */
 
@@ -90,7 +94,7 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the data_type field.
-     * 
+     *
      * @param type
      */
 
@@ -105,7 +109,7 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Gets the logical db field.
-     * 
+     *
      * @return A string containing the logical db information.
      */
 
@@ -128,9 +132,9 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Returns the Display Type field.  Valid display types are maintained in 
+     * Returns the Display Type field.  Valid display types are maintained in
      * the IndexConstants class in QuickSearchCommons.
-     * 
+     *
      * @return String representing the DisplayType
      */
 
@@ -151,35 +155,43 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
             this.hasError = true;
         }
     }
-    
+
+    public String getObject_type() {
+        return object_type;
+    }
+
+    public void setObject_type(String objectType) {
+        object_type = objectType;
+    }
+
     /**
-     * This main program is a stub for a test harness that can be built to 
+     * This main program is a stub for a test harness that can be built to
      * specifically test this object.
-     * 
+     *
      * @param args Standard argument.
      */
     public static void main(String[] args) {
         // Set up the logger.
 
-        MarkerAccIDLuceneDocBuilder builder = new MarkerAccIDLuceneDocBuilder();
-        
-        Logger log = 
+        GenomeFeatureAccIDLuceneDocBuilder builder = new GenomeFeatureAccIDLuceneDocBuilder();
+
+        Logger log =
             Logger.getLogger(builder.getClass().getName());
-        
+
         log.info(builder.getClass().getName() + " Test Harness");
-        
+
         // Should result in an error being printed!, but the lucene document
         // should still come through.
-        
+
         builder.setData(null);
         Document doc = builder.getDocument();
-        
+
         // Reset the doc builder for the next object.
-        
+
         builder.clear();
-        
+
         log.info("Lucene document: " + doc);
-        
+
         // Should work properly, resulting in a Lucene document being returned.
 
         builder.setData("test");
@@ -187,13 +199,13 @@ public class MarkerAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
         builder.setDataType("test type");
         builder.setDisplay_type("Test: test");
         builder.setProvider("test provider");
-        
+
         doc = builder.getDocument();
 
         // Should print out the toString() version of the doc builder.
-        
+
         log.info(builder);
-        
+
         log.info("Lucene document: " + doc);
 
     }

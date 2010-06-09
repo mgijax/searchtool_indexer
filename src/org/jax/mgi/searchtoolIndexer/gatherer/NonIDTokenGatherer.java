@@ -92,6 +92,11 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
             // Place the document on the stack.
             
             documentStore.push(builder.getDocument());
+            
+            if (rs.getString("labelType").equals("AS")) {
+                builder.setData(rs.getString("label").replaceAll("<", "").replaceAll(">", ""));
+                documentStore.push(builder.getDocument());
+            }
             builder.clear();
             rs.next();
         }
@@ -408,6 +413,12 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
                 // Place the document on the stack.
                 
                 documentStore.push(builder.getDocument());
+
+                // Place another copy of the label w/o the allele markups.
+                
+                builder.setData(rs.getString("label").replaceAll("<", "").replaceAll(">", ""));
+                documentStore.push(builder.getDocument());
+
                 builder.clear();
                 rs.next();
             }

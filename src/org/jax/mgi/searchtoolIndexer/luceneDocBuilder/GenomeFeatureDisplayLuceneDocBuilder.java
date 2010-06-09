@@ -15,7 +15,7 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * @does Knows how to turn the data values inside of it into a Lucene document.
  */
 
-public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
+public class GenomeFeatureDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     // Internal private variables, which contain the data during runtime usage.
     private String symbol      = "";
@@ -23,10 +23,14 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
     private String name        = "";
     private String marker_type = "";
     private String acc_id      = "";
-    private String startCoord  = "";
-    private String stopCoord   = "";
+/*    private String startCoord  = "";
+    private String stopCoord   = "";*/
     private String strand      = "";
     private String locDisplay  = "";
+    private String objectType  = "";
+    private String batchValue  = "";
+
+
 
     /**
      * Returns the MarkerDisplay object to its default state. This enables the
@@ -40,6 +44,8 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         this.acc_id         = "";
         this.strand         = "";
         this.locDisplay     = "";
+        this.objectType     = "";
+        this.batchValue     = "";
     }
 
     /**
@@ -49,13 +55,13 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
      */
     protected Document prepareDocument() {
 
-        doc.add(new Field(IndexConstants.COL_MARKER_SYMBOL, this.symbol,
+        doc.add(new Field(IndexConstants.COL_FEATURE_SYMBOL, this.symbol,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_CHROMOSOME, this.chr,
                 Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.name,
+        doc.add(new Field(IndexConstants.COL_FEATURE_NAME, this.name,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_MARKER_TYPE, this.marker_type,
+        doc.add(new Field(IndexConstants.COL_FEATURE_TYPE, this.marker_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -64,6 +70,10 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         doc.add(new Field(IndexConstants.COL_STRAND, this.strand,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field(IndexConstants.COL_LOC_DISPLAY, this.locDisplay,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.objectType,
+                Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(IndexConstants.COL_BATCH_FORWARD_VALUE, this.batchValue,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
         return doc;
     }
@@ -182,6 +192,26 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
+     * Get the value that will be passed ot the batch query form.
+     * @return String
+     */
+    
+    public String getBatchValue() {
+        return batchValue;
+    }
+
+    /**
+     * Set the value to be returned to the batch query form.
+     * @param batchValue
+     */
+    
+    public void setBatchValue(String batchValue) {
+        if (batchValue != null) {
+            this.batchValue = batchValue;            
+        }
+    }    
+    
+    /**
      * Get the accession id/
      * @return String representing the accession id.
      */
@@ -195,15 +225,21 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
      * @param acc_id String to set the accession id to.
      */
 
-    public void setAcc_id(String acc_id) {
+/*    public void setAcc_id(String acc_id) {
         if (acc_id != null) {
             this.acc_id = acc_id;
         }
         else {
             this.hasError = true;
         }
-    }
+    }*/
 
+    public void setAcc_id(String acc_id) {
+        if (acc_id != null) {
+            this.acc_id = acc_id;
+        }
+    }    
+    
     public String getStrand() {
         return strand;
     }
@@ -224,7 +260,13 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
         }
     }
 
+    public String getObjectType() {
+        return objectType;
+    }
 
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
+    }
 
 
     /**
@@ -237,8 +279,8 @@ public class MarkerDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
     public static void main(String[] args) {
         // Set up the logger.
 
-        MarkerDisplayLuceneDocBuilder builder =
-            new MarkerDisplayLuceneDocBuilder();
+        GenomeFeatureDisplayLuceneDocBuilder builder =
+            new GenomeFeatureDisplayLuceneDocBuilder();
 
         Logger log =
             Logger.getLogger(builder.getClass().getName());

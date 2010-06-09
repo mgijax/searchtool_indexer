@@ -2,8 +2,8 @@
 
 cd `dirname $0`
 
+# 
 INDEX_CONFIG=../searchtool_indexer.config
-
 if [ ! -r ${INDEX_CONFIG} ]
 then
     echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
@@ -11,10 +11,19 @@ then
 fi
 . ${INDEX_CONFIG}
 
-# Create the Marker and Vocab Related Indexes
 
-makeMarkersAndVocab
+# Create the Genome Feature related indexes
+echo "---Starting Genome Feature indexes"
+makeIndex_GenomeFeatures
 
-# Create the Other Indexes
+# Create the Vocabulary related indexes
+echo "---Starting Vocabulary indexes"
+makeIndex_Vocabs
 
-makeOther
+# Create the token existance index
+echo "---Starting Token-Existance indexes"
+makeIndex_TokenExistance
+
+# Create the Other ID related indexes
+echo "---Starting Other-ID indexes"
+makeIndex_OtherIDs

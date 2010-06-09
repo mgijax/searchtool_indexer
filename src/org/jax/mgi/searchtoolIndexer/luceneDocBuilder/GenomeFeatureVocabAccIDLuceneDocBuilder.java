@@ -7,16 +7,16 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
  * Object that encapsulates the information needed to create a single document
- * in the markerVocabExact index.
- * 
+ * in the markerVocabAccID index.
+ *
  * @author mhall
- * 
+ *
  * @has Nothing
  * @does Knows how to take the data contained inside of it, and turn it into a
  *  lucene document.
- * 
+ *
  */
-public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
+public class GenomeFeatureVocabAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     private String  data_type    = "";
     private String  vocabulary   = "";
@@ -39,43 +39,42 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Returns a Lucene document This object also performs some transformation on
-     * the data field, stripping out all unneeded whitespace and lowercasing it
-     * before sending it off to be indexed.
-     * 
-     * @return Lucene document constructed with the information that this 
-     * object
-     *         encapsulates.
+     * Returns a Lucene document This object also performs some transformation
+     * on the data field, stripping out all unneeded whitespace before sending
+     * it off to be indexed.
+     *
+     * @return Lucene document constructed with the information that this
+     * object encapsulates.
      */
 
     protected Document prepareDocument() {
-        
+
         doc.add(new Field(IndexConstants.COL_DATA,
                 this.data.replaceAll("\\s+", " ")
                 .replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(),
                      Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+
         doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data,
                 Field.Store.YES, Field.Index.NO));
-        
+
         doc.add(new Field(IndexConstants.COL_VOCABULARY, this.vocabulary,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+
         doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+
         doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+
         doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type,
                 Field.Store.YES, Field.Index.NO));
-        
+
         doc.add(new Field(IndexConstants.COL_PROVIDER, this.provider,
                 Field.Store.YES, Field.Index.NO));
-        
+
         doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+
         return doc;
     }
 
@@ -84,35 +83,14 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
      */
 
     public String toString() {
-        return "Id: " + this.db_key + "  Raw Data: " + this.data 
-        + "  Data Type: " + this.data_type + "  Vocabulary: " 
-        + this.vocabulary+ "  Unique Key: " + this.unique_key;
-    }
-
-    /**
-     * Appends to the searchable data field. Some of the data that we are
-     * pulling from the database can be compound in nature. So we need to be
-     * able to construct a single field in lucene from this.
-     * 
-     * @param data
-     */
-
-    public void appendData(String data) {
-        if (data != null) {
-            if (this.data.equals("")) {
-                this.data = data;
-            } else {
-                this.data = this.data + data;
-            }
-        }
-        else {
-            this.hasError = true;
-        }
+        return "Id: " + this.db_key + "  Raw Data: " + this.data
+        + "  Data Type: " + this.data_type + "  Vocabulary: "
+        + this.vocabulary + "  Unique Key: " + this.unique_key;
     }
 
     /**
      * Returns the data type (Term Type)
-     * 
+     *
      * @return String representation of the data_type field.
      */
 
@@ -122,7 +100,7 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Sets the data type (Term Type)
-     * 
+     *
      * @param type
      */
 
@@ -135,7 +113,7 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
         }
     }
 
-    /** 
+    /**
      * Get the display type
      * @return String
      */
@@ -146,7 +124,7 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Set the display type
-     * 
+     *
      * @param display_type
      */
 
@@ -161,7 +139,7 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
     /**
      * Returns the vocabulary.
-     * 
+     *
      * @return String representation of the vocabulary field.
      */
 
@@ -173,7 +151,7 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
      * Sets the vocabulary field. If the value passed to this function is
      * "Mammalian Phenotype" then it transforms that data into "MP" for naming
      * consistency in the indexes.
-     * 
+     *
      * @param type
      */
 
@@ -219,19 +197,19 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Returns the provider.
+     * Get the provider string.
      * @return String
      */
-    
+
     public String getProvider() {
         return provider;
     }
 
     /**
-     * Sets the provider.
+     * Sets the provider string.
      * @param provider
      */
-    
+
     public void setProvider(String provider) {
         if (provider != null) {
             this.provider = provider;
@@ -246,15 +224,15 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
      * across indexes at display time.
      * @return String with this objects unique key.
      */
-    
+
     public String getUnique_key() {
         return unique_key;
     }
-    
+
     /**
-     * Sets the unique key for this document.  This is used as a join point 
+     * Sets the unique key for this document.  This is used as a join point
      * across indexes at display time.
-     * 
+     *
      * @param unique_key
      */
 
@@ -268,48 +246,49 @@ public class MarkerVocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
     }
 
     /**
-     * Testharness for this object.
+     * The Main method is used as a test harness for the
+     * MarkerVocabAccIDLuceneDocBuilder object.
      * @param args
      */
     public static void main(String[] args) {
         // Set up the logger.
-        
-        MarkerVocabExactLuceneDocBuilder builder =
-            new MarkerVocabExactLuceneDocBuilder();
-        
-        Logger log = 
+
+        GenomeFeatureVocabAccIDLuceneDocBuilder builder =
+            new GenomeFeatureVocabAccIDLuceneDocBuilder();
+
+        Logger log =
             Logger.getLogger(builder.getClass().getName());
-        
+
         log.info(builder.getClass().getName() + " Test Harness");
-        
+
         // Should result in an error being printed!, but the lucene document
         // should still come through.
-        
+
         builder.setData(null);
         Document doc = builder.getDocument();
-        
+
         // Reset the doc builder for the next object.
-        
+
         builder.clear();
-        
+
         log.info("Lucene document: " + doc);
-        
+
         // Should work properly, resulting in a Lucene document being returned.
-    
+
         builder.setData("test");
         builder.setDb_key("123");
         builder.setDataType("test type");
         builder.setDisplay_type("Test: test");
         builder.setUnique_key("123test_type");
         builder.setVocabulary("MARKER");
-        
+
         doc = builder.getDocument();
-    
+
         // Should print out the toString() version of the doc builder.
-        
+
         log.info(builder);
-        
+
         log.info("Lucene document: " + doc);
-    
+
     }
 }

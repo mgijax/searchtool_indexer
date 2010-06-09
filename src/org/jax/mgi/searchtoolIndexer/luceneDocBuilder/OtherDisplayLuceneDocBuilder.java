@@ -43,7 +43,7 @@ public class OtherDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
         doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_MARKER_NAME, this.name,
+        doc.add(new Field(IndexConstants.COL_FEATURE_NAME, this.name,
                 Field.Store.YES, Field.Index.NO));
         doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
                 Field.Store.YES, Field.Index.UN_TOKENIZED));

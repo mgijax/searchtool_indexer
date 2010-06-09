@@ -6,7 +6,7 @@ cd `dirname $0`
 INDEX_CONFIG=../searchtool_indexer.config
 
 # What is the memory footprint we want for the jvm for these indexes.
-MEMORY_ARGS="-Xms128m -Xmx512m"
+MEMORY_ARGS="-Xms1g -Xmx1g"
 
 # Where is the base indexing directory
 BASE_INDEX_DIR=/data/searchtool/build/
@@ -22,41 +22,11 @@ fi
 
 COMMAND="java -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${BASE_INDEX_DIR}"
 
-###########################
-# Make the Marker Indexes
-###########################
-
-${COMMAND}markerInexact/index/ g
-
-${COMMAND}markerDisplay/index/ gd
-
-${COMMAND}markerExact/index/ ge
-
-${COMMAND}markerAccID/index/ ga
-
-${COMMAND}markerSymbol/index/ gs
-
-${COMMAND}markerVocabExact/index/ gve
-
-${COMMAND}markerVocabDag/index/ gvd
-
-${COMMAND}markerVocabAccID/index/ gva
-
-###########################
-# Make the Vocab Indexes
-###########################
-
-${COMMAND}vocabInexact/index/ v
-
-${COMMAND}vocabDisplay/index/ vd
-
-${COMMAND}vocabExact/index/ ve
-
-${COMMAND}vocabAccID/index/ va
 
 ##################################################
 # Make the Token Existance Index
 ##################################################
 
-${COMMAND}nonIDToken/index/ t
 
+${COMMAND}nonIDToken/index/ t
+echo "Finished nonIdToken index"
