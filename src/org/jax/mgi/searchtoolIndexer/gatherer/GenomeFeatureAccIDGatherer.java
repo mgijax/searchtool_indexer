@@ -150,7 +150,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
         String ALLELE_TO_MARKER_EXACT = "select al._allele_key,  ac.accID"
                                 + " from ALL_Allele al, ACC_Accession ac"
                                 + " where al._Allele_key = ac._Object_key and" 
-                                + " ac._MGIType_key = 11 " 
+                                + " ac._MGIType_key = 11 and ac.private != 1 " 
                                 + " and al.isWildType != 1";
 
         // Gather the data
