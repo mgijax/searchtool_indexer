@@ -151,24 +151,19 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
         // marker name, marker label, marker symbol, chromosome and accession
         // id
 
-        String MARKER_DISPLAY_KEY = "select distinct m1._Marker_key, m1.label"
-                + " as markername, m2.Label as markersymbol,"
-                + " mt.name as markertype, mlc.chromosome, a.accID,"
-                + " convert(varchar(50), mlc.startCoordinate) as startCoord, "
-                + " convert(varchar(50), mlc.endCoordinate) as endCoord, "
-                + " mlc.strand, mlc.offset, mlc.cytogeneticOffset "
-                + " from MRK_label m1, mrk_marker mrk, mrk_label m2,"
-                + " mrk_location_cache mlc, MRK_Types mt, acc_accession a"
-                + " where m1._Organism_key = 1 and m1._Label_Status_key = 1"
-                + " and m1.labelType = 'MN'  and m1._Marker_key ="
-                + " mrk._Marker_key and mrk._Marker_Status_key != 2 "
-                + "and m1._Marker_key = m2._Marker_key and m2.labelType = 'MS'"
-                + " and m2._Label_Status_key = 1 and m2._Organism_key = 1"
-                + " and m1._Marker_key = mlc._Marker_key"
-                + " and mrk._Marker_Type_key = mt._Marker_Type_key "
-                + "and m1._Marker_key = a._Object_key and a._LogicalDB_key = 1"
-                + " and a.preferred = 1 and a._MGIType_key = 2 " 
-                + " and mrk._Marker_Type_key != 12";
+        String MARKER_DISPLAY_KEY = "select distinct mmv._Marker_key, mmv.name, " +
+                "mmv.symbol, mmc.directTerms, a.accID, " +  
+                "convert(varchar(50), mlc.startCoordinate) as startCoord, " +
+                "convert(varchar(50), mlc.endCoordinate) as endCoord, " + 
+                "mlc.strand, mlc.offset, mlc.cytogeneticOffset, mlc.chromosome " +
+                "from MRK_Marker_View mmv, acc_accession a, MRK_Location_Cache mlc, " +
+                "MRK_MCV_Cache mmc " +
+                "where mmv._Marker_Status_key != 2 and mmv._Organism_key = 1 " +
+                "and mmv._Marker_key = a._Object_key and a.prefixPart = 'MGI:' " +
+                "and a.private != 1 and a.preferred = 1 and a._MGIType_key = 2 " +
+                "and mmv._Marker_key = mlc._Marker_key " +
+                "and mmv._Marker_Type_key != 12 " +
+                "and mmv._Marker_key = mmc._Marker_key";
 
         // Grab the result set
         ResultSet rs = executor.executeMGD(MARKER_DISPLAY_KEY);
@@ -181,14 +176,14 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 
             // standard entries
             builder.setDb_key(rs.getString("_Marker_key"));
-            builder.setName(rs.getString("markername"));
-            builder.setSymbol(rs.getString("markersymbol"));
-            builder.setMarker_type(rs.getString("markertype"));
+            builder.setName(rs.getString("name"));
+            builder.setSymbol(rs.getString("symbol"));
+            builder.setMarker_type(rs.getString("directTerms"));
             builder.setChr(rs.getString("chromosome"));
             builder.setAcc_id(rs.getString("accID"));
             builder.setStrand(rs.getString("strand"));
             builder.setObjectType("MARKER");
-            builder.setBatchValue(rs.getString("markerSymbol"));
+            builder.setBatchValue(rs.getString("symbol"));
 
             // derive display values for location
             startCoord  = rs.getString("startCoord");
