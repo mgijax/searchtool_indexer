@@ -264,7 +264,10 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         vsOMIM.setVoc_key(OMIM_VOC_KEY);
         
-        // Gather the marker keys for given omim non human terms.
+        // Gather the marker keys for given omim non human terms.  (via
+	// annotations of OMIM disease terms to mouse genotypes)
+	//
+	// Excludes: Transgenes involving Cre
 
         String OMIM_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
                 + " vmc._Marker_key"
@@ -325,15 +328,27 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         vsOrtho.setVoc_key(OMIM_HUMAN_VOC_KEY);         
          
-        // Gather the marker keys for given omim/human terms.
+        // Gather the marker keys for given omim/human terms.  (via the
+	// VOC_Marker_Cache -- human marker OMIM IDs, not OMIM disease IDs)
+	//
+	// Excludes: Transgenes involving Cre
 
-        String OMIM_HUMAN_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
-                + "vmc._Marker_key"
-                + " from VOC_Marker_Cache vmc, mrk_label ml"
-                + " where annotType = 'OMIM/Human Marker'"
-                + " and vmc._Marker_key ="
-                + " ml._Marker_key and ml.label not like 'tg%cre%' and"
-                + " ml.labelType = 'MS'" + " order by _Term_key";
+	// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
+	String OMIM_HUMAN_MARKER_DISPLAY_KEY = 
+	    " select distinct m._Marker_key, a._Term_key "
+	    + "from VOC_Annot a, MRK_Cluster mc, MRK_ClusterMember mcm, "
+	    + "  MRK_ClusterMember mcm2, VOC_Term vt, MRK_Marker m "
+	    + "where mcm._Marker_key = a._Object_key "
+	    + " and a._AnnotType_key = 1006 "
+	    + " and m.symbol not like 'tg%cre%' "
+	    + " and mc._ClusterSource_key = vt._Term_key "
+	    + " and vt.term = 'HomoloGene' "
+	    + " and m._Marker_Status_key != 2 "
+	    + " and mcm._Cluster_key = mc._Cluster_key "
+	    + " and mc._Cluster_key = mcm2._Cluster_key "
+	    + " and mcm2._Marker_key = m._Marker_key "
+	    + " and m._Organism_key = 1 "
+	    + "order by a._Term_key";
 
         vsOrtho.setDisplay_key(OMIM_HUMAN_MARKER_DISPLAY_KEY);
         vsOrtho.setObject_type("MARKER");

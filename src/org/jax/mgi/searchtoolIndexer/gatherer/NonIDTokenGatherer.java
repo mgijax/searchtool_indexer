@@ -64,7 +64,7 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 
         // SQL for this Subsection
 
-        // Gather up marker key, label, label type, organism key, label staty
+        // Gather up marker key, label, label type, organism key, label status
         // and label type name where the marker is not withdrawn and the 
         // organism is mouse.
         

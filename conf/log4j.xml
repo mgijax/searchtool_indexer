@@ -11,7 +11,7 @@
 
   <appender name="errorAppender"
              class="org.apache.log4j.DailyRollingFileAppender">
-     <param name="File" value="/data/searchtool/logs/exception.log"/>
+     <param name="File" value="${LOGDIR}/exception.log"/>
      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
      <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
@@ -26,7 +26,7 @@
   
     <appender name="debugAppender"
              class="org.apache.log4j.DailyRollingFileAppender">
-     <param name="File" value="/data/searchtool/logs/debug.log"/>
+     <param name="File" value="${LOGDIR}/debug.log"/>
      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
      <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
@@ -41,7 +41,7 @@
 
     <appender name="indexAppender"
              class="org.apache.log4j.DailyRollingFileAppender">
-     <param name="File" value="/data/searchtool/logs/index.log"/>
+     <param name="File" value="${LOGDIR}/index.log"/>
      <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
              value="%d %-5p [%C{1}] %m%n"/>

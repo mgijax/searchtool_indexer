@@ -8,9 +8,6 @@ INDEX_CONFIG=../searchtool_indexer.config
 # What is the memory footprint we want for the jvm for these indexes.
 MEMORY_ARGS="-Xms4g -Xmx8g"
 
-# Where is the base indexing directory
-BASE_INDEX_DIR=/data/searchtool/build/
-
 if [ ! -r ${INDEX_CONFIG} ]
 then
     echo "Cannot read configuration file: ${INDEX_CONFIG}" | tee -a ${LOG}
@@ -18,18 +15,18 @@ then
 fi
 . ${INDEX_CONFIG}
 
-# The basic indexing command, w/ the BASE_INDEX_DIR argument
+# The basic indexing command, w/ the SEARCHTOOL_BUILDDIR argument
 
-COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${BASE_INDEX_DIR}"
+COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
 
 ###########################
 # Make the Other Indexes
 ###########################
 
 
-${COMMAND}otherExact/index/ o
-echo "Finished otherExact index"
-
 ${COMMAND}otherDisplay/index/ od
 echo "Finished otherDisplay index"
+
+${COMMAND}otherExact/index/ o
+echo "Finished otherExact index"
 

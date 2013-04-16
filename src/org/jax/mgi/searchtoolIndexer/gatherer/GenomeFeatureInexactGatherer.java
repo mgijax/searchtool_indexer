@@ -96,6 +96,12 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
         // Collect all marker lables where the marker is not withdrawn
         // and the organism is for mouse.
+	//
+	// Includes: data for current or iterim mouse markers
+	// Excludes:
+	//	allele synonyms
+	//	allele names
+	//	all data for transgene markers
 
         String MARKER_LABEL_KEY = "select ml._Marker_key, ml.label, "
                 + "ml.labelType, ml._OrthologOrganism_key, "
@@ -588,6 +594,9 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
         log.info("Collecting Allele Nomenclature");
 
         // Gather up allele nomenclature
+	//
+	// Includes: current allele symbols, names, and synonyms
+	// Excludes: all data for wild-type alleles
 
         String ALLELE_NOMEN_KEY = "select distinct aa._Allele_key, " +
         		"al.label, al.labelType, al.labelTypeName"+

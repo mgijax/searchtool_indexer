@@ -1,5 +1,10 @@
 package org.jax.mgi.searchtoolIndexer.gatherer;
 
+import java.util.HashMap;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -68,11 +73,11 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
      */
 
     public void runLocal() throws Exception {
+            doOrthologs();
             doProbes();
             doAssays();
             doReferences();
             doSequences();
-            doOrthologs();
             doAntibodies();
             doAntigens();
             doExperiments();
@@ -318,25 +323,42 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
         // SQL for this Subsection
 
-        // gather up marker key, type, ortholog symbol and name
+        // gather up marker key, HomoloGene ID, ortholog symbol and name.
         
-        String OTHER_ORTHOLOG_DISPLAY = "select _Marker_key, '"
-                + IndexConstants.OTHER_ORTHOLOG + "' as type, symbol, name"
-                + " from MRK_Marker_View" + " where _Organism_key != 1";
+	String OTHER_ORTHOLOG_DISPLAY = "select distinct a.accID, "
+	    + " mv._Marker_key, "
+	    + " mv.symbol, "
+	    + " mv.name "
+	    + "from MRK_Marker_View mv, "
+	    + " MRK_ClusterMember mcm, "
+	    + " ACC_Accession a, "
+	    + " MRK_Cluster mc, "
+	    + " VOC_Term vt "
+	    + "where mv._Organism_key != 1 "
+	    + " and mv._Marker_key = mcm._Marker_key "
+	    + " and mcm._Cluster_key = a._Object_key "
+	    + " and a._MGIType_key = 39 "
+	    + " and mcm._Cluster_key = mc._Cluster_key "
+	    + " and mc._ClusterSource_key = vt._Term_key "
+	    + " and vt.term = 'HomoloGene' "
+	    + " and a.private = 0 "
+	    + " and a.preferred = 1";
 
         // Gather the data
 
         ResultSet rs_ortho = executor.executeMGD(OTHER_ORTHOLOG_DISPLAY);
         rs_ortho.next();
-        log.info("Time taken gather ortholog result set: "
+        log.info("Time taken gather homologous marker result set: "
                 + executor.getTiming());
 
         // Parse it
 
+	int documentCount = 0;
         while (!rs_ortho.isAfterLast()) {
+	    documentCount++;
 
             builder.setDb_key(rs_ortho.getString("_Marker_key"));
-            builder.setDataType(rs_ortho.getString("type"));
+            builder.setDataType(IndexConstants.OTHER_ORTHOLOG);
             
             // The name for Orthologs is a realized field.
             
@@ -362,8 +384,270 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
         // Clean up
 
-        log.info("Done Orthologs!");
+        log.info("Done homologous markers! (" + documentCount + " documents)");
         rs_ortho.close();
+
+	doHomoloGeneClasses();
+    }
+
+    /**
+     * Gather display data for HomoloGene classes.  Please note that this has
+     * a realized display field.
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+
+    private void doHomoloGeneClasses() throws SQLException, InterruptedException {
+	HashMap descriptions = getHomoloGeneClassDescriptions();
+
+        // SQL for this Subsection
+
+        // gather up marker key, type, ortholog symbol and name
+        
+	String HOMOLOGENE_CLASSES_DISPLAY = 
+	    "select distinct aa.accID as HomoloGeneID, "
+	    + " '" + IndexConstants.OTHER_HOMOLOGY + "' as type "
+	    + "from VOC_Term source, "
+	    + " MRK_Cluster mc, "
+	    + " ACC_Accession aa "
+	    + "where source.term = 'HomoloGene' "
+	    + " and source._Term_key = mc._ClusterSource_key "
+	    + " and mc._Cluster_key = aa._Object_key "
+	    + " and aa._MGIType_key = 39 "
+	    + " and aa.private = 0";
+
+        // Gather the data
+
+        ResultSet rs_ortho = executor.executeMGD(HOMOLOGENE_CLASSES_DISPLAY);
+        rs_ortho.next();
+        log.info("Time taken gather HomoloGene class result set: "
+                + executor.getTiming());
+
+	String hgID = null;
+
+	int documentCount = 0;
+        while (!rs_ortho.isAfterLast()) {
+	    documentCount++;
+
+            hgID = rs_ortho.getString("HomoloGeneID");
+            builder.setDb_key(hgID);
+            builder.setDataType(rs_ortho.getString("type"));
+            
+	    if (descriptions.containsKey(hgID)) {
+ 	        builder.setName((String) descriptions.get(hgID));
+	    } else {
+		builder.setName("HomoloGene class: " + hgID);
+	    }
+            while (documentStore.size() > stack_max) {
+                Thread.sleep(1);
+            }
+            
+            // Place the document on the stack.
+            
+            documentStore.push(builder.getDocument());
+            total++;
+            if (total >= output_threshold) {
+                log.debug("We have now gathered " + total + " documents!");
+                output_threshold += output_incrementer;
+            }
+            builder.clear();
+            rs_ortho.next();
+        }
+
+        // Clean up
+
+        log.info("Done HomoloGene classes! (" + documentCount + " documents)");
+        rs_ortho.close();
+    }
+
+    /**
+     * compose and return the HomoloGene class descriptions
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    private HashMap getHomoloGeneClassDescriptions() throws SQLException, InterruptedException {
+
+	log.info ("Building HomoloGene class descriptions");
+
+	// key is HomoloGene ID, contents is a HashMap that maps from organism
+	// to a count of markers for that organism in the HomoloGene class
+	HashMap organismsById = new HashMap();
+
+	String HOMOLOGENE_CLASS_SEARCH = "select aa.accID, "
+		+ " mo.commonName, "
+		+ " count(1) as idCount "
+		+ "from MRK_Cluster mc, "
+		+ " VOC_Term vt, "
+		+ " MRK_ClusterMember mcm, "
+		+ " ACC_Accession aa, "
+		+ " MRK_Marker mm, "
+		+ " MGI_Organism mo "
+		+ "where vt.term = 'HomoloGene' "
+		+ " and vt._Term_key = mc._ClusterSource_key "
+		+ " and mc._Cluster_key = mcm._Cluster_key "
+		+ " and mcm._Marker_key = mm._Marker_key "
+		+ " and mm._Organism_key = mo._Organism_key "
+		+ " and mc._Cluster_key = aa._Object_key "
+		+ " and aa._MGIType_key = 39 "
+		+ " and aa.private = 0 "
+		+ "group by aa.accID, mo.commonName";
+
+        ResultSet rs_counts = executor.executeMGD(HOMOLOGENE_CLASS_SEARCH);
+        rs_counts.next();
+
+        log.info("Time taken to gather organism counts for HomoloGene classes: "
+                + executor.getTiming());
+
+	// keyed by organism name, values are counts of markers for that
+	// organism in the HomoloGene class we are considering
+	HashMap inner = null;
+
+	String hgID = null;		// HomoloGene ID
+	String organism = null;		// common name for organism
+	String count = null;		// integer count of markers
+
+	int rowCount = 0;
+
+        while (!rs_counts.isAfterLast()) {
+	    rowCount++;
+
+	    hgID = rs_counts.getString("accID");
+	    organism = rs_counts.getString("commonName");
+	    count = rs_counts.getString("idCount");
+
+	    if (organismsById.containsKey(hgID)) {
+		inner = (HashMap) organismsById.get(hgID);
+	    } else {
+		inner = new HashMap();
+		organismsById.put (hgID, inner);
+	    }
+	    inner.put (organism, count);
+
+            rs_counts.next();
+	}
+        rs_counts.close();
+
+	log.info ("Processed " + rowCount + " rows for " +
+		organismsById.size() + " HomoloGene classes");
+
+	// So we now have essentially:
+	//     { HomoloGene ID : { organism : count of markers } }
+	// and we need to transform that into a 1-line description of each
+	// HomoloGene class.
+	
+	// keys are HomoloGene IDs, values are description strings
+	HashMap descriptions = new HashMap();
+
+	// organisms which need to be renamed
+	HashMap renamed = new HashMap();
+	renamed.put ("mouse, laboratory", "mouse");
+	renamed.put ("dog, domestic", "dog");
+
+	// organisms given priority in ordering
+	ArrayList priority = new ArrayList();
+
+	// the big three
+	priority.add ("human");
+	priority.add ("mouse, laboratory");
+	priority.add ("rat");
+
+	// primates - alphabetical
+	priority.add ("chimpanzee");
+	priority.add ("rhesus macaque");
+	
+	// mammals - alphabetical
+	priority.add ("cattle");
+	priority.add ("dog, domestic");
+	
+	// others - alphabetical
+	priority.add ("chicken");
+	priority.add ("zebrafish");
+
+	String displayOrg = null;
+	StringBuffer sb = null;
+	Set orgSet = null;
+	Iterator orgIt = null;
+	String description = null;
+
+	Iterator it = organismsById.keySet().iterator();
+	while (it.hasNext()) {
+
+	    hgID = (String) it.next();
+	    inner = (HashMap) organismsById.get(hgID);
+	    sb = new StringBuffer();
+	    sb.append ("Class with ");
+
+	    // do the organisms named in priority order first
+
+	    orgIt = priority.iterator();
+	    while (orgIt.hasNext()) {
+		organism = (String) orgIt.next();
+
+		if (inner.containsKey(organism)) {
+		    if (renamed.containsKey(organism)) {
+			displayOrg = (String) renamed.get(organism);
+		    } else {
+			displayOrg = organism;
+		    }
+		    sb.append ((String) inner.get(organism));	// count
+		    sb.append (" ");
+		    sb.append (displayOrg);			// organism
+		    sb.append (", ");
+		}
+	    }
+
+	    // fill in any extra organisms that were not prioritized in an
+	    // ad-hoc manner
+
+	    orgIt = inner.keySet().iterator();
+	    while (orgIt.hasNext()) {
+		organism = (String) orgIt.next();
+
+		if (!priority.contains(organism)) {
+		    if (renamed.containsKey(organism)) {
+			displayOrg = (String) renamed.get(organism);
+		    } else {
+			displayOrg = organism;
+		    }
+		    sb.append ((String) inner.get(organism));
+		    sb.append (" ");
+		    sb.append (displayOrg);
+		    sb.append (", ");
+		}
+
+	    }
+
+	    sb.append ("genes");
+	    description = sb.toString();
+
+	    // We now have the basic description string compiled, so do last
+	    // minute tweaking, including:
+	    //  1. removing a trailing comma from the list of organisms
+	    //  2. adding an 'and' between the last two organisms
+	    //  3. converting 'genes' to 'gene' for classes with only 1 marker
+
+	    description = description.replace (", genes", "");
+
+	    int organismCount = ((HashMap) organismsById.get(hgID)).size();
+
+	    if (organismCount == 2) {
+		// if only two organisms, strip the comma
+		description = description.replace (", ", " and ");
+
+	    } else if (organismCount >= 3) {
+		// if three or more organisms, leave the comma & insert 'and'
+		int lastComma = description.lastIndexOf(", ");
+		description = description.substring(0, lastComma) 
+		   + ", and "
+		   + description.substring (lastComma + 2);
+	    }
+
+	    descriptions.put (hgID, description);
+
+	} // while (it.hasNext())
+
+	log.info ("Finished building " + descriptions.size() + " HomoloGene class descriptions");
+	return descriptions;
     }
 
     /**

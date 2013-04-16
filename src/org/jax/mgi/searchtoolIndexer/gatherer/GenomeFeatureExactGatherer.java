@@ -65,10 +65,19 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
     private void doLabels() throws SQLException, InterruptedException {
 
-        // Grav marker key, label, label type and the type name for all
+        // Grab marker key, label, label type and the type name for all
         // marker, alleles and orthologs, but not the symbols.
         // Also only do this for the mouse related items, where the marker
         // has not been withdrawn.
+	//
+	// Includes: only data associated in MRK_Label with mouse markers
+	// Excludes:
+	// 	marker symbol
+	// 	allele symbol
+	// 	ortholog symbol
+	//	allele name
+	//	all data for withdrawn markers
+	//	all data for transgene markers
 
         String GENE_LABEL_EXACT = "select ml._Marker_key, "
                 + "ml.label, ml.labelType,  ml.labelTypeName, "
@@ -152,11 +161,16 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
     
     private void doAlleleLabels() throws SQLException, InterruptedException {
     
-        // Grav marker key, label, label type and the type name for all
+        // Grab marker key, label, label type and the type name for all
         // marker, alleles and orthologs, but not the symbols.
         // Also only do this for the mouse related items, where the marker
         // has not been withdrawn.
-    
+	//
+	// Includes: current allele names and synonyms from ALL_Label
+	// Excludes:
+	//	all data for wild-type alleles
+	//	allele symbols
+
         String ALLELE_LABEL_EXACT = "select distinct aa._Allele_key, m.name, " +
                 "al.label, al.labelType, al.labelTypeName, al._Label_Status_key "+
                 " from all_label al, ALL_Allele aa, mrk_marker m"+

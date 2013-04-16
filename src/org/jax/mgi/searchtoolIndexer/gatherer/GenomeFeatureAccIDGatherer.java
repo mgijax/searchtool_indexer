@@ -197,22 +197,34 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
         log.info("Gathering Accession ID's for Orthologs");
 
-        // Gather up any accession ID, that can be directly related to
-        // a mouse marker, via the MRK_Homology_cache.  We are directly
-        // matching up ortholog's for known associations to mouse.
+	// Collect accession IDs for non-mouse markers that can be related to
+	// mouse markers via HomoloGene classes.
 
-        String ORTH_TO_MARKER_ACC_ID = "select distinct mouse._Marker_key,"
-                + " a.accID, a._LogicalDB_key, m.commonName "
-                + "from MRK_Homology_Cache mouse, MRK_Homology_Cache nonmouse,"
-                + " ACC_Accession a, MGI_Organism m, MRK_Marker mm"
-                + " where mouse._Class_key = nonmouse._Class_key and"
-                + " mouse._Organism_key = 1 and nonmouse._Organism_key != 1"
-                + " and nonmouse._Marker_key = a._Object_key"
-                + " and mouse._Marker_key = mm._Marker_key"
-                + " and mm._Marker_Status_key !=2"
-                + " and nonmouse._Organism_key = m._Organism_key"
-                + " and a._MGIType_key = 2 and a.private = 0"
-                + " and mm._Marker_Type_key != 12";
+	String ORTH_TO_MARKER_ACC_ID = "select distinct mouse._Marker_key, "
+	    + " aa.accID, aa._LogicalDB_key, o.commonName "
+	    + "from VOC_Term source, "
+	    + " MRK_Cluster mc, "
+	    + " MRK_ClusterMember nonmouse, "
+	    + " MRK_ClusterMember mouse, "
+	    + " MRK_Marker mm, "
+	    + " ACC_Accession aa, "
+	    + " MRK_Marker nm, "
+	    + " MGI_Organism o "
+	    + "where source.term = 'HomoloGene' "
+	    + " and source._Term_key = mc._ClusterSource_key "
+	    + " and mc._Cluster_key = mouse._Cluster_key "
+	    + " and mouse._Marker_key = mm._Marker_key "
+	    + " and mm._Organism_key = 1 "
+	    + " and mm._Marker_Status_key != 2 "
+	    + " and mm._Marker_Type_key != 12 "
+	    + " and mc._Cluster_key = nonmouse._Cluster_key "
+	    + " and nonmouse._Marker_key = nm._Marker_key "
+	    + " and nm._Organism_key != 1 "
+	    + " and nm._Organism_key = o._Organism_key "
+	    + " and nm._Marker_Status_key != 2 "
+	    + " and nonmouse._Marker_key = aa._Object_key "
+	    + " and aa._MGIType_key = 2 "
+	    + " and aa.private = 0";
 
         // Gather the data
 

@@ -68,6 +68,15 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
         // Gather up all the marker, allele and ortholog symbols, where the
         // symbol is for mouse, and the marker has not been withdrawn.
+	//
+	// Includes: (for current mouse markers)
+	// 	marker names and synonyms
+	// 	ortholog names
+	// 	allele symbols and names
+	// Excludes:
+	// 	all data for transgene markers
+	// 	marker symbols
+	// 	ortholog symbols
 
         String GENE_LABEL_EXACT = "select ml._Marker_key, "
                 + "ml.label, ml._OrthologOrganism_key, ml.labelType,"
@@ -159,6 +168,9 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
     
         // Gather up all the marker, allele and ortholog symbols, where the
         // symbol is for mouse, and the marker has not been withdrawn.
+	//
+	// Includes: current allele symbols
+	// Excludes: all data for wild-type alleles
     
         String GENE_LABEL_EXACT = "select distinct aa._Allele_key, " +
             "al.label, al.labelType, al.labelTypeName, al._Label_Status_key "+

@@ -2,6 +2,9 @@ package org.jax.mgi.searchtoolIndexer.gatherer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Set;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.OtherExactLuceneDocBuilder;
 import org.jax.mgi.searchtoolIndexer.util.InitCap;
@@ -65,6 +68,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
      */
 
     public void runLocal() throws Exception {
+            doOrthologs();
             doReferences();
             doProbes();
             doAssays();
@@ -76,7 +80,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
             doSequencesByProbe();
             doSnps();
             doSubSnps();
-            doOrthologs();
             doAMA(); 
     }
 
@@ -754,32 +757,56 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
         // SQL for this Subsection
 
-        // Gather up the accession ids for orthologs.
-        
-        String OTHER_ORTHOLOG_SEARCH = "select distinct a._Accession_key,"
-                + " a.accID, nonmouse._Marker_key, 'ORTHOLOG' as _MGIType_key,"
-                + " a.preferred, a._LogicalDB_key, m.commonName"
-                + " from MRK_Homology_Cache nonmouse, ACC_Accession a,"
-                + " MGI_Organism m" + " where nonmouse._Organism_key != 1 and"
-                + " nonmouse._Marker_key = a._Object_key"
-                + " and a._MGIType_key = 2 and a.private = 0"
-                + " and nonmouse._Organism_key = m._Organism_key";
+	// Get accession IDs for non-mouse markers involved in HomoloGene
+	// homology classes.
+
+	String OTHER_ORTHOLOG_SEARCH = "select distinct aa._Accession_key, "
+	    + " aa.accID, "
+	    + " mm._Marker_key, "
+	    + " 'ORTHOLOG' as _MGIType_key, "
+	    + " aa.preferred, "
+	    + " aa._LogicalDB_key, "
+	    + " mo.commonName, "
+	    + " hg.accID as HomoloGeneID "
+	    + "from VOC_Term source, "
+	    + " MRK_Cluster mc, "
+	    + " MRK_ClusterMember mcm, "
+	    + " MRK_Marker mm, "
+	    + " MGI_Organism mo, "
+	    + " ACC_Accession aa, "
+	    + " ACC_Accession hg "
+	    + "where source.term = 'HomoloGene' "
+	    + " and source._Term_key = mc._ClusterSource_key "
+	    + " and mc._Cluster_key = mcm._Cluster_key "
+	    + " and mcm._Marker_key = mm._Marker_key "
+	    + " and mm._Organism_key != 1 "
+	    + " and mm._Organism_key = mo._Organism_key "
+	    + " and mm._Marker_key = aa._Object_key "
+	    + " and aa._MGIType_key = 2 "
+	    + " and aa.private = 0"
+            + " and mc._Cluster_key = hg._Object_key "
+	    + " and hg._MGIType_key = 39 " 
+	    + " and hg.private = 0"; 
 
         // gather the data
 
         ResultSet rs_orthologs = executor.executeMGD(OTHER_ORTHOLOG_SEARCH);
         rs_orthologs.next();
 
-        log.info("Time taken to gather ortholog id data set: "
+        log.info("Time taken to gather homologous marker id data set: "
                 + executor.getTiming());
 
         // Parse it
 
+	int documentCount = 0;
         while (!rs_orthologs.isAfterLast()) {
+	    documentCount++;
 
             builder.setType(rs_orthologs.getString("_MGIType_key"));
             builder.setData(rs_orthologs.getString("accID"));
+
             builder.setDb_key(rs_orthologs.getString("_Marker_key"));
+
             builder.setAccessionKey(rs_orthologs.getString("_Accession_key"));
             builder.setPreferred(rs_orthologs.getString("preferred"));
             
@@ -808,9 +835,86 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
         // Clean up
 
-        log.info("Done creating documents for ortholog IDs!");
+        log.info("Done creating " + documentCount
+		+ " documents for homologous marker IDs!");
         rs_orthologs.close();
 
+	doHomoloGeneClasses();
+    }
+
+    /**
+     * Gather the HomoloGene class data. This has a realized logical db display field.
+     * 
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+
+    private void doHomoloGeneClasses() throws SQLException, InterruptedException {
+	// Get accession IDs for the HomoloGene classes themselves.
+
+	String HOMOLOGENE_CLUSTER_SEARCH = 
+	    "select distinct aa._Accession_key, "
+	    + " aa._Object_key, "
+	    + " 'HOMOLOGY' as _MGIType_key, "
+	    + " aa.preferred, "
+	    + " aa._LogicalDB_key, "
+	    + " aa.accID as HomoloGeneID "
+	    + "from VOC_Term source, "
+	    + " MRK_Cluster mc, "
+	    + " ACC_Accession aa "
+	    + "where source.term = 'HomoloGene' "
+	    + " and source._Term_key = mc._ClusterSource_key "
+	    + " and mc._Cluster_key = aa._Object_key "
+	    + " and aa._MGIType_key = 39 "
+	    + " and aa.private = 0";
+
+        // gather the data
+
+        ResultSet rs_homologene =
+	    executor.executeMGD(HOMOLOGENE_CLUSTER_SEARCH);
+        rs_homologene.next();
+
+        log.info("Time taken to gather HomoloGene class id data set: "
+                + executor.getTiming());
+
+        // Parse it
+
+	int documentCount = 0;
+        while (!rs_homologene.isAfterLast()) {
+	    documentCount++;
+
+            builder.setType(IndexConstants.OTHER_HOMOLOGY);
+            builder.setData(rs_homologene.getString("HomoloGeneID"));
+
+            builder.setDb_key(rs_homologene.getString("HomoloGeneID"));
+            builder.setAccessionKey(rs_homologene.getString("_Accession_key"));
+            builder.setPreferred(rs_homologene.getString("preferred"));
+            builder.setProvider(
+		phm.get(rs_homologene.getString("_LogicalDB_key")) );
+
+            while (documentStore.size() > stack_max) {
+                Thread.sleep(1);
+            }
+            
+            // Place the document on the stack.
+            
+            documentStore.push(builder.getDocument());
+            builder.clear();
+
+            total++;
+            if (total >= output_threshold) {
+                log.debug("We have now gathered " + total + " documents!");
+                output_threshold += output_incrementer;
+            }
+            
+            rs_homologene.next();
+        }
+
+        // Clean up
+
+        log.info("Done creating " + documentCount
+		+ " documents for HomoloGene class IDs!");
+        rs_homologene.close();
     }
 
     /**
