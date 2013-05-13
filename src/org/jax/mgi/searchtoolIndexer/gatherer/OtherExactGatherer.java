@@ -13,30 +13,30 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gathering up all the different sorts of 
+ * This class is responsible for gathering up all the different sorts of
  * information that we need to perform searches against accession id's.  It is
- * however important to note that this is not always direct accid->object 
- * relations.  We do more complex things like es cell line 
+ * however important to note that this is not always direct accid->object
+ * relations.  We do more complex things like es cell line
  * accession id's -> alleles, and probes -> sequences as well.
- * 
+ *
  * This information is then used to populate the otherExact index.
- * 
+ *
  * @author mhall
  *
  * @has An instance of the IndexCfg object, which is used to setup this object.
- * 
- * @does Upon being started this runs through a group of methods, each of 
+ *
+ * @does Upon being started this runs through a group of methods, each of
  * which are responsible for gathering documents from a different accession id
  * type.
- * 
+ *
  * Each subprocess basically operates as follows:
- * 
- * Gather the data for the specific subtype, parse it while creating lucene 
- * documents and adding them to the stack.  
- * 
+ *
+ * Gather the data for the specific subtype, parse it while creating lucene
+ * documents and adding them to the stack.
+ *
  * After it completes parsing, it cleans up its result sets, and exits.
- * 
- * After all of these methods complete, we set gathering complete to true in 
+ *
+ * After all of these methods complete, we set gathering complete to true in
  * the shared document stack and exit.
  *
  */
@@ -60,7 +60,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         super(config);
         phm = new ProviderHashMap(config);
     }
-    
+
     /**
      * This is the runLocal method, which is called by the supers run() method.
      * It encapsulates the work that this specific implementing object needs to
@@ -78,9 +78,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
             doImages();
             doSequences();
             doSequencesByProbe();
-            doSnps();
-            doSubSnps();
-            doAMA(); 
+            doAMA();
     }
 
     /**
@@ -88,13 +86,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
      * @throws SQLException
      * @throws InterruptedException
      */
-    
+
     private void doReferences() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
 
         // Gather up the non private accession ids for references.
-        
+
         String OTHER_REF_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
                 + "a._Object_key, '" + IndexConstants.OTHER_REFERENCE
                 + "' as _MGIType_key, a.preferred, a._LogicalDB_key"
@@ -122,9 +120,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -143,7 +141,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the probe data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -153,7 +151,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // SQL For this Subsection
 
         // gather up the non private accession id's for probes.
-        
+
         String OTHER_PROBE_SEARCH = "SELECT distinct a._Accession_key, "
                 + "a.accID, a._Object_key, '" + IndexConstants.OTHER_PROBE
                 + "' as _MGIType_key, a.preferred, a._LogicalDB_key"
@@ -181,9 +179,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -206,13 +204,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
      * @throws SQLException
      * @throws InterruptedException
      */
-    
+
     private void doAssays() throws SQLException, InterruptedException {
 
         // SQL for this Subsection.
 
         // gather up the non private accession ids for assays
-        
+
         String OTHER_ASSAY_SEARCH = "SELECT distinct a._Accession_key, "
                 + "a.accID, a._Object_key, 'ASSAY' as _MGIType_key, "
                 + "a.preferred" + " FROM ACC_Accession a"
@@ -238,9 +236,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -260,7 +258,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the antibody data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -270,7 +268,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up the non private accession id's for anitbodies.
-        
+
         String OTHER_ANTIBODY_SEARCH = "SELECT distinct a._Accession_key, "
                 + "a.accID, a._Object_key, 'ANTIBODY' as _MGIType_key, "
                 + "a.preferred" + " FROM ACC_Accession a"
@@ -296,9 +294,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the documents on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -317,7 +315,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the antigen data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -327,7 +325,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // SQL for this Subsection.
 
         // gather up the non private accession id's for anitgens.
-        
+
         String OTHER_ANTIGEN_SEARCH = "SELECT distinct a._Accession_key, "
                 + "a.accID, a._Object_key, 'ANTIGEN' as _MGIType_key, "
                 + "a.preferred" + " FROM ACC_Accession a"
@@ -353,9 +351,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -375,7 +373,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the experiment data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -385,7 +383,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // Gather up the non private accession id's for experiments.
-        
+
         String OTHER_EXPERIMENT_SEARCH = "SELECT distinct a._Accession_key, "
                 + " a.accID, a._Object_key, 'EXPERIMENT' as _MGIType_key,"
                 + " a.preferred" + " FROM ACC_Accession a"
@@ -411,9 +409,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -433,7 +431,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the image data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -443,7 +441,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // Gather up the non private accession id's for images.
-        
+
         String OTHER_IMAGE_SEARCH = "SELECT distinct a._Accession_key,"
                 + " a.accID, a._Object_key, 'IMAGE' as _MGIType_key,"
                 + " a.preferred" + " FROM ACC_Accession a"
@@ -469,9 +467,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -490,7 +488,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the sequence data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -498,7 +496,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
     private void doSequences() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-        
+
         // gather up the non private accession id's for sequences, for mouse
         // only sequences.
 
@@ -532,9 +530,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             builder.clear();
             total++;
@@ -544,8 +542,8 @@ public class OtherExactGatherer extends DatabaseGatherer {
             }
 
             rs_seq.next();
-        }      
-        
+        }
+
         // Clean up
 
         log.info("Done creating documents for sequences!");
@@ -555,16 +553,16 @@ public class OtherExactGatherer extends DatabaseGatherer {
     /**
      * Gather Sequences by way of Probe Accession ID's. This subsections SQL is
      * significantly more complex than the others.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
 
-    private void doSequencesByProbe() 
+    private void doSequencesByProbe()
         throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-        
+
         // Gather up the accession ids for probes, and then assign them to the
         // sequences that these probes point at for non private accession ids
         // where the organism is a mouse.
@@ -604,9 +602,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             builder.clear();
 
@@ -627,128 +625,8 @@ public class OtherExactGatherer extends DatabaseGatherer {
     }
 
     /**
-     * Gather the ref SNP data.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-
-    private void doSnps() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection
-
-        // Gather up the snp accession id's
-        
-        String OTHER_SNP_PRIME_SEARCH = "SELECT distinct _Accession_key,"
-                + " accID, _Object_key, 'SNP' as _MGIType_key, 1 as preferred"
-                + " FROM SNP_Accession" + " where _MGIType_key = 30";
-
-        // Gather the data
-
-        ResultSet rs_snp_prime = executor.executeSNP(OTHER_SNP_PRIME_SEARCH);
-        rs_snp_prime.next();
-
-        log.info("Time taken gather snp data set: "
-                + executor.getTiming());
-
-        // Parse it
-
-        while (!rs_snp_prime.isAfterLast()) {
-
-            builder.setType(rs_snp_prime.getString("_MGIType_key"));
-            builder.setData(rs_snp_prime.getString("accID"));
-            builder.setDb_key(rs_snp_prime.getString("_Object_key"));
-            builder.setAccessionKey(rs_snp_prime.getString("_Accession_key"));
-            builder.setPreferred(rs_snp_prime.getString("preferred"));
-            
-            // This is an odd case, as far as I can tell, this is hard coded
-            // on the jsp page that this requirement was pulled from.
-            
-            builder.setProvider("dbSNP");
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_snp_prime.next();
-        }
-
-        // Clean up
-
-        log.info("Done creating documents for snps!");
-        rs_snp_prime.close();
-    }
-
-    /**
-     * Gather the Sub SNP data
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-
-    private void doSubSnps() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection
-        
-        // gather up the snp accession ids
-
-        String OTHER_SNP_SECONDARY_SEARCH = "SELECT distinct sa._Accession_key, sa.accID, sss._ConsensusSnp_key " +
-        		"as _Object_key, 'SNP' as _MGIType_key, 0 as prefered " +
-                "FROM SNP_Accession sa, SNP_SubSnp sss " +
-                "where _MGIType_key = 31 and sa._Object_key = sss._SubSnp_key";
-
-        // Gather the data
-
-        ResultSet rs_snp_sub = executor.executeSNP(OTHER_SNP_SECONDARY_SEARCH);
-        rs_snp_sub.next();
-
-        log.info("Time taken to gather sub snp data set: "
-                + executor.getTiming());
-
-        // Parse it
-
-        while (!rs_snp_sub.isAfterLast()) {
-
-            builder.setType(rs_snp_sub.getString("_MGIType_key"));
-            builder.setData(rs_snp_sub.getString("accID"));
-            builder.setDb_key(rs_snp_sub.getString("_Object_key"));
-            builder.setAccessionKey(rs_snp_sub.getString("_Accession_key"));
-            builder.setPreferred(rs_snp_sub.getString("prefered"));
-            // This is the same odd case the the other SNP data.
-            builder.setProvider("dbSNP");
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_snp_sub.next();
-        }
-
-        // Clean up
-
-        log.info("Done creating documents for sub snps!");
-        rs_snp_sub.close();
-    }
-
-    /**
      * Gather the orthologs data. This has a realized logical db display field.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -785,8 +663,8 @@ public class OtherExactGatherer extends DatabaseGatherer {
 	    + " and aa._MGIType_key = 2 "
 	    + " and aa.private = 0"
             + " and mc._Cluster_key = hg._Object_key "
-	    + " and hg._MGIType_key = 39 " 
-	    + " and hg.private = 0"; 
+	    + " and hg._MGIType_key = 39 "
+	    + " and hg.private = 0";
 
         // gather the data
 
@@ -809,18 +687,18 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
             builder.setAccessionKey(rs_orthologs.getString("_Accession_key"));
             builder.setPreferred(rs_orthologs.getString("preferred"));
-            
+
             // This has a realized provider string, we add in the species.
-            
+
             builder.setProvider(phm.get(rs_orthologs.getString("_LogicalDB_key"))
                     + " - " + InitCap.initCap(rs_orthologs.getString("commonName")));
 
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             builder.clear();
 
@@ -829,7 +707,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
                 log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            
+
             rs_orthologs.next();
         }
 
@@ -844,7 +722,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
     /**
      * Gather the HomoloGene class data. This has a realized logical db display field.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -852,7 +730,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
     private void doHomoloGeneClasses() throws SQLException, InterruptedException {
 	// Get accession IDs for the HomoloGene classes themselves.
 
-	String HOMOLOGENE_CLUSTER_SEARCH = 
+	String HOMOLOGENE_CLUSTER_SEARCH =
 	    "select distinct aa._Accession_key, "
 	    + " aa._Object_key, "
 	    + " 'HOMOLOGY' as _MGIType_key, "
@@ -895,9 +773,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             builder.clear();
 
@@ -906,7 +784,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
                 log.debug("We have now gathered " + total + " documents!");
                 output_threshold += output_incrementer;
             }
-            
+
             rs_homologene.next();
         }
 
@@ -922,12 +800,12 @@ public class OtherExactGatherer extends DatabaseGatherer {
      * @throws SQLException
      * @throws InterruptedException
      */
-    
+
     private void doAMA() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-        
-        // Gather up the adult mouse anatomy term accession id's, only for the 
+
+        // Gather up the adult mouse anatomy term accession id's, only for the
         // preferred accession id's
 
         String OTHER_AMA_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
@@ -959,9 +837,9 @@ public class OtherExactGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {

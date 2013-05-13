@@ -15,23 +15,23 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
 /**
  * Gatherer responsible for understanding how to gather all needed information
  * that goes into the otherDisplay index.
- * 
- * Please note that all "Other" gatherers have a gathering item limit 
+ *
+ * Please note that all "Other" gatherers have a gathering item limit
  * programmed into each of their subsections. Based on this value, they are
  * only able to put a set maximum number of documents onto the stack before
  * being forced to wait.
- * 
+ *
  * This number is a configurable item via the Configuration file.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has An instance of the IndexCfg object, which is used to setup this object.
- * 
+ *
  * @does Responsible for running through the algorithm that gathers up all of
- * the data needed to make the other display index. For each subsection, we 
- * parse through it placing Lucene documents on the stack for each row, and 
- * then perform cleanup. 
- * 
+ * the data needed to make the other display index. For each subsection, we
+ * parse through it placing Lucene documents on the stack for each row, and
+ * then perform cleanup.
+ *
  * When all of the subsections
  * are complete, we notify the stack that gathering is complete, perform some
  * overall cleanup, and exit.
@@ -46,7 +46,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
     /*
      * Since other gathering is so long, it has extra log messages, these
      * variable will control how often these log messages are displayed.
-     * 
+     *
      * One the output_threshhold has been reached, we output one of these
      * special log messages. We then increment the threshold by the output
      * incrementer, and repeat the process.
@@ -59,11 +59,11 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
     private OtherDisplayLuceneDocBuilder builder =
         new OtherDisplayLuceneDocBuilder();
-    
+
     public OtherDisplayGatherer(IndexCfg config) {
         super(config);
     }
-        
+
     /**
      * This method encapsulates the list of tasks that need to be completed in
      * order to gather the information for the OtherDisplay index. Once it is
@@ -82,14 +82,12 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             doAntigens();
             doExperiments();
             doImages();
-            doSnps();
-            doSubSnps();
             doAMA();
     }
 
     /**
      * Gather the probe data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -99,7 +97,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // Gather up probe key, name and probe type.
-        
+
         String OTHER_PROBE_DISPLAY_KEY = "select distinct _Probe_key, '"
                 + IndexConstants.OTHER_PROBE + "' as type, name, vt.Term"
                 + " from PRB_Probe_view, voc_term vt"
@@ -124,9 +122,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -146,7 +144,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
     /**
      * Gather the assay data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -156,7 +154,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up assay name, symbol and type
-        
+
         String OTHER_ASSAY_DISPLAY_KEY = "select _Assay_key, '"
                 + IndexConstants.OTHER_ASSAY
                 + "' as type, name, symbol from GXD_Assay_View";
@@ -179,9 +177,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -200,7 +198,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
     /**
      * Gather the reference data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -208,7 +206,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
     private void doReferences() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-        
+
         // Gather up reference key, type, and short citation
 
         String OTHER_REF_DISPLAY_KEY = "select distinct _Refs_key, '"
@@ -234,9 +232,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -256,7 +254,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
     /**
      * Gather the sequence data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -266,7 +264,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up sequence key, type and description
-        
+
         String OTHER_SEQ_DISPLAY_KEY = "select distinct _Sequence_key, '"
                 + IndexConstants.OTHER_SEQUENCE
                 + "' as type, description, sequenceType"
@@ -293,9 +291,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place a document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -313,7 +311,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
     }
 
     /**
-     * Gather Ortholog data.  Please note that this has a realized display 
+     * Gather Ortholog data.  Please note that this has a realized display
      * field.
      * @throws SQLException
      * @throws InterruptedException
@@ -324,7 +322,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up marker key, HomoloGene ID, ortholog symbol and name.
-        
+
 	String OTHER_ORTHOLOG_DISPLAY = "select distinct a.accID, "
 	    + " mv._Marker_key, "
 	    + " mv.symbol, "
@@ -359,9 +357,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
             builder.setDb_key(rs_ortho.getString("_Marker_key"));
             builder.setDataType(IndexConstants.OTHER_ORTHOLOG);
-            
+
             // The name for Orthologs is a realized field.
-            
+
             String symbol = new String(rs_ortho.getString("symbol"));
             String name = new String(rs_ortho.getString("name"));
 
@@ -369,9 +367,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -403,8 +401,8 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up marker key, type, ortholog symbol and name
-        
-	String HOMOLOGENE_CLASSES_DISPLAY = 
+
+	String HOMOLOGENE_CLASSES_DISPLAY =
 	    "select distinct aa.accID as HomoloGeneID, "
 	    + " '" + IndexConstants.OTHER_HOMOLOGY + "' as type "
 	    + "from VOC_Term source, "
@@ -432,7 +430,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             hgID = rs_ortho.getString("HomoloGeneID");
             builder.setDb_key(hgID);
             builder.setDataType(rs_ortho.getString("type"));
-            
+
 	    if (descriptions.containsKey(hgID)) {
  	        builder.setName((String) descriptions.get(hgID));
 	    } else {
@@ -441,9 +439,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -534,7 +532,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 	//     { HomoloGene ID : { organism : count of markers } }
 	// and we need to transform that into a 1-line description of each
 	// HomoloGene class.
-	
+
 	// keys are HomoloGene IDs, values are description strings
 	HashMap descriptions = new HashMap();
 
@@ -554,11 +552,11 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 	// primates - alphabetical
 	priority.add ("chimpanzee");
 	priority.add ("rhesus macaque");
-	
+
 	// mammals - alphabetical
 	priority.add ("cattle");
 	priority.add ("dog, domestic");
-	
+
 	// others - alphabetical
 	priority.add ("chicken");
 	priority.add ("zebrafish");
@@ -637,7 +635,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 	    } else if (organismCount >= 3) {
 		// if three or more organisms, leave the comma & insert 'and'
 		int lastComma = description.lastIndexOf(", ");
-		description = description.substring(0, lastComma) 
+		description = description.substring(0, lastComma)
 		   + ", and "
 		   + description.substring (lastComma + 2);
 	    }
@@ -661,7 +659,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up antibody key, name and type
-        
+
         String OTHER_ANTIBODY_DISPLAY_KEY = "select distinct _Antibody_key, '"
                 + IndexConstants.OTHER_ANTIBODY
                 + "' as type, antibodyName from GXD_Antibody";
@@ -683,9 +681,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -713,7 +711,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up antigen key, type and name
-        
+
         String OTHER_ANTIGEN_DISPLAY_KEY = "select distinct _Antigen_key, '"
                 + IndexConstants.OTHER_ANTIGEN
                 + "' as type, antigenName from GXD_Antigen";
@@ -735,9 +733,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -756,7 +754,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
     /**
      * Gather experiment data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -766,7 +764,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // Gather up experiment key, citation and type
-        
+
         String OTHER_EXPERIMENT_DISPLAY_KEY = "select _Expt_key, '"
                 + IndexConstants.OTHER_EXPERIMENT
                 + "' as type, short_citation, exptType from MLD_Expt_View";
@@ -789,9 +787,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -819,7 +817,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         // SQL for this Subsection
 
         // gather up image key, citation and type
-        
+
         String OTHER_IMAGE_DISPLAY_KEY = "select _Image_key, '"
                 + IndexConstants.OTHER_IMAGE
                 + "' as type, short_citation  from IMG_Image_View";
@@ -841,9 +839,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
@@ -860,133 +858,10 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
         rs_image.close();
     }
 
-    /**
-     * Collect Ref Snp data. Please note that it has a realized name field.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-
-    private void doSnps() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection
-        
-        // Gather up snp key, type choromosome and start coordinate
-        
-        String OTHER_SNP_PRIME_DISPLAY = "select _ConsensusSnp_key, '"
-                + IndexConstants.OTHER_SNP
-                + "' as type, chromosome, startCoordinate "
-                + "from SNP_Coord_Cache ";
-
-        // Gather the data
-
-        ResultSet rs_snp = executor.executeSNP(OTHER_SNP_PRIME_DISPLAY);
-        rs_snp.next();
-        log.info("Time taken gather SNP result set: "
-                + executor.getTiming());
-
-        // parse it
-
-        while (!rs_snp.isAfterLast()) {
-
-            builder.setDb_key(rs_snp.getString("_ConsensusSnp_key"));
-            builder.setDataType(rs_snp.getString("type"));
-
-            // SNPs are a bit different, they need a realized name field.
-
-            builder.setName("SNP at Chr" + rs_snp.getString("chromosome")
-                    + ":" + rs_snp.getInt("startCoordinate"));
-
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_snp.next();
-        }
-
-        // Clean up
-
-        log.info("Done SNPs!");
-        rs_snp.close();
-
-    }
-
-    /**
-     * Collect the sub SNP data. Please note that this type's name field is a
-     * realized field.
-     * 
-     * @throws SQLException
-     * @throws InterruptedException
-     */
-
-    private void doSubSnps() throws SQLException, InterruptedException {
-
-        // SQL for this Subsection
-
-        // gather up snp key, type, chromosome, and start coordinate
-        
-        String OTHER_SNP_SECONDARY_DISPLAY = "select ss._SubSNP_Key, '"
-                + IndexConstants.OTHER_SUBSNP
-                + "' as type, sc.chromosome, sc.startCoordinate"
-                + " from SNP_Coord_Cache sc, SNP_Subsnp ss"
-                + " where ss._ConsensusSnp_key = sc._ConsensusSnp_key";
-
-        // Gather the data
-
-        ResultSet rs_subsnp = executor.executeSNP(OTHER_SNP_SECONDARY_DISPLAY);
-        rs_subsnp.next();
-        log.info("Time taken gather Sub SNP result set: "
-                + executor.getTiming());
-
-        // Parse it
-
-        while (!rs_subsnp.isAfterLast()) {
-
-            builder.setDb_key(rs_subsnp.getString("_SubSNP_Key"));
-            builder.setDataType(rs_subsnp.getString("type"));
-
-            // SNPs are a bit different, they need a realized name field.
-
-            builder.setName("SNP at Chr"
-                    + rs_subsnp.getString("chromosome") + ":"
-                    + rs_subsnp.getInt("startCoordinate"));
-
-            while (documentStore.size() > stack_max) {
-                Thread.sleep(1);
-            }
-            
-            // Place the document on the stack.
-            
-            documentStore.push(builder.getDocument());
-            total++;
-            if (total >= output_threshold) {
-                log.debug("We have now gathered " + total
-                        + " documents!");
-                output_threshold += output_incrementer;
-            }
-            builder.clear();
-            rs_subsnp.next();
-        }
-
-        // Clean up
-
-        log.info("Done Sub SNPs!");
-        rs_subsnp.close();
-    }
 
     /**
      * Collect the Adult Mouse Anatomy data.
-     * 
+     *
      * @throws SQLException
      * @throws InterruptedException
      */
@@ -994,7 +869,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
     private void doAMA() throws SQLException, InterruptedException {
 
         // SQL for this Subsection
-        
+
         // Gather up adult mouse anatomy term keys, type and term.
 
         String OTHER_AMA_DISPLAY = "select _Term_key, '"
@@ -1018,9 +893,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
             while (documentStore.size() > stack_max) {
                 Thread.sleep(1);
             }
-            
+
             // Place the document on the stack.
-            
+
             documentStore.push(builder.getDocument());
             total++;
             if (total >= output_threshold) {
