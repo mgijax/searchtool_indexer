@@ -28,7 +28,8 @@ public class SQLExecutor {
     private Date start;
     private Date end;
 
-    protected String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver";
+    // now pulled from configuration, rather than hard-coding Sybase
+    protected String DB_DRIVER = null;
 
     protected Logger log =
         Logger.getLogger(this.getClass().getName());
@@ -42,6 +43,7 @@ public class SQLExecutor {
 
     public SQLExecutor (IndexCfg config) {
         try {
+	DB_DRIVER = config.get("DB_DRIVER");
         Class.forName(DB_DRIVER);
         user = config.get("MGI_PUBLICUSER");
         password = config.get("MGI_PUBLICPASSWORD");
