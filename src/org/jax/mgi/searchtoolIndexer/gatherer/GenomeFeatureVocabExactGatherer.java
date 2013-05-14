@@ -242,7 +242,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
         // These are ordered by sequence number so they can be put back together
         // in the lucene document
 
-        String GO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
+        String GO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
                 + " from VOC_Term_View tv, VOC_text t,"
                 + " Voc_Annot_count_cache vacc"
                 + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
@@ -258,7 +258,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
         // These are ordered by sequence number so they can be put back together
         // in the lucene document
 
-        String MP_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
+        String MP_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
                 + " from VOC_Term_View tv, VOC_text t,"
                 + " Voc_Annot_count_cache vacc"
                 + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
@@ -293,7 +293,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
         String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
                 + "s.printName, 'AD' as vocabName"
                 + " from GXD_Structure s, VOC_Annot_Count_Cache vacc"
-                + " where s._Parent_key != null and vacc.annotType = 'AD'"
+                + " where s._Parent_key is not null and vacc.annotType = 'AD'"
                 + " and vacc._Term_key = s._Structure_key";
 
         // Gather the data
@@ -373,9 +373,9 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
         String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
             + "'AD' as vocabName"
-            + " from dbo.GXD_Structure s, GXD_StructureName sn,"
+            + " from GXD_Structure s, GXD_StructureName sn,"
             + " VOC_Annot_Count_Cache vacc"
-            + " where s._parent_key != null"
+            + " where s._parent_key is not null"
             + " and s._Structure_key = sn._Structure_key and"
             + " s._StructureName_key != sn._StructureName_key"
             + " and vacc.annotType='AD' and vacc._Term_key ="

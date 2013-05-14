@@ -185,7 +185,7 @@ public class VocabInexactGatherer extends DatabaseGatherer {
         // This list is sorted in sequence order, so the notes can be 
         // reconstructed in the lucene document
         
-        String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName"
+        String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
                 + " from VOC_Term_View tv, VOC_text t"
                 + " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
                 + "and tv._Vocab_key in (44, 4, 5, 8, 46)"
@@ -249,7 +249,7 @@ public class VocabInexactGatherer extends DatabaseGatherer {
         
         String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
                 + "s.printName, 'AD' as vocabName" + " from GXD_Structure s"
-                + " where s._Parent_key != null";
+                + " where s._Parent_key is not null";
 
         // Gather the data
 
@@ -308,8 +308,8 @@ public class VocabInexactGatherer extends DatabaseGatherer {
         
         String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
                 + "'AD' as vocabName"
-                + " from dbo.GXD_Structure s, GXD_StructureName sn"
-                + " where s._parent_key != null"
+                + " from GXD_Structure s, GXD_StructureName sn"
+                + " where s._parent_key is not null"
                 + " and s._Structure_key = sn._Structure_key and "
                 + "s._StructureName_key != sn._StructureName_key";
 

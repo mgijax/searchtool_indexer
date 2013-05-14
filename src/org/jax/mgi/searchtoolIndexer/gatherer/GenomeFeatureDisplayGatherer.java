@@ -66,31 +66,31 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
         log.info("Gathering Allele Location Information");        
         
         String ALL_LOC_KEY = "select a._Allele_key, mlc.genomicChromosome as chromosome, " +
-        		    " convert(varchar(50), mlc.startCoordinate) as startCoordinate, " +
-        		    " convert(varchar(50), mlc.endCoordinate) as endCoordinate, mlc.strand," +
+        		    " to_char(mlc.startCoordinate, '999999999999') as startCoordinate, " +
+        		    " to_char(mlc.endCoordinate, '999999999999') as endCoordinate, mlc.strand," +
         		    " 'MARKER' as source" + 
                     " from all_allele a, MRK_Location_Cache mlc" + 
                     " where a._Marker_key = mlc._Marker_key" + 
                     " and mlc.genomicChromosome is not null" + 
                     " union" +
                     " select a._Allele_key, mlc.chromosome," +
-					" convert(varchar(50), mlc.startCoordinate) as startCoordinate," +
-					" convert(varchar(50), mlc.endCoordinate) as endCoordinate, mlc.strand," +
+					" to_char(mlc.startCoordinate, '999999999999') as startCoordinate," +
+					" to_char(mlc.endCoordinate, '999999999999') as endCoordinate, mlc.strand," +
 					" 'MARKER' as source" +
 					" from all_allele a, MRK_Location_Cache mlc" +
 					" where a._Marker_key = mlc._Marker_key" +
 					" and mlc.genomicChromosome is null" +
                     " union" + 
                     " select a._Allele_key, scc.chromosome, " +
-                    " convert(varchar(50), scc.startCoordinate) as startCoordinate," +
-                    " convert(varchar(50), scc.endCoordinate) as endCoordinate," +
+                    " to_char(scc.startCoordinate, '999999999999') as startCoordinate," +
+                    " to_char(scc.endCoordinate, '999999999999') as endCoordinate," +
                     " scc.strand, 'SEQUENCE'" + 
                     " from all_allele a, SEQ_Allele_Assoc saa, SEQ_Coord_Cache scc" + 
                     " where a._Allele_key = saa._Allele_key" + 
                     " and saa._Sequence_key = scc._Sequence_key" + 
                     " and a.isMixed != 1" + 
                     " and saa._Qualifier_key = 3983018" + 
-                    " order by a._Allele_key";            
+                    " order by 1";            
         
         ResultSet rs = executor.executeMGD(ALL_LOC_KEY);
 
@@ -160,31 +160,46 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
         // marker name, marker label, marker symbol, chromosome and accession
         // id
 
-        String MARKER_DISPLAY_KEY = "select distinct mmv._Marker_key, mmv.name, " +
-                "mmv.symbol, mmc.directTerms, a.accID, " +  
-                "convert(varchar(50), mlc.startCoordinate) as startCoord, " +
-                "convert(varchar(50), mlc.endCoordinate) as endCoord, " + 
-                "mlc.strand, mlc.offset, mlc.cytogeneticOffset, mlc.genomicChromosome as chromosome " +
-                "from MRK_Marker_View mmv, acc_accession a, MRK_Location_Cache mlc, " +
-                "MRK_MCV_Cache mmc " +
-                "where mmv._Marker_Status_key != 2 and mmv._Organism_key = 1 " +
-                "and mmv._Marker_key = a._Object_key and a.prefixPart = 'MGI:' " +
-                "and a.private != 1 and a.preferred = 1 and a._MGIType_key = 2 " +
-                "and mmv._Marker_key = mlc._Marker_key and mlc.genomicChromosome is not null " +
-                "and mmv._Marker_Type_key != 12 and mmv._Marker_key = mmc._Marker_key " +
-                "UNION " +
-                "select distinct mmv._Marker_key, mmv.name, mmv.symbol, " +
-                "mmc.directTerms, a.accID, convert(varchar(50), mlc.startCoordinate) as startCoord, " +
-                "convert(varchar(50), mlc.endCoordinate) as endCoord, mlc.strand, " +
-                "mlc.offset, mlc.cytogeneticOffset, mlc.chromosome  " +
-                "from MRK_Marker_View mmv, acc_accession a, MRK_Location_Cache mlc, " +
-                "MRK_MCV_Cache mmc " +
-                "where mmv._Marker_Status_key != 2 and mmv._Organism_key = 1 " +
-	            "and mmv._Marker_key = a._Object_key and a.prefixPart = 'MGI:' " +
-	            "and a.private != 1 and a.preferred = 1  " +
-	            "and a._MGIType_key = 2 and mmv._Marker_key = mlc._Marker_key " +
-	            "and mlc.genomicChromosome is null and mmv._Marker_Type_key != 12 " +
-	            "and mmv._Marker_key = mmc._Marker_key";
+        String MARKER_DISPLAY_KEY =
+	    "select distinct mmv._Marker_key, mmv.name, mmv.symbol, "
+	    + "  mmc.directTerms, a.accID, "
+	    + "  to_char(mlc.startCoordinate, '999999999999') as startCoord, "
+	    + "  to_char(mlc.endCoordinate, '999999999999') as endCoord, "
+	    + "  mlc.strand, mlc.cmOffset, mlc.cytogeneticOffset, "
+	    + "  mlc.genomicChromosome as chromosome "
+	    + "from MRK_Marker_View mmv, "
+	    + "  ACC_Accession a, "
+	    + "  MRK_Location_Cache mlc, "
+	    + "  MRK_MCV_Cache mmc "
+	    + "where mmv._Marker_Status_key != 2 and mmv._Organism_key = 1 "
+	    + "  and mmv._Marker_key = a._Object_key "
+	    + "  and a.prefixPart = 'MGI:' "
+	    + "  and a.private != 1 and a.preferred = 1 "
+	    + "  and a._MGIType_key = 2 "
+	    + "  and mmv._Marker_key = mlc._Marker_key "
+	    + "  and mlc.genomicChromosome is not null "
+	    + "  and mmv._Marker_Type_key != 12 "
+	    + "  and mmv._Marker_key = mmc._Marker_key "
+	    + "UNION "
+	    + "select distinct mmv._Marker_key, mmv.name, mmv.symbol, "
+	    + "  mmc.directTerms, a.accID, "
+	    + "  to_char(mlc.startCoordinate, '999999999999') as startCoord, "
+	    + "  to_char(mlc.endCoordinate, '999999999999') as endCoord, "
+	    + "  mlc.strand, mlc.cmOffset, mlc.cytogeneticOffset, "
+	    + "  mlc.chromosome "
+	    + "from MRK_Marker_View mmv, "
+	    + "  ACC_Accession a, "
+	    + "  MRK_Location_Cache mlc, "
+	    + "  MRK_MCV_Cache mmc "
+	    + "where mmv._Marker_Status_key != 2 and mmv._Organism_key = 1 "
+	    + "  and mmv._Marker_key = a._Object_key "
+	    + "  and a.prefixPart = 'MGI:' "
+	    + "  and a.private != 1 and a.preferred = 1 "
+	    + "  and a._MGIType_key = 2 "
+	    + "  and mmv._Marker_key = mlc._Marker_key "
+	    + "  and mlc.genomicChromosome is null "
+	    + "  and mmv._Marker_Type_key != 12 "
+	    + "  and mmv._Marker_key = mmc._Marker_key";
 
         // Grab the result set
         ResultSet rs = executor.executeMGD(MARKER_DISPLAY_KEY);
@@ -209,7 +224,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             // derive display values for location
             startCoord  = rs.getString("startCoord");
             stopCoord   = rs.getString("endCoord");
-            offset      = rs.getString("offset");
+            offset      = rs.getString("cmOffset");
             cytoOffset  = rs.getString("cytogeneticOffset");
 
             if (startCoord != null && stopCoord != null) { // use coords
@@ -265,17 +280,33 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
         // allele name, allele label, allele symbol, chromosome and accession
         // id
 
-        String ALLELE_DISPLAY_KEY = "select aa._Allele_key, aa.name as allele_name, aa.symbol, " + 
-                                    "vt.term as alleletype, '' as chromosome, a.accID, " + 
-                                    "'' as startCoord, '' as endCoord, '' as strand, '' " + 
-                                    "as offset, '' as cytogeneticOffset, m.symbol as marker_symbol, " +
-                                    "m.name as marker_name " + 
-                                    "from all_allele aa, voc_term vt, acc_accession a, mrk_marker m " +
-                                    "where aa._Allele_Type_key = vt._Term_key and aa._Allele_key " + 
-                                    "*= a._Object_key and a.private != 1 and a.preferred = 1 " + 
-                                    "and a.prefixPart = 'MGI:' and a._LogicalDB_key = 1 and " + 
-                                    "a._MGIType_key = 2 and aa.isWildType != 1 " +
-                                    "and aa._Marker_key *= m._Marker_key";
+        String ALLELE_DISPLAY_KEY =
+	    "select aa._Allele_key, "
+	    + "  aa.name as allele_name, "
+	    + "  aa.symbol, "
+	    + "  vt.term as alleletype, "
+	    + "  '' as chromosome, "
+	    + "   a.accID, "
+	    + "  '' as startCoord, "
+	    + "  '' as endCoord, "
+	    + "  '' as strand, "
+	    + "  '' as cmOffset, "
+	    + "  '' as cytogeneticOffset, "
+	    + "  m.symbol as marker_symbol, "
+	    + "  m.name as marker_name "
+	    + "from all_allele aa "
+	    + "inner join voc_term vt on ("
+	    + "  aa._Allele_Type_key = vt._Term_key) "
+	    + "left outer join mrk_marker m on ("
+	    + "  aa._Marker_key = m._Marker_key)"
+	    + "left outer join acc_accession a on ("
+	    + "  aa._Allele_key = a._Object_key "
+	    + "  and a.private != 1 "
+	    + "  and a.preferred = 1 "
+	    + "  and a.prefixPart = 'MGI:' "
+	    + "  and a._LogicalDB_key = 1 "
+	    + "  and a._MGIType_key = 2) "
+	    + "where aa.isWildType != 1";
 
         // Grab the result set
         ResultSet rs = executor.executeMGD(ALLELE_DISPLAY_KEY);

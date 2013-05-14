@@ -83,7 +83,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
         // in term key order.
         
         String GEN_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
-                + " tv.vocabName" + " FROM dbo.VOC_Term_View tv"
+                + " tv.vocabName" + " FROM VOC_Term_View tv"
                 + " where tv.isObsolete != 1 and tv._Vocab_key in "
                 + "(44, 4, 5, 8, 46)" + " order by _Term_key";
         
@@ -276,15 +276,21 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
         // Gather the printname, the vocab name, the number of objects annotated
         // to this term, and the number of annotations, in term key order.
         
-        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS'"
-                + " + convert(VARCHAR, s._Stage_key) +': '+ s.printName"
-                + " as PrintName2, 'AD' as VocabName, vac.objectCount,"
-                + " vac.annotCount, vac._MGIType_key"
-                + " FROM dbo.GXD_Structure s, GXD_StructureName sn,"
-                + " VOC_Annot_Count_Cache vac" + " where s._parent_key != null"
-                + " and s._Structure_key = sn._Structure_key"
-                + " and s._Structure_key *= vac._Term_key"
-                + " and vac.annotType = 'AD'" + " order by _Structure_key";
+        String GEN_AD_KEY =
+	    "SELECT distinct s._Structure_key, "
+	    + "  'TS' || _Stage_key || ': ' || printName as PrintName2, "
+	    + "  'AD' as VocabName, "
+	    + "  vac.objectCount, "
+	    + "  vac.annotCount, "
+	    + "  vac._MGIType_key "
+	    + "FROM GXD_Structure s "
+	    + "inner join GXD_StructureName sn on ("
+	    + "  s._Structure_key = sn._Structure_key)"
+	    + "left outer join VOC_Annot_Count_Cache vac on ("
+	    + "  s._Structure_key = vac._Term_key "
+	    + "  and vac.annotType = 'AD') "
+	    + "where s._Parent_key is not null "
+	    + "order by s._Structure_key";
 
         // Get the dag for a given ad term, in term key order.
         

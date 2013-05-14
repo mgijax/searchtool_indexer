@@ -85,7 +85,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
         // been withdrawn.
 
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
-                + " FROM dbo.ACC_Accession a,  MRK_Marker m"
+                + " FROM ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
                 + " a._Object_key = m._Marker_key and m._Organism_key = 1"
                 + " and m._Marker_Status_key != 2 and m._Marker_Type_key != 12";
@@ -412,7 +412,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
                 " a.preferred, a._LogicalDB_key" +
                 " from ACC_Accession a, SEQ_Allele_Assoc saa"+
                 " where a._MGIType_key = 19 and a.private != 1"+
-                " and saa._Sequence_key = a._Object_key and saa._Allele_key != null";
+                " and saa._Sequence_key = a._Object_key and saa._Allele_key is not null";
 
         // Gather the data
 
