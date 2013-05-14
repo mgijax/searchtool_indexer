@@ -22,9 +22,9 @@ MAX_BUFFERED_DOCS=10000
 # Collapse the indexes into a smaller physical file structure.
 USE_COMPOUND_DOCS=false
 # How large can the stack get before blocking.
-STACK_MAX=1000000
+STACK_MAX=100000
 # The Jconn JDBC Driver
-DB_DRIVER=com.sybase.jdbc3.jdbc.SybDriver
+DB_DRIVER=org.postgresql.Driver
 
 # Play around with JAVA_HOME
 
