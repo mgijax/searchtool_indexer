@@ -236,7 +236,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
             else if (offset != null){
 
 	      // trim off the decimal portion of the string
-	      offset = offset.replaceAll("\.[0-9]+", "");
+	      offset = offset.replaceAll("\\.[0-9]+", "");
 
               if (!offset.equals("-999")) { // not undetermined offset
                 if (offset.equals("-1") && cytoOffset == null) {
