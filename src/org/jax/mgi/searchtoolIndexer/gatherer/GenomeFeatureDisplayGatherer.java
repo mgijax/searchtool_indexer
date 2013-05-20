@@ -234,11 +234,15 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
               builder.setLocDisplay(startCoord + "-" + stopCoord);
             }
             else if (offset != null){
-              if (!offset.equals("-999.0")) { // not undetermined offset
-                if (offset.equals("-1.0") && cytoOffset == null) {
+
+	      // trim off the decimal portion of the string
+	      offset = offset.replaceAll("\.[0-9]+", "");
+
+              if (!offset.equals("-999")) { // not undetermined offset
+                if (offset.equals("-1") && cytoOffset == null) {
                   builder.setLocDisplay("Syntenic");
                 }
-                else if (offset.equals("-1.0") && cytoOffset != null) {
+                else if (offset.equals("-1") && cytoOffset != null) {
                   //use cyto offset in this case
                   builder.setLocDisplay("cytoband " + cytoOffset);
                 }
