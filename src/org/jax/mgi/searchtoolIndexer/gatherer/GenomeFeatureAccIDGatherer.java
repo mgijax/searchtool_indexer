@@ -82,13 +82,14 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
         // Select all marker related accession id's, where the id is
         // not private, where its for the mouse, and the marker has not
-        // been withdrawn.
+        // been withdrawn.  Order to prefer lower logical databases.
 
         String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
                 + " FROM ACC_Accession a,  MRK_Marker m"
                 + " where private = 0 and _MGIType_key = 2 and"
                 + " a._Object_key = m._Marker_key and m._Organism_key = 1"
-                + " and m._Marker_Status_key != 2 and m._Marker_Type_key != 12";
+                + " and m._Marker_Status_key != 2 and m._Marker_Type_key != 12"
+		+ "order by a._Object_key, a.accID, a._LogicalDB_key";
 
         // Gather the data
 
