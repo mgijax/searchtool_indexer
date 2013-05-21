@@ -31,13 +31,17 @@ public class ProviderHashMap {
             + " from ACC_LogicalDB";
 
     // Gather up the exceptions to the logical db rules.  This is is for
-    // the compound providers.
+    // the compound providers.  (logical databases with >1 actual database)
     
-    private String EXCEPTION_PROVIDER_SQL = "select distinct _LogicalDB_key,"
-            + " name" + " from ACC_ActualDB" + " where active = 1"
-            + " group by _LogicalDB_key, name "
-	    + " having count(*) > 1"
-            + " order by _LogicalDB_key, name desc";
+    private String EXCEPTION_PROVIDER_SQL =
+	"select distinct _LogicalDB_key, name "
+	+ "from ACC_ActualDB a1 "
+	+ "where active = 1 "
+	+ "  and exists (select 1 from ACC_ActualDB a2 "
+	+ "    where a1._LogicalDB_key = a2._LogicalDB_key "
+	+ "    and a2.active = 1 "
+	+ "    and a1._ActualDB_key != a2._ActualDB_key) "
+	+ "order by _LogicalDB_key, name desc";
 
     private static Logger log = Logger.getLogger(ProviderHashMap.class
             .getName());
