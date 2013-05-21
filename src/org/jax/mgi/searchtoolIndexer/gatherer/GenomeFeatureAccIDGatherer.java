@@ -8,6 +8,7 @@ import org.jax.mgi.searchtoolIndexer.util.InitCap;
 import org.jax.mgi.searchtoolIndexer.util.ProviderHashMap;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
+import java.util.HashMap;
 
 /**
  * This is responsible for gathering up and information we might need in
