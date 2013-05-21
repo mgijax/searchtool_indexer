@@ -101,16 +101,52 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
         log.info("Time taken to gather marker's accession id result set: "
                         + executor.getTiming());
 
+	// keys are Entrez Gene IDs for this particular marker, so we don't 
+	// repeat the same ID for NCBI Gene Model (we prefer to show Entrez
+	// Gene)
+	HashMap egIDs = new HashMap();
+
+	String logicalDB = null;
+	String accID = null;
+	String objectKey = null;
+	String lastObjectKey = "none";
+
+	boolean skipThisOne = false;
+
         // Parse it
 
         while (!rs_acc.isAfterLast()) {
 
-            builder.setData(rs_acc.getString("accID"));
-            builder.setDb_key(rs_acc.getString("_Object_key"));
+	    skipThisOne = false;
+
+            objectKey = rs_acc.getString("_Object_key");
+            accID = rs_acc.getString("accID");
+            logicalDB = rs_acc.getString("_LogicalDB_key");
+
+	    // if this is a new object, reset our cache of Entrez Gene IDs
+	    if (!lastObjectKey.equals(objectKey)) {
+		egIDs.clear();
+		lastObjectKey = objectKey;
+	    }
+
+	    if ("55".equals(logicalDB)) {
+	        // Entrez Gene ID
+		egIDs.put(accID, "55");
+
+	    } else if ("59".equals(logicalDB)) {
+
+		// NCBI Gene Model ID
+		if (egIDs.get(accID) != null) {
+		    skipThisOne = true;
+		}
+	    }
+
+            builder.setData(accID);
+            builder.setDb_key(objectKey);
             builder.setDataType(IndexConstants.ACCESSION_ID);
             builder.setDisplay_type("ID");
             builder.setObject_type("MARKER");
-            provider = phmg.get(rs_acc.getString("_LogicalDB_key"));
+            provider = phmg.get(logicalDB);
 
             // Set the provider, blanking it out if needed.
 
@@ -120,12 +156,14 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
                 builder.setProvider(provider);
             }
 
-            // Place the document on the stack
+            // Place the document on the stack (unless we need to skip it)
 
-            documentStore.push(builder.getDocument());
+	    if (!skipThisOne) {
+            	documentStore.push(builder.getDocument());
+	    }
+
             builder.clear();
             rs_acc.next();
-
         }
 
         // Clean up
