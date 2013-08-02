@@ -1,3 +1,12 @@
+TAG: searchtool_indexer-tr11353-1
+DATE: 08/02/2013
+STAFF: sc
+CHANGES: All of Jon's changes plus:
+   - set MGD_JDBC_URL from MGD_JDBC_URL_PUB
+   - use ST_INDEXER_PUB instead of SEARCHTOOL_INDEXER when setting classpath
+   - JAVA_HOME - remove. Intent is to use the default which will be Java 7 on
+        linux
+
 TAG: searchtool_indexer-tr11353-BP
 DATE: 05/13/2013
 STAFF: jsb
