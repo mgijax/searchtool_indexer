@@ -22,21 +22,23 @@ MAX_BUFFERED_DOCS=10000
 # Collapse the indexes into a smaller physical file structure.
 USE_COMPOUND_DOCS=false
 # How large can the stack get before blocking.
-STACK_MAX=1000000
+STACK_MAX=100000
 # The Jconn JDBC Driver
-DB_DRIVER=com.sybase.jdbc3.jdbc.SybDriver
+DB_DRIVER=org.postgresql.Driver
 
-# Play around with JAVA_HOME
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/searchtool_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
 
-JAVA_HOME=/usr/mgijava6/
-
-CLASSPATH=$CLASSPATH:${SEARCHTOOL_INDEXER}/searchtool_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
+MGD_JDBC_URL=${MGD_JDBC_URL_PUB}
 
 PATH=/usr/mgijava6/bin/:/usr/local/apache-ant-1.7.1/bin/:${PATH}
 export PATH
 
+# - sc commented out as default will be java 7 on linux
+#JAVA_HOME=/usr/mgijava6/
+
 ANT_HOME=/usr/local/apache-ant-1.7.1/bin/ant
 export CLASSPATH
-export JAVA_HOME
+export MGD_JDBC_URL
+#export JAVA_HOME
 export ANT_HOME
 

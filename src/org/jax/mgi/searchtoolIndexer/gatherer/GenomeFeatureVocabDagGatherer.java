@@ -70,7 +70,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         String GO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 4"
                 + " and vacc.annotType = 'GO/Marker' and vacc._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
@@ -111,7 +111,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         
         String MP_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 5"
                 + " and vacc.annotType = 'Mammalian Phenotype/Genotype'"
                 + " and vacc._Term_key = tv._Term_key" + " order by _Term_key";
@@ -154,7 +154,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         
         String MP_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Allele_Cache vac"
+                + " FROM VOC_Term_View tv, VOC_Allele_Cache vac"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 5"
                 + " and vac.annotType = 'Mammalian Phenotype/Genotype'"
                 + " and vac._Term_key = tv._Term_key" + " order by _Term_key";
@@ -199,7 +199,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         
         String INTERPRO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 8"
                 + " and vacc.annotType = 'InterPro/Marker' and"
                 + " vacc._Term_key = tv._Term_key" + " order by _Term_key";
@@ -228,7 +228,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         
         String PIRSF_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 46"
                 + " and vacc.annotType = 'PIRSF/Marker' and vacc._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
@@ -257,7 +257,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         String OMIM_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
                 + " and vacc.annotType = 'OMIM/Genotype' and vacc._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
@@ -290,7 +290,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         String OMIM_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
                 + " tv.vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Allele_Cache vac"
+                + " FROM VOC_Term_View tv, VOC_Allele_Cache vac"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
                 + " and vac.annotType = 'OMIM/Genotype' and vac._Term_key ="
                 + " tv._Term_key" + " order by _Term_key";
@@ -320,7 +320,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
         String OMIM_HUMAN_VOC_KEY = "SELECT tv._Term_key, tv.term, tv.accID,"
          		+ " '" + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName"
-                + " FROM dbo.VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+                + " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
                 + " where tv.isObsolete != 1 and tv._Vocab_key = 44"
                 + " and vacc.annotType = 'OMIM/Human Marker'"
                 + " and vacc._Term_key =" + " tv._Term_key"
@@ -378,11 +378,11 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
         // Please note that we exclude top level keys here (Terms that have no
         // parents.
 
-        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS' +"
-                + " convert(VARCHAR, s._Stage_key) +': '+ s.printName as"
+        String GEN_AD_KEY = "SELECT distinct s._Structure_key, 'TS' || "
+                + " s._Stage_key || ': ' || s.printName as"
                 + " PrintName2, 'AD' as VocabName"
-                + " FROM dbo.GXD_Structure s, GXD_StructureName sn,"
-                + " VOC_Annot_Count_Cache vac" + " where s._parent_key != null"
+                + " FROM GXD_Structure s, GXD_StructureName sn,"
+                + " VOC_Annot_Count_Cache vac" + " where s._parent_key is not null"
                 + " and s._Structure_key = sn._Structure_key"
                 + " and s._Structure_key = vac._Term_key"
                 + " and vac.annotType = 'AD'" + " order by _Structure_key";

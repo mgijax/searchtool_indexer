@@ -31,20 +31,24 @@ public class ProviderHashMap {
             + " from ACC_LogicalDB";
 
     // Gather up the exceptions to the logical db rules.  This is is for
-    // the compound providers.
+    // the compound providers.  (logical databases with >1 actual database)
     
-    private String EXCEPTION_PROVIDER_SQL = "select distinct _LogicalDB_key,"
-            + " name" + " from ACC_ActualDB" + " where active = 1"
-            + " group by _LogicalDB_key" + " having count(*) > 1"
-            + " order by _LogicalDB_key, name desc";
+    private String EXCEPTION_PROVIDER_SQL =
+	"select distinct _LogicalDB_key, name "
+	+ "from ACC_ActualDB a1 "
+	+ "where active = 1 "
+	+ "  and exists (select 1 from ACC_ActualDB a2 "
+	+ "    where a1._LogicalDB_key = a2._LogicalDB_key "
+	+ "    and a2.active = 1 "
+	+ "    and a1._ActualDB_key != a2._ActualDB_key) "
+	+ "order by _LogicalDB_key, name desc";
 
     private static Logger log = Logger.getLogger(ProviderHashMap.class
             .getName());
     
-    // The Sybase JDBC Driver, if we were to switch to a different database
-    // this would have to be updated.
-    
-    protected String DB_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver"; 
+    // Sybase JDBC driver used to be hard-coded.  We now pull this from 
+    // configuration instead.
+    protected String DB_DRIVER = null;
     
     protected SQLExecutor executor; 
 
@@ -57,6 +61,7 @@ public class ProviderHashMap {
 
     public ProviderHashMap(IndexCfg config) {
         try {
+	    DB_DRIVER = config.get("DB_DRIVER");
             executor = new SQLExecutor(config);
         } catch (Exception e) {
             log.error(e);

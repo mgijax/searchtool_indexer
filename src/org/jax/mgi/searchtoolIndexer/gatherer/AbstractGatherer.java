@@ -46,6 +46,7 @@ public abstract class AbstractGatherer implements Runnable {
             log.error(e);
         }
         documentStore = SharedDocumentStack.getSharedDocumentStack();
+	documentStore.setMaxSize(stack_max.intValue());
     }
 
     /**

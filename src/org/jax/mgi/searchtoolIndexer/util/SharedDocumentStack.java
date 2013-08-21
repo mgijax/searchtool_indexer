@@ -25,6 +25,7 @@ public class SharedDocumentStack {
     private static SharedDocumentStack theInstance = new SharedDocumentStack();
     private static Stack<Document>     stack = new Stack<Document>();
     private Boolean                    gatheringComplete = false;
+    private int max_size = -1;
 
     // Hidden constructor, access to this object is through the singleton 
     // get method.
@@ -42,15 +43,31 @@ public class SharedDocumentStack {
         return theInstance;
     }
 
+    /** Set the maximum number of documents allowed in this stack
+     */
+    public void setMaxSize (int size) {
+	this.max_size = size;
+    }
+
     /**
-     * Add a document onto the stack.
+     * Add a document onto the stack.  If the stack is full, then wait here
+     * until space frees up and it can be added.
      * 
      * @param doc
      * A lucence document to add.
      */
 
-    public void push(Document doc) {
-        stack.push(doc);
+    public void push(Document doc) throws InterruptedException {
+	// if no limit, just add the doc and move on
+	if (max_size == -1) {
+            stack.push(doc);
+	} else {
+	    while (this.size() >= this.max_size) {
+		// sleep for 100ms to wait for the backlog to clear
+		Thread.sleep(100);
+	    }
+            stack.push(doc); 
+	}
     }
 
     /**
