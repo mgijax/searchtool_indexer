@@ -30,15 +30,5 @@ CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/searchtool_indexer.jar:${MGI_JAVALIB}/cor
 
 MGD_JDBC_URL=${MGD_JDBC_URL_PUB}
 
-PATH=/usr/mgijava6/bin/:/usr/local/apache-ant-1.7.1/bin/:${PATH}
-export PATH
-
-# - sc commented out as default will be java 7 on linux
-#JAVA_HOME=/usr/mgijava6/
-
-ANT_HOME=/usr/local/apache-ant-1.7.1/bin/ant
 export CLASSPATH
 export MGD_JDBC_URL
-#export JAVA_HOME
-export ANT_HOME
-
