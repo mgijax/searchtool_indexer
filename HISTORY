@@ -1,3 +1,9 @@
+TAG: searchtool_indexer-5-1-5-3
+DATE: 09/18/2013
+STAFF: jsb
+CHANGES: 
+1) fixed bug where marker coordinates lost last two characters
+
 TAG: searchtool_indexer-5-1-5-2
 DATE: 08/24/2013
 STAFF: dbm
