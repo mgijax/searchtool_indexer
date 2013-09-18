@@ -229,8 +229,12 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 
             if (startCoord != null && stopCoord != null) { // use coords
               //trim off trailing ".0" and set display value
-              startCoord = startCoord.substring(0, startCoord.length() -2);
-              stopCoord = stopCoord.substring(0, stopCoord.length() -2);
+	      if (startCoord.endsWith(".0")) {
+                startCoord = startCoord.substring(0, startCoord.length() -2);
+	      }
+	      if (stopCoord.endsWith(".0")) {
+                stopCoord = stopCoord.substring(0, stopCoord.length() -2);
+	      }
               builder.setLocDisplay(startCoord + "-" + stopCoord);
             }
             else if (offset != null){
