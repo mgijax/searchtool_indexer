@@ -1,3 +1,10 @@
+TAG: searchtool_indexer-tr11468
+DATE: 12/03/2013
+STAFF: oblod
+CHANGES: 
+1) return EMAPS results rather then AD results
+2) Branch point tag for TR11468
+
 TAG: searchtool_indexer-5-1-5-3
 DATE: 09/18/2013
 STAFF: jsb
