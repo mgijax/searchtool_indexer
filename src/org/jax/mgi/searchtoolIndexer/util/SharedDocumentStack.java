@@ -1,5 +1,6 @@
 package org.jax.mgi.searchtoolIndexer.util;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import org.apache.lucene.document.Document;
@@ -58,16 +59,16 @@ public class SharedDocumentStack {
      */
 
     public void push(Document doc) throws InterruptedException {
-	// if no limit, just add the doc and move on
-	if (max_size == -1) {
-            stack.push(doc);
-	} else {
-	    while (this.size() >= this.max_size) {
-		// sleep for 100ms to wait for the backlog to clear
-		Thread.sleep(100);
-	    }
-            stack.push(doc); 
-	}
+    	// if no limit, just add the doc and move on
+    	if (max_size == -1) {
+    		stack.push(doc);
+    	} else {
+    		while (this.size() >= this.max_size) {
+    			// sleep for 100ms to wait for the backlog to clear
+    			Thread.sleep(100);
+    		}
+    		stack.push(doc); 
+    	}
     }
 
     /**
@@ -77,13 +78,18 @@ public class SharedDocumentStack {
      * @return A Lucene Document
      */
 
-    public synchronized Document pop() throws InterruptedException {
+    public synchronized ArrayList<Document> pop(int amount) throws InterruptedException {
         
         int waittime = 1;
         
+        ArrayList<Document> ret = new ArrayList<Document>();
+        
         while (!isComplete() || !isEmpty()) {
             if (!isEmpty()) {
-                return stack.pop();
+            	for(int i = 0; i < amount && !isEmpty(); i++) {
+            		ret.add(stack.pop());
+            	}
+            	return ret;
             }
             else {
                 Thread.sleep(1000*waittime);

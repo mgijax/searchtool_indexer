@@ -1,3 +1,8 @@
+TAG: searchtool_indexer-5-1-7-1
+DATE 02/07/2014
+STAFF: oblod
+CHANGES: Impelmented EMAPA/S in the QS - merge tr11468 to trunk
+
 TAG: searchtool_indexer-tr11515
 DATE 1/31/14
 STAFF: pf

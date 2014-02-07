@@ -6,102 +6,87 @@ import org.apache.lucene.document.Field;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * Container Class that encapsulates the data needed to create the
- * nonIDToken Index
+ * Container Class that encapsulates the data needed to create the nonIDToken
+ * Index
  * 
  * @author mhall
  * 
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into
- *  a Lucene document.
+ * @does Knows how to take the data contained inside of it, and turn it into a
+ *       Lucene document.
  * 
  */
 
 public class NonIDTokenLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
-    /**
-     * This method is required by the LuceneDocBuilder class.
-     */
-    
-    protected void clearLocal() {}
+	/**
+	 * This method is required by the LuceneDocBuilder class.
+	 */
 
-    /**
-     * Returns a Lucene document.
-     * 
-     * @return A Lucene Document representing a MarkerAndVocabByField record.
-     */
+	protected void clearLocal() {
+	}
 
-    protected Document prepareDocument() {
+	/**
+	 * Returns a Lucene document.
+	 * 
+	 * @return A Lucene Document representing a MarkerAndVocabByField record.
+	 */
 
-        doc.add(new Field(IndexConstants.COL_DATA, this.data, 
-                Field.Store.YES, Field.Index.TOKENIZED));
-        return doc;
-    }
+	protected Document prepareDocument() {
 
-    /**
-     * Returns a string representation of the data contained in this object.
-     */
+		doc.add(new Field(IndexConstants.COL_DATA, this.data.toString(),
+				Field.Store.YES, Field.Index.TOKENIZED));
+		return doc;
+	}
 
-    public String toString() {
-        return "Data: " + this.data;
-    }
+	/**
+	 * Returns a string representation of the data contained in this object.
+	 */
 
-    /**
-     * Appends to the data field. Some of our fields are split up in the
-     * database, so they have to be put back together manually at indexing 
-     * time.
-     * 
-     * @param data
-     */
+	public String toString() {
+		return "Data: " + this.data;
+	}
 
-    public void appendData(String data) {
-        if (this.data.equals("")) {
-            this.data = data;
-        } else {
-            this.data = this.data + data;
-        }
-    }
+	/**
+	 * Test harness for this object.
+	 * 
+	 * @param args
+	 */
 
-    /**
-     * Test harness for this object.
-     * 
-     * @param args
-     */
-    
-    public static void main(String[] args) {
-       // Set up the logger.
+	public static void main(String[] args) {
+		// Set up the logger.
 
-        NonIDTokenLuceneDocBuilder builder =
-            new NonIDTokenLuceneDocBuilder();
-        
-        Logger log = 
-            Logger.getLogger(builder.getClass().getName());
-        
-        log.info(builder.getClass().getName() + " Test Harness");
+		NonIDTokenLuceneDocBuilder builder =
+				new NonIDTokenLuceneDocBuilder();
 
-        // Should result in an error being printed!, but the lucene document
-        // should still come through.
-        
-        builder.setData(null);
-        Document doc = builder.getDocument();
-        
-        // Reset the doc builder for the next object.
-        
-        builder.clear();
-        
-        log.info("Lucene document: " + doc);
-        
-        // Should work properly, resulting in a Lucene document being returned.
-    
-        builder.setData("test");
-        
-        doc = builder.getDocument();
-    
-        // Should print out the toString() version of the doc builder.
-        
-        log.info(builder);
-        
-        log.info("Lucene document: " + doc);
-    }
+		Logger log =
+				Logger.getLogger(builder.getClass().getName());
+
+		log.info(builder.getClass().getName() + " Test Harness");
+
+		// Should result in an error being printed!, but the lucene document
+		// should still come through.
+
+		builder.setData(null);
+		Document doc = builder.getDocument();
+
+		// Reset the doc builder for the next object.
+
+		builder.clear();
+
+		log.info("Lucene document: " + doc);
+
+		// Should work properly, resulting in a Lucene document being returned.
+
+		builder.setData("test");
+
+		doc = builder.getDocument();
+
+		// Should print out the toString() version of the doc builder.
+
+		log.info(builder);
+
+		log.info("Lucene document: " + doc);
+	}
 
 }

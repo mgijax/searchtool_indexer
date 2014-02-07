@@ -6,356 +6,343 @@ import org.apache.lucene.document.Field;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * Container Class that encapsulates the data needed to create
- * markerInexact index documents.
- *
+ * Container Class that encapsulates the data needed to create markerInexact
+ * index documents.
+ * 
  * @author mhall
- *
+ * 
  * @has Nothing
- * @does Knows how to take the data contained inside of it, and turn it into
- * a lucene document.
- *
+ * @does Knows how to take the data contained inside of it, and turn it into a
+ *       lucene document.
+ * 
  */
 
 public class GenomeFeatureInexactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
-    private String data_type    = "";
-    private String isCurrent    = "1";
-    private String organism     = "1";
-    private String vocabulary   = "";
-    private String raw_data     = "";
-    private String display_type = "";
-    private String unique_key   = "";
+	private String			data_type		= "";
+	private String			isCurrent		= "1";
+	private String			organism		= "1";
+	private String			vocabulary		= "";
+	private StringBuffer	raw_data		= new StringBuffer("");
+	private String			display_type	= "";
+	private String			unique_key		= "";
 
-    /**
-     * Resets the object back to its initial state. This allows us to reuse the
-     * same object for our entire indexing process.
-     */
-    protected void clearLocal() {
-        this.data_type      = "";
-        this.isCurrent      = "1";
-        this.organism       = "1";
-        this.vocabulary     = "";
-        this.raw_data       = "";
-        this.display_type   = "";
-        this.unique_key     = "";
-        }
+	/**
+	 * Resets the object back to its initial state. This allows us to reuse the
+	 * same object for our entire indexing process.
+	 */
+	protected void clearLocal() {
+		this.data_type = "";
+		this.isCurrent = "1";
+		this.organism = "1";
+		this.vocabulary = "";
+		this.raw_data = new StringBuffer("");
+		this.display_type = "";
+		this.unique_key = "";
+	}
 
-    /**
-     * Returns a lucene document.
-     *
-     * This performs a special transformation, and replaces any non standard
-     * whitespace character with a single blank space.
-     *
-     * @return A Lucene Document representing a MarkerAndVocabByField record.
-     */
+	/**
+	 * Returns a lucene document.
+	 * 
+	 * This performs a special transformation, and replaces any non standard
+	 * whitespace character with a single blank space.
+	 * 
+	 * @return A Lucene Document representing a MarkerAndVocabByField record.
+	 */
 
-    protected Document prepareDocument() {
+	protected Document prepareDocument() {
 
-        doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
-                Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DATA,
-                this.data.replaceAll("[\\W_]", " "),
-                Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data,
-                Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_SDATA,
-        	 	this.data.replaceAll("[\\W_]", " "),
-                Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
-                Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_IS_CURRENT,
-                this.isCurrent, Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_ORGANISM, this.organism,
-                Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_OBJ_TYPE, this.vocabulary,
-                Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type,
-                Field.Store.YES, Field.Index.NO));
-        doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
-                Field.Store.YES, Field.Index.UN_TOKENIZED));
-        return doc;
-    }
+		doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
+				Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_DATA,
+				this.data.toString().replaceAll("[\\W_]", " "),
+				Field.Store.YES, Field.Index.TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data.toString(),
+				Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_SDATA,
+				this.data.toString().replaceAll("[\\W_]", " "),
+				Field.Store.YES, Field.Index.TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
+				Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_IS_CURRENT,
+				this.isCurrent, Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_ORGANISM, this.organism,
+				Field.Store.YES, Field.Index.TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_OBJ_TYPE, this.vocabulary,
+				Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type,
+				Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
+				Field.Store.YES, Field.Index.UN_TOKENIZED));
+		return doc;
+	}
 
-    /**
-     * Returns a string representation of the data contained in this object.
-     */
+	/**
+	 * Returns a string representation of the data contained in this object.
+	 */
 
-    public String toString() {
-        return "DB Key: " + this.db_key + " Data: " + this.data
-                + " Type: " + this.data_type + " Current: "
-                + this.isCurrent + " Organism Type: " + this.organism
-                + " Object/Vocabulary Type: " + this.vocabulary
-                + " Raw Data: " + this.raw_data + " Unique Key: "
-                + this.unique_key;
-    }
+	public String toString() {
+		return "DB Key: " + db_key +
+				"\n Data: " + data +
+				"\n Type: " + data_type +
+				"\n Current: " + isCurrent +
+				"\n Organism Type: " + organism +
+				"\n Object/Vocabulary Type: " + vocabulary +
+				"\n Raw Data: " + raw_data +
+				"\n Unique Key: " + unique_key;
+	}
 
-    /**
-     * Appends to the data field. Some of our fields are split up in the
-     * database, so they have to be put back together manually at indexing
-     * time.
-     *
-     * @param data
-     */
+	/**
+	 * Returns the data_type.
+	 * 
+	 * @return Returns a string representation of the term type.
+	 */
 
-    public void appendData(String data) {
-        if (this.data.equals("")) {
-            this.data = data;
-        } else {
-            this.data = this.data + data;
-        }
-    }
+	public String getDataType() {
+		return data_type;
+	}
 
-    /**
-     * Returns the data_type.
-     *
-     * @return Returns a string representation of the term type.
-     */
+	/**
+	 * Sets the datatype. Defaults to an empty string.
+	 * 
+	 * @param type
+	 */
 
-    public String getDataType() {
-        return data_type;
-    }
+	public void setDataType(String type) {
+		if (type != null) {
+			this.data_type = type;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the datatype. Defaults to an empty string.
-     *
-     * @param type
-     */
+	/**
+	 * Returns the whether or not this object is current in the database.
+	 * 
+	 * @return String representation of the isCurrent field.
+	 */
 
-    public void setDataType(String type) {
-        if (type != null) {
-            this.data_type = type;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public String getIsCurrent() {
+		return isCurrent;
+	}
 
-    /**
-     * Returns the whether or not this object is current in the database.
-     *
-     * @return String representation of the isCurrent field.
-     */
+	/**
+	 * Sets the isCurrent field. This defaults to 1, or true.
+	 * 
+	 * @param isCurrent
+	 */
 
-    public String getIsCurrent() {
-        return isCurrent;
-    }
+	public void setIsCurrent(String isCurrent) {
+		if (isCurrent != null) {
+			this.isCurrent = isCurrent;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the isCurrent field. This defaults to 1, or true.
-     *
-     * @param isCurrent
-     */
+	/**
+	 * Gets the organism field.
+	 * 
+	 * @return String representation of the organism field.
+	 */
+	public String getOrganism() {
+		return organism;
+	}
 
-    public void setIsCurrent(String isCurrent) {
-        if (isCurrent != null) {
-            this.isCurrent = isCurrent;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	/**
+	 * Sets the organism field Defaults to 1, which represents mouse.
+	 * 
+	 * @param organism
+	 */
 
-    /**
-     * Gets the organism field.
-     *
-     * @return String representation of the organism field.
-     */
-    public String getOrganism() {
-        return organism;
-    }
+	public void setOrganism(String organism) {
+		if (organism != null) {
+			this.organism = organism;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the organism field Defaults to 1, which represents mouse.
-     *
-     * @param organism
-     */
+	/**
+	 * Gets the vocabulary type.
+	 * 
+	 * @return vocabulary type
+	 */
 
-    public void setOrganism(String organism) {
-        if (organism != null) {
-            this.organism = organism;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public String getVocabulary() {
+		return vocabulary;
+	}
 
-    /**
-     * Gets the vocabulary type.
-     *
-     * @return vocabulary type
-     */
+	/**
+	 * Sets that vocabulary type. Defaults to an empty string.
+	 * 
+	 * @param type
+	 *            Takes the type from the database, and records it into the
+	 *            object. If the type is Mammalian Phenotype it does a
+	 *            conversion into MP
+	 */
 
-    public String getVocabulary() {
-        return vocabulary;
-    }
+	public void setVocabulary(String type) {
+		if (type != null) {
+			if (type.equals(IndexConstants.MP_DATABASE_TYPE)) {
+				type = "MP";
+			}
+			if (type.equals(IndexConstants.INTERPRO_DATABASE_TYPE)) {
+				type = "IP";
+			}
+			if (type.equals(IndexConstants.PIRSF_DATABASE_TYPE)) {
+				type = "PS";
+			}
+			this.vocabulary = type;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets that vocabulary type. Defaults to an empty string.
-     *
-     * @param type
-     * Takes the type from the database, and records it into the object. If the
-     * type is Mammalian Phenotype it does a conversion into MP
-     */
+	/**
+	 * Get the raw data field, this is the raw value from the database
+	 * 
+	 * @return raw data String.
+	 */
 
-    public void setVocabulary(String type) {
-        if (type != null) {
-            if (type.equals(IndexConstants.MP_DATABASE_TYPE)) {
-                type = "MP";
-            }
-            if (type.equals(IndexConstants.INTERPRO_DATABASE_TYPE)) {
-                type = "IP";
-            }
-            if (type.equals(IndexConstants.PIRSF_DATABASE_TYPE)) {
-                type = "PS";
-            }
-            this.vocabulary = type;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public String getRaw_data() {
+		return raw_data.toString();
+	}
 
-    /**
-     * Get the raw data field, this is the raw value from the database
-     *
-     * @return raw data String.
-     */
+	/**
+	 * Sets the raw data field, this is used at display time to see an unaltered
+	 * form of the item we are matching on.
+	 * 
+	 * @param raw_data
+	 *            String
+	 */
 
-    public String getRaw_data() {
-        return raw_data;
-    }
+	public void setRaw_data(String raw_data) {
+		if (raw_data != null) {
+			this.raw_data = new StringBuffer(raw_data);
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the raw data field, this is used at display time to see an
-     * unaltered form of the item we are matching on.
-     *
-     * @param raw_data
-     * String
-     */
+	/**
+	 * Append to the raw data field.
+	 * 
+	 * @param data
+	 */
 
-    public void setRaw_data(String raw_data) {
-        if (raw_data != null) {
-            this.raw_data = raw_data;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public void appendRaw_data(String data) {
+		if (this.raw_data.length() == 0) {
+			this.raw_data.append(data);
+		} else {
+			this.raw_data.append(data);
+		}
+	}
 
-    /**
-     * Append to the raw data field.
-     * @param data
-     */
+	/**
+	 * Gets the display type
+	 * 
+	 * @return Display Type String
+	 */
 
-    public void appendRaw_data(String data) {
-        if (this.raw_data.equals("")) {
-            this.raw_data = data;
-        } else {
-            this.raw_data = this.raw_data + data;
-        }
-    }
+	public String getDisplay_type() {
+		return display_type;
+	}
 
-    /**
-     * Gets the display type
-     *
-     * @return Display Type String
-     */
+	/**
+	 * Sets the display type.
+	 * 
+	 * @param display_type
+	 *            String
+	 */
 
-    public String getDisplay_type() {
-        return display_type;
-    }
+	public void setDisplay_type(String display_type) {
+		if (display_type != null) {
+			this.display_type = display_type;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the display type.
-     *
-     * @param display_type
-     * String
-     */
+	/**
+	 * Returns the unique key for this document. This key is used as a join
+	 * point across indexes at display time.
+	 * 
+	 * @return String with this objects unique key.
+	 */
 
-    public void setDisplay_type(String display_type) {
-        if (display_type != null) {
-            this.display_type = display_type;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public String getUnique_key() {
+		return unique_key;
+	}
 
-    /**
-     * Returns the unique key for this document.  This key is used as a join
-     * point across indexes at display time.
-     *
-     * @return String with this objects unique key.
-     */
+	/**
+	 * Sets the unique key for this document. This key is used as a join point
+	 * across indexes.
+	 * 
+	 * @param unique_key
+	 */
 
-    public String getUnique_key() {
-        return unique_key;
-    }
+	public void setUnique_key(String unique_key) {
+		if (unique_key != null) {
+			this.unique_key = unique_key;
+		}
+		else {
+			this.hasError = true;
+		}
+	}
 
-    /**
-     * Sets the unique key for this document.  This key is used as a join point
-     * across indexes.
-     *
-     * @param unique_key
-     */
+	/**
+	 * Test harness for this object.
+	 * 
+	 * @param args
+	 */
 
-    public void setUnique_key(String unique_key) {
-        if (unique_key != null) {
-            this.unique_key = unique_key;
-        }
-        else {
-            this.hasError = true;
-        }
-    }
+	public static void main(String[] args) {
+		// Set up the logger.
 
-    /**
-     * Test harness for this object.
-     *
-     * @param args
-     */
+		GenomeFeatureInexactLuceneDocBuilder builder =
+				new GenomeFeatureInexactLuceneDocBuilder();
 
-    public static void main(String[] args) {
-       // Set up the logger.
+		Logger log =
+				Logger.getLogger(builder.getClass().getName());
 
-        GenomeFeatureInexactLuceneDocBuilder builder =
-            new GenomeFeatureInexactLuceneDocBuilder();
+		log.info(builder.getClass().getName() + " Test Harness");
 
-        Logger log =
-            Logger.getLogger(builder.getClass().getName());
+		// Should result in an error being printed!, but the lucene document
+		// should still come through.
 
-        log.info(builder.getClass().getName() + " Test Harness");
+		builder.setData(null);
+		Document doc = builder.getDocument();
 
-        // Should result in an error being printed!, but the lucene document
-        // should still come through.
+		// Reset the doc builder for the next object.
 
-        builder.setData(null);
-        Document doc = builder.getDocument();
+		builder.clear();
 
-        // Reset the doc builder for the next object.
+		log.info("Lucene document: " + doc);
 
-        builder.clear();
+		// Should work properly, resulting in a Lucene document being returned.
 
-        log.info("Lucene document: " + doc);
+		builder.setData("test");
+		builder.setDb_key("123");
+		builder.setDataType("test type");
+		builder.setDisplay_type("Test: test");
+		builder.setUnique_key("123test_type");
+		builder.setOrganism("test organism");
+		builder.setVocabulary("MARKER");
 
-        // Should work properly, resulting in a Lucene document being returned.
+		doc = builder.getDocument();
 
-        builder.setData("test");
-        builder.setDb_key("123");
-        builder.setDataType("test type");
-        builder.setDisplay_type("Test: test");
-        builder.setUnique_key("123test_type");
-        builder.setOrganism("test organism");
-        builder.setVocabulary("MARKER");
+		// Should print out the toString() version of the doc builder.
 
-        doc = builder.getDocument();
+		log.info(builder);
 
-        // Should print out the toString() version of the doc builder.
+		log.info("Lucene document: " + doc);
 
-        log.info(builder);
-
-        log.info("Lucene document: " + doc);
-
-    }
+	}
 }
-

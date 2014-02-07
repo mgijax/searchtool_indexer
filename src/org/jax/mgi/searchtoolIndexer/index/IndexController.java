@@ -12,73 +12,74 @@ import org.jax.mgi.shr.config.IndexCfg;
  * 
  * @author mhall
  * 
- * @has An Lucene IndexWriter, which consumes Lucene Documents, and places
- *      them into the index.
- *      
- * @does Controls the creation of the indexers, and then optimizes the  
- * resulting Lucene index.
+ * @has An Lucene IndexWriter, which consumes Lucene Documents, and places them
+ *      into the index.
+ * 
+ * @does Controls the creation of the indexers, and then optimizes the resulting
+ *       Lucene index.
  * 
  */
 
 public class IndexController implements Runnable {
 
-    private int NUMBER_OF_THREADS;
-    IndexWriter writer = null;
-    
-    Logger log = Logger.getLogger(this.getClass().getName());
+	private int	NUMBER_OF_THREADS;
+	IndexWriter	writer	= null;
 
-    /**
-     * Sets up the IndexController, initializing it with a IndexWriter.
-     * 
-     * @param iw A Lucene IndexWriter
-     */
+	Logger		log		= Logger.getLogger(this.getClass().getName());
 
-    public IndexController(IndexWriter iw) throws Exception{
-        writer = iw;
-        
-        IndexCfg config = new IndexCfg();
-        NUMBER_OF_THREADS = 
-            new Integer(config.get("NUMBER_OF_THREADS")).intValue();
+	/**
+	 * Sets up the IndexController, initializing it with a IndexWriter.
+	 * 
+	 * @param iw
+	 *            A Lucene IndexWriter
+	 */
 
-    }
+	public IndexController(IndexWriter iw) throws Exception {
+		writer = iw;
 
-    /**
-     * This is what is invoked when this thread is started by the main program.
-     * It uses the configuration file to figure out how many threads it should
-     * be creating, and then monitors them as they work. When its complete, it
-     * optimizes the index, and then exits.
-     */
+		IndexCfg config = new IndexCfg();
+		NUMBER_OF_THREADS =
+				new Integer(config.get("NUMBER_OF_THREADS")).intValue();
 
-    public void run() {
-        Thread threads[] = new Thread[NUMBER_OF_THREADS];
+	}
 
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            try {
-                threads[i] = new Thread(new Indexer(writer));
-                threads[i].start();
-            } catch (Exception e) {
-                log.error(e);
-            }
-        }
+	/**
+	 * This is what is invoked when this thread is started by the main program.
+	 * It uses the configuration file to figure out how many threads it should
+	 * be creating, and then monitors them as they work. When its complete, it
+	 * optimizes the index, and then exits.
+	 */
 
-        // Wait until all the threads have completed their work, after which
-        // optimize and close the indexwriter.
+	public void run() {
+		Thread threads[] = new Thread[NUMBER_OF_THREADS];
 
-        try {
+		for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+			try {
+				threads[i] = new Thread(new Indexer(writer));
+				threads[i].start();
+			} catch (Exception e) {
+				log.error(e);
+			}
+		}
 
-            for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-                threads[i].join();
-            }
+		// Wait until all the threads have completed their work, after which
+		// optimize and close the indexwriter.
 
-            // Optimize the index.
+		try {
 
-            writer.optimize();
+			for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+				threads[i].join();
+			}
 
-            // Close the index.
+			// Optimize the index.
 
-            writer.close();
-        } catch (Exception e) {
-            log.error(e);
-        }
-    }
+			writer.optimize();
+
+			// Close the index.
+
+			writer.close();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
 }
