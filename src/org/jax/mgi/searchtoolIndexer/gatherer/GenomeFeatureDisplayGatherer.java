@@ -11,17 +11,17 @@ import org.jax.mgi.shr.config.IndexCfg;
  * The marker display gatherer is used to collect anything we might need to
  * display for a given marker. This currently includes its symbol, name,
  * chromosomal location and its marker type.
- * 
+ *
  * This information is then used to populate the markerDisplay index.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has An instance of the IndexCfg object, which is used to setup this object.
- * 
+ *
  * @does Gathers information, and creates Lucene documents for the marker
  *       display type, it then populates the shared document stack with these
  *       documents, and sets gathering complete to true when its done.
- * 
+ *
  */
 
 public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
@@ -33,7 +33,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 	/**
 	 * Create a new MarkerDisplayGatherer, whose environment is setup via its
 	 * superclass.
-	 * 
+	 *
 	 * @param config
 	 */
 
@@ -53,7 +53,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 
 	/**
 	 * Create a hashmap of the allele locations
-	 * 
+	 *
 	 * @return HashMap containing the values;
 	 */
 
@@ -142,7 +142,7 @@ public class GenomeFeatureDisplayGatherer extends DatabaseGatherer {
 
 	/**
 	 * Grab the Marker Display Information.
-	 * 
+	 *
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
