@@ -40,8 +40,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 	// Class Variables
 	// Instantiate the single VocabDisplay Lucene doc builder.
 
-	private VocabDisplayLuceneDocBuilder	builder		=
-																new VocabDisplayLuceneDocBuilder();
+	private VocabDisplayLuceneDocBuilder	builder		= new VocabDisplayLuceneDocBuilder();
 
 	HashMap<String, String>					providerMap	= new HashMap<String, String>();
 
@@ -146,20 +145,22 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		// Gather the number of annotations annotated directly to a given term
 		// in term key order.
 		// Create a Hash of Hashs to get all this data
-		HashMap<String, HashMap<String, String>> termToAnnotationsCountMap = new HashMap<String, HashMap<String, String>>();
-		String VOC_NON_AD_ANNOT_COUNT = "select _Term_key, _MGIType_key, "
-				+ "objectCount, annotCount" + " from VOC_Annot_Count_Cache"
-				+ " where annotType != 'AD'";
+		HashMap<String, HashMap<String, HashMap<String, String>>> termToAnnotationsCountMap = new HashMap<String, HashMap<String, HashMap<String, String>>>();
+		String VOC_NON_AD_ANNOT_COUNT = "select _Term_key, _MGIType_key, objectCount, annotCount from VOC_Annot_Count_Cache where annotType != 'AD'";
 		ResultSet vocab_annot_rs = executor.executeMGD(VOC_NON_AD_ANNOT_COUNT);
 		while (vocab_annot_rs.next()) {
-			HashMap<String, String> annotations = termToAnnotationsCountMap.get(vocab_annot_rs.getString("_Term_key"));
+			HashMap<String, HashMap<String, String>> annotations = termToAnnotationsCountMap.get(vocab_annot_rs.getString("_Term_key"));
 			if (annotations == null) {
-				annotations = new HashMap<String, String>();
+				annotations = new HashMap<String, HashMap<String, String>>();
 				termToAnnotationsCountMap.put(vocab_annot_rs.getString("_Term_key"), annotations);
 			}
-			annotations.put("_MGIType_key", vocab_annot_rs.getString("_MGIType_key"));
-			annotations.put("objectCount", vocab_annot_rs.getString("objectCount"));
-			annotations.put("annotCount", vocab_annot_rs.getString("annotCount"));
+			HashMap<String, String> typeCountMap = annotations.get(vocab_annot_rs.getString("_MGIType_key"));
+			if(typeCountMap == null) {
+				typeCountMap = new HashMap<String, String>();
+				annotations.put(vocab_annot_rs.getString("_MGIType_key"), typeCountMap);
+			}
+			typeCountMap.put("objectCount", vocab_annot_rs.getString("objectCount"));
+			typeCountMap.put("annotCount", vocab_annot_rs.getString("annotCount"));
 		}
 		vocab_annot_rs.close();
 
@@ -234,14 +235,17 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 			// Set the annotation counts, and in the case of non human
 			// omim, the secondary object counts.
 
-			HashMap<String, String> annotations = termToAnnotationsCountMap.get(rs_vocabTerm.getString("_Term_key"));
+			HashMap<String, HashMap<String, String>> annotations = termToAnnotationsCountMap.get(rs_vocabTerm.getString("_Term_key"));
 			if (annotations != null) {
-				if (!builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) || (builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) && "12".equals(annotations.get("_MGIType_key")))) {
-					builder.setAnnotation_object_type(annotations.get("_MGIType_key"));
-					builder.setAnnotation_objects(annotations.get("objectCount"));
-					builder.setAnnotation_count(annotations.get("annotCount"));
-				} else {
-					builder.setSecondary_object_count(annotations.get("annotCount"));
+				for(String key: annotations.keySet()) {
+					HashMap<String, String> typeMap = annotations.get(key);
+					if (!builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) || (builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) && "12".equals(key))) {
+						builder.setAnnotation_object_type(key);
+						builder.setAnnotation_objects(typeMap.get("objectCount"));
+						builder.setAnnotation_count(typeMap.get("annotCount"));
+					} else {
+						builder.setSecondary_object_count(typeMap.get("annotCount"));
+					}
 				}
 			}
 
@@ -255,152 +259,6 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		log.info("Done Non AD Display Information!");
 
 		rs_vocabTerm.close();
-	}
-
-	/**
-	 * Gather up all of the AD Term's display information, please note that
-	 * while similar to non ad terms, AD is special in that it doesn't possess
-	 * Accession ID's.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doADVocab() throws SQLException, InterruptedException {
-
-		// SQL For this Subsection
-
-		// Gather the count of markers directly annotated to a given term
-		// in term key order.
-
-		String VOC_AD_MARKER_COUNT = "select _Term_key, count(_Marker_key)"
-				+ " as marker_count" + " from VOC_Marker_Cache"
-				+ " where annotType ='AD'"
-				+ " group by _Term_key order by _Term_key";
-
-		// Gather the printname, the vocab name, the number of objects annotated
-		// to this term, and the number of annotations, in term key order.
-
-		String GEN_AD_KEY =
-				"SELECT distinct s._Structure_key, "
-						+ "  'TS' || _Stage_key || ': ' || printName as PrintName2, "
-						+ "  'AD' as VocabName, "
-						+ "  vac.objectCount, "
-						+ "  vac.annotCount, "
-						+ "  vac._MGIType_key "
-						+ "FROM GXD_Structure s "
-						+ "inner join GXD_StructureName sn on ("
-						+ "  s._Structure_key = sn._Structure_key)"
-						+ "left outer join VOC_Annot_Count_Cache vac on ("
-						+ "  s._Structure_key = vac._Term_key "
-						+ "  and vac.annotType = 'AD') "
-						+ "where s._Parent_key is not null "
-						+ "order by s._Structure_key";
-
-		// Get the dag for a given ad term, in term key order.
-
-		String AD_VOC_DAG_KEY = "select _Structure_key, _Descendent_key"
-				+ " from GXD_StructureClosure"
-				+ " order by _Structure_key, _Descendent_key";
-
-		// Gather the marker keys for a given term in term key order.
-
-		String VOC_AD_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
-				+ " _Marker_key  from VOC_Marker_Cache"
-				+ " where annotType = 'AD'" + " order by _Term_key";
-
-		ResultSet rs_ad = executor.executeMGD(GEN_AD_KEY);
-
-		ResultSet ad_marker_display_rs = executor.executeMGD(VOC_AD_MARKER_DISPLAY_KEY);
-		ad_marker_display_rs.next();
-
-		ResultSet vocab_marker_count_rs_ad = executor.executeMGD(VOC_AD_MARKER_COUNT);
-		vocab_marker_count_rs_ad.next();
-
-		ResultSet ad_child_rs = executor.executeMGD(AD_VOC_DAG_KEY);
-		ad_child_rs.next();
-
-		log.info("Time taken gather AD Display result sets: "
-				+ executor.getTiming());
-
-		// Since these are compound documents, we need to keep track of the
-		// document we are on.
-
-		int place = -1;
-
-		while (rs_ad.next()) {
-
-			// Have we found a new document?
-
-			if (place != rs_ad.getInt("_Structure_key")) {
-
-				// If so, and its not the first document, add the current
-				// document to the stack.
-
-				if (place != -1) {
-					documentStore.push(builder.getDocument());
-					builder.clear();
-				}
-
-				// Populate the basic document information.
-
-				builder.setDb_key(rs_ad.getString("_Structure_key"));
-				builder.setData(rs_ad.getString("PrintName2"));
-				builder.setVocabulary(rs_ad.getString("VocabName"));
-				builder.setTypeDisplay(providerMap.get(rs_ad.getString("vocabName")));
-				builder.setAnnotation_object_type(rs_ad.getString("_MGIType_key"));
-				builder.setAnnotation_objects(rs_ad.getString("objectCount"));
-				builder.setAnnotation_count(rs_ad.getString("annotCount"));
-
-				// Set the document place, when this changes we know we are on a
-				// new document.
-
-				place = rs_ad.getInt("_Structure_key");
-
-				// Grab the markers directly associated to these terms.
-
-				while (!ad_marker_display_rs.isAfterLast()
-						&& ad_marker_display_rs.getInt("_Term_key") <= place) {
-					if (ad_marker_display_rs.getInt("_Term_key") == place) {
-						builder.appendGene_ids(ad_marker_display_rs.getString("_Marker_key"));
-					}
-					ad_marker_display_rs.next();
-				}
-
-				// Grab the marker counts
-
-				while (!vocab_marker_count_rs_ad.isAfterLast() && vocab_marker_count_rs_ad.getInt("_Term_key") < place) {
-					vocab_marker_count_rs_ad.next();
-				}
-				if (!vocab_marker_count_rs_ad.isAfterLast() && vocab_marker_count_rs_ad.getInt("_Term_key") == place) {
-					builder.setMarker_count(vocab_marker_count_rs_ad.getString("marker_count"));
-				}
-
-				// Grab the terms that are descendants of this term, by term
-				// key order.
-
-				while (!ad_child_rs.isAfterLast() && ad_child_rs.getInt("_Structure_key") <= place) {
-					if (ad_child_rs.getInt("_Structure_key") == place) {
-						builder.appendChild_ids(ad_child_rs.getString("_Descendent_key"));
-					}
-					ad_child_rs.next();
-				}
-			}
-		}
-
-		// Push the last document onto the stack, the one the loop kicked
-		// out on.
-
-		documentStore.push(builder.getDocument());
-
-		// Clean up
-
-		log.info("Done AD Display Inforamtion!");
-
-		rs_ad.close();
-		ad_marker_display_rs.close();
-		vocab_marker_count_rs_ad.close();
-		ad_child_rs.close();
 	}
 
 }
