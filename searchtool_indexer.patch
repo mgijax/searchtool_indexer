@@ -1,0 +1,52 @@
+diff --git a/bin/makeIndex_GenomeFeatures b/bin/makeIndex_GenomeFeatures
+index 6671899..bc88af6 100755
+--- a/bin/makeIndex_GenomeFeatures
++++ b/bin/makeIndex_GenomeFeatures
+@@ -17,7 +17,7 @@ fi
+ 
+ # The basic indexing command, w/ the SEARCHTOOL_BUILDDIR argument
+ 
+-COMMAND="${JAVA_HOME}/bin/java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
++COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
+ 
+ echo $COMMAND
+ ##################################################
+diff --git a/bin/makeIndex_OtherIDs b/bin/makeIndex_OtherIDs
+index 2ca5e7e..5a83152 100755
+--- a/bin/makeIndex_OtherIDs
++++ b/bin/makeIndex_OtherIDs
+@@ -17,7 +17,7 @@ fi
+ 
+ # The basic indexing command, w/ the SEARCHTOOL_BUILDDIR argument
+ 
+-COMMAND="${JAVA_HOME}/bin/java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
++COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
+ 
+ ###########################
+ # Make the Other Indexes
+diff --git a/bin/makeIndex_TokenExistance b/bin/makeIndex_TokenExistance
+index 7cebbb5..f2fdd60 100755
+--- a/bin/makeIndex_TokenExistance
++++ b/bin/makeIndex_TokenExistance
+@@ -17,7 +17,7 @@ fi
+ 
+ # The basic indexing command, w/ the SEARCHTOOL_BUILDDIR argument
+ 
+-COMMAND="${JAVA_HOME}/bin/java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
++COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
+ 
+ 
+ ##################################################
+diff --git a/bin/makeIndex_Vocabs b/bin/makeIndex_Vocabs
+index 51bd9f9..98e2852 100755
+--- a/bin/makeIndex_Vocabs
++++ b/bin/makeIndex_Vocabs
+@@ -17,7 +17,7 @@ fi
+ 
+ # The basic indexing command, w/ the SEARCHTOOL_BUILDDIR argument
+ 
+-COMMAND="${JAVA_HOME}/bin/java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
++COMMAND="java -d64 -DCONFIG=${CONFIG_MASTER},${INDEX_CONFIG} -DLOGDIR=${SEARCHTOOL_LOGDIR} ${MEMORY_ARGS} org.jax.mgi.searchtoolIndexer.index.IndexMaker ${SEARCHTOOL_BUILDDIR}/"
+ 
+ 
+ ###########################
