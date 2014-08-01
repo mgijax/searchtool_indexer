@@ -542,6 +542,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// others - alphabetical
 		priority.add("chicken");
+		priority.add("western clawed frog");
 		priority.add("zebrafish");
 
 		String displayOrg = null;
