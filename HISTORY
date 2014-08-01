@@ -1,3 +1,9 @@
+TAG: searchtool_indexer-5-1-9-2
+DATE 08/01/2014
+STAFF: dbm
+CHANGES:
+1) OtherDisplayGatherer.java: added "western clawed frog" (TR11662)
+
 TAG: searchtool_indexer-5-1-9-1
 DATE 02/22/2014
 STAFF: oblod
