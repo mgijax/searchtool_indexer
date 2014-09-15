@@ -74,18 +74,30 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		String VOC_ACCID_KEY = "select _Term_key, accId, vocabName "
 				+ "from VOC_Term_View where isObsolete != 1 "
 				+ "and _Vocab_key in (44, 4, 5, 8, 46, 90, 91) "
+				
 				+ "union "
+				
 				+ "select vtv._Term_key, a.accId, 'Mammalian Phenotype' as vocabName "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 5 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
 				+ "and a.preferred = 0"
+				
 				+ "union "
+				
 				+ "select vtv._Term_key, a.accId, 'EMAPA' as vocabName "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 90 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
 				+ "and a.preferred = 0"
+				
+				+ "union "
+				
+				+ "select vtv._Term_key, a.accId, 'GO' as vocabName "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 4 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				
 				;
 
 		// Gather the data
