@@ -109,7 +109,14 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
 				+ " where isObsolete != 1 and _Vocab_key = 4"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'GO/Marker'";
+				+ " 'GO/Marker'"
+				+ "union "
+				+ "select vtv._Term_key, a.accId, 'GO' as vocabName, vtv.term "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 4 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				+ "and a.preferred = 0";
+				;
 
 		doVocabAccessionID(GO_ACCID_KEY);
 
