@@ -62,7 +62,6 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 
 	public void runLocal() throws Exception {
 		doNonADVocab();
-		//doADVocab();
 	}
 
 	/**
@@ -243,8 +242,6 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 						builder.setAnnotation_object_type(key);
 						builder.setAnnotation_objects(typeMap.get("objectCount"));
 						builder.setAnnotation_count(typeMap.get("annotCount"));
-					} else {
-						builder.setSecondary_object_count(typeMap.get("annotCount"));
 					}
 				}
 			}

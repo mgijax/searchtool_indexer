@@ -90,8 +90,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 		ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
 		rs_label.next();
 
-		log.info("Time taken to gather label's result set: "
-				+ executor.getTiming());
+		log.info("Time taken to gather label's result set: " + executor.getTiming());
 
 		// Parse it
 
@@ -120,15 +119,13 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 			// If we have an old symbol, we need to create a custom type.
 
 			if (!rs_label.getString("_Label_Status_key").equals("1")) {
-
 				builder.setDataType(builder.getDataType() + "O");
 			}
 
 			builder.setData(rs_label.getString("label"));
 			builder.setRaw_data(rs_label.getString("label"));
 			builder.setDb_key(rs_label.getString("_Marker_key"));
-			builder.setUnique_key(rs_label.getString("_Label_key")
-					+ IndexConstants.MARKER_TYPE_NAME);
+			builder.setUnique_key(rs_label.getString("_Label_key") + IndexConstants.MARKER_TYPE_NAME);
 			builder.setObject_type("MARKER");
 			displayType = InitCap.initCap(rs_label.getString("labelTypeName"));
 			if (displayType.equals("Current Symbol")) {
@@ -177,8 +174,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 		ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
 		rs_label.next();
 
-		log.info("Time taken to gather allele label's result set: "
-				+ executor.getTiming());
+		log.info("Time taken to gather allele label's result set: " + executor.getTiming());
 
 		// Parse it
 
@@ -191,7 +187,6 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 			// If we have an old symbol, we need to create a custom type.
 
 			if (!rs_label.getString("_Label_Status_key").equals("1")) {
-
 				builder.setDataType(builder.getDataType() + "O");
 			}
 
@@ -212,8 +207,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 
-			String fixedLabel = rs_label.getString("label").replace("<", "")
-					.replace(">", "");
+			String fixedLabel = rs_label.getString("label").replace("<", "").replace(">", "");
 
 			if (!fixedLabel.equals(label)) {
 				builder.setData(fixedLabel);

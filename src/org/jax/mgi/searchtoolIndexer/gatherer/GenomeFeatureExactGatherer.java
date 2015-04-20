@@ -164,24 +164,24 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 		// Also only do this for the mouse related items, where the marker
 		// has not been withdrawn.
 		//
-		// Includes: current allele names and synonyms from ALL_Label
+		// Includes: current allele names and synonyms from ALL_Label,
 		// Excludes:
 		// all data for wild-type alleles
 		// allele symbols
 
 		String ALLELE_LABEL_EXACT = "select distinct aa._Allele_key, "
-				+ "  m.name, "
-				+ "  al.label, "
-				+ "  al.labelType, "
-				+ "  al.labelTypeName, "
-				+ "  al._Label_Status_key "
-				+ "from ALL_Allele aa "
-				+ "inner join ALL_Label al on (al._Allele_key = aa._Allele_key "
-				+ "  and al._Label_Status_key != 0 "
-				+ "  and al.labelType in ('AN', 'AY') ) "
-				+ "left outer join MRK_Marker m on ("
-				+ "  aa._Marker_key = m._Marker_key)"
-				+ "where aa.isWildType != 1";
+			+ "  m.name, "
+			+ "  al.label, "
+			+ "  al.labelType, "
+			+ "  al.labelTypeName, "
+			+ "  al._Label_Status_key "
+			+ "from ALL_Allele aa "
+			+ "inner join ALL_Label al on (al._Allele_key = aa._Allele_key "
+			+ "  and al._Label_Status_key != 0 "
+			+ "  and al.labelType in ('AN', 'AY') ) "
+			+ "left outer join MRK_Marker m on ("
+			+ "  aa._Marker_key = m._Marker_key)"
+			+ "where aa.isWildType != 1 ";
 
 		// Gather the data
 

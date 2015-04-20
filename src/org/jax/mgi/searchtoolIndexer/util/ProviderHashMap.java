@@ -135,7 +135,6 @@ public class ProviderHashMap {
     /**
      * Get the logical db display name.
      * @param logicalDB
-     * @return
      */
 
     public String get(String logicalDB) {

@@ -47,8 +47,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		doVocabTerm();
 		doVocabSynonym();
 		doVocabNotes();
-		//doVocabADTerm();
-		//doVocabADSynonym();
 		doAlleleSynonym();
 	}
 
@@ -255,129 +253,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		}
 
 		log.info("Done Vocab Notes/Definitions!");
-	}
-
-	/**
-	 * Gather the AD Vocab Terms.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doVocabADTerm() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Gather all ad terms, who are not top level terms (non null parent)
-
-		String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
-				+ "s.printName, 'AD' as vocabName" + " from GXD_Structure s"
-				+ " where s._Parent_key is not null";
-
-		// Gather the data
-
-		ResultSet rs_ad_term = executor.executeMGD(VOC_AD_TERM_KEY);
-		rs_ad_term.next();
-
-		log.info("Time taken gather AD vocab terms result set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_ad_term.isAfterLast()) {
-
-			// For AD specifically we are adding in multiple ways for something
-			// to match inexactly.
-
-			// TS#:Printname version.
-
-			builder.setData("TS" + rs_ad_term.getString("_Stage_key") + ":"
-					+ rs_ad_term.getString("printName"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-
-			// TS#: printname version
-
-			builder.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
-					+ rs_ad_term.getString("printName"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-
-			// printname version
-
-			builder.setData(rs_ad_term.getString("printName"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-
-			// TS#: print name version
-
-			builder.setData("TS" + rs_ad_term.getString("_Stage_key") + ": "
-					+ rs_ad_term.getString("printName").replaceAll(";", "; "));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			builder.clear();
-			rs_ad_term.next();
-		}
-
-		// Clean up
-		log.info("Done AD Vocab Terms!");
-		rs_ad_term.close();
-
-	}
-
-	/**
-	 * Gather the AD Vocab Synonyms.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doVocabADSynonym() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// gather up ad synonyms for non top level terms (Non null parents)
-
-		String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
-				+ "'AD' as vocabName"
-				+ " from GXD_Structure s, GXD_StructureName sn"
-				+ " where s._parent_key is not null"
-				+ " and s._Structure_key = sn._Structure_key and"
-				+ " s._StructureName_key != sn._StructureName_key";
-
-		// Gather the data
-
-		ResultSet rs_ad_syn = executor.executeMGD(VOC_AD_SYN_KEY);
-		rs_ad_syn.next();
-
-		log.info("Time taken gather AD vocab synonym result set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_ad_syn.isAfterLast()) {
-
-			builder.setData(rs_ad_syn.getString("Structure"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			builder.clear();
-			rs_ad_syn.next();
-		}
-
-		// Clean up
-
-		log.info("Done AD Vocab Synonyms!");
-		rs_ad_syn.close();
 	}
 
 	/**

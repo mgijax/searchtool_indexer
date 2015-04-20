@@ -77,8 +77,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		doVocabTerms();
 		doVocabSynonyms();
 		doVocabNotes();
-		//doVocabADTerm();
-		//doVocabADSynonym();
 		doAlleleNomen();
 	}
 
@@ -490,132 +488,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 	}
 
 	/**
-	 * Gather the AD Vocab Terms.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doVocabADTerm() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Also since this is a marker related index only bring back notes for
-		// terms who have annotations to markers.
-
-		log.info("Collecting AD Terms");
-
-		// Gather all AD vocabulary terms. Ignore top level terms (those
-		// whose parent key is null)
-
-		String VOC_AD_TERM_KEY = "select s._Structure_key, s._Stage_key, "
-				+ "s.printName, 'AD' as vocabName"
-				+ " from GXD_Structure s, VOC_Annot_Count_Cache vacc"
-				+ " where s._Parent_key is not null and vacc.annotType = 'AD'"
-				+ " and vacc._Term_key = s._Structure_key";
-
-		// Gather the data
-
-		ResultSet rs_ad_term = executor.executeMGD(VOC_AD_TERM_KEY);
-		rs_ad_term.next();
-
-		log.info("Time taken gather AD vocab terms result set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_ad_term.isAfterLast()) {
-
-			// For AD specifically we are adding in multiple ways for something
-			// to match inexactly.
-			// We are also directly manipulating the data in the gatherer,
-			// which is NOT the normal pattern.
-
-			builder.setData("TS" + rs_ad_term.getString("_Stage_key") + " " + rs_ad_term.getString("printName").replaceAll(";", " "));
-			builder.setRaw_data("TS" + rs_ad_term.getString("_Stage_key") + ": " + rs_ad_term.getString("printName").replaceAll(";", "; "));
-			builder.setDb_key(rs_ad_term.getString("_Structure_key"));
-			builder.setUnique_key(rs_ad_term.getString("_Structure_key") + rs_ad_term.getString("vocabName"));
-			builder.setVocabulary(rs_ad_term.getString("vocabName"));
-			builder.setDisplay_type(providerMap.get(rs_ad_term.getString("vocabName")));
-			builder.setDataType(IndexConstants.VOCAB_TERM);
-			documentStore.push(builder.getDocument());
-			// Transformed version, w/o TS
-			builder.setData(rs_ad_term.getString("printName").replaceAll(";"," "));
-			documentStore.push(builder.getDocument());
-
-			builder.clear();
-			rs_ad_term.next();
-		}
-
-		// Clean up
-		log.info("Done AD Vocab Terms!");
-		rs_ad_term.close();
-
-	}
-
-	/**
-	 * Gather the AD Vocab Synonyms.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doVocabADSynonym() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Also since this is a marker related index only bring back notes for
-		// terms who have annotations to markers.
-
-		log.info("Collecting AD Synonyms");
-
-		// Gather AD synonyms, ignoring top level terms (those who's parent
-		// key == null)
-
-		String VOC_AD_SYN_KEY = "select s._Structure_key, sn.Structure, "
-				+ "'AD' as vocabName"
-				+ " from GXD_Structure s, GXD_StructureName sn,"
-				+ " VOC_Annot_Count_Cache vacc"
-				+ " where s._parent_key is not null"
-				+ " and s._Structure_key = sn._Structure_key and"
-				+ " s._StructureName_key != sn._StructureName_key"
-				+ " and vacc.annotType='AD' and vacc._Term_key ="
-				+ " s._Structure_key";
-
-		// Gather the data
-
-		ResultSet rs_ad_syn = executor.executeMGD(VOC_AD_SYN_KEY);
-		rs_ad_syn.next();
-
-		log.info("Time taken gather AD vocab synonym result set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_ad_syn.isAfterLast()) {
-
-			builder.setData(rs_ad_syn.getString("Structure"));
-			builder.setRaw_data(rs_ad_syn.getString("Structure"));
-			builder.setDb_key(rs_ad_syn.getString("_Structure_key"));
-			builder.setUnique_key(rs_ad_syn.getString("_Structure_key") + rs_ad_syn.getString("Structure") + rs_ad_syn.getString("vocabName"));
-			builder.setVocabulary(rs_ad_syn.getString("vocabName"));
-			builder.setDisplay_type(providerMap.get(rs_ad_syn.getString("vocabName")));
-			builder.setDataType(IndexConstants.VOCAB_SYNONYM);
-
-			// Place the document onto the stack.
-
-			documentStore.push(builder.getDocument());
-			builder.clear();
-			rs_ad_syn.next();
-		}
-
-		// Clean up
-
-		log.info("Done AD Vocab Synonyms!");
-		rs_ad_syn.close();
-	}
-
-	/**
 	 * Gather the allele labels.
 	 * 
 	 * @throws SQLException
@@ -630,15 +502,25 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		// Gather up allele nomenclature
 		//
-		// Includes: current allele symbols, names, and synonyms
+		// Includes: current allele symbols, names, and synonyms, as
+		// 	well as marker synonyms
 		// Excludes: all data for wild-type alleles
 
 		String ALLELE_NOMEN_KEY = "select distinct aa._Allele_key, "
-				+ "al.label, al.labelType, al.labelTypeName"
-				+ " from all_label al, ALL_Allele aa"
-				+ " where al._Allele_key ="
-				+ " aa._Allele_key and al._Label_Status_key != 0 "
-				+ " and aa.isWildType != 1";
+			+ " al.label, al.labelType, al.labelTypeName "
+			+ "from all_label al, ALL_Allele aa "
+			+ "where al._Allele_key = aa._Allele_key "
+			+ " and al._Label_Status_key != 0 "
+			+ " and aa.isWildType != 1 "
+			+ "union "
+			+ "select distinct a._Allele_key, "
+			+ " ml.label, ml.labelType, ml.labelTypeName "
+			+ "from all_allele a, mrk_label ml "
+			+ "where ml._Marker_key = a._Marker_key "
+			+ " and ml._Label_Status_key != 0 "
+			+ " and a.isWildType != 1 "
+			+ " and ml.labelTypeName in ('current symbol', "
+			+ "    'synonym')";
 
 		// Gather the data
 

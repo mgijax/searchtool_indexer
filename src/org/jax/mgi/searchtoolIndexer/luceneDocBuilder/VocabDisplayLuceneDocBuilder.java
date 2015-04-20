@@ -26,7 +26,6 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 	private String			annotation_object_type	= "0";
 	private StringBuffer	child_ids				= new StringBuffer("");
 	private String			acc_id					= "";
-	private String			secondary_object_count	= "0";
 	private String			type_display			= "";
 
 	/**
@@ -42,7 +41,6 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		annotation_object_type = "0";
 		child_ids = new StringBuffer("");
 		acc_id = "";
-		secondary_object_count = "0";
 		type_display = "";
 	}
 
@@ -67,7 +65,6 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		// This is very special in that its a realized field.
 
 		doc.add(new Field(IndexConstants.COL_ANNOT_DISPLAY, getAnnot_display(), Field.Store.YES, Field.Index.NO));
-		doc.add(new Field("secondary_object_count", secondary_object_count, Field.Store.YES, Field.Index.NO));
 		doc.add(new Field(IndexConstants.COL_ACC_ID, acc_id, Field.Store.YES, Field.Index.NO));
 		doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, type_display, Field.Store.YES, Field.Index.NO));
 
@@ -339,33 +336,6 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 	}
 
 	/**
-	 * Get the secondary object count, some vocabularies have both the count of
-	 * annotations to the term, as well as the count of some other object, say
-	 * markers for example.
-	 */
-
-	public String getSecondary_object_count() {
-		return secondary_object_count;
-	}
-
-	/**
-	 * Set the secondary object count.
-	 * 
-	 * @param secondary_object_count
-	 */
-
-	public void setSecondary_object_count(String secondary_object_count) {
-		if (secondary_object_count != null) {
-			this.secondary_object_count = secondary_object_count;
-		}
-		else {
-			// System.out.println("Setting Error: setSecondary_object_count: secondary_object_count: "
-			// + secondary_object_count);
-			this.hasError = true;
-		}
-	}
-
-	/**
 	 * Returns the accession id
 	 * 
 	 * @return String representation of the acc_id field.
@@ -435,32 +405,12 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		// If its omim, we will calculate the number of mouse models
 
 		if (vocabulary.equals(IndexConstants.OMIM_TYPE_NAME)) {
-			if (!annotation_count.equals("0") && !secondary_object_count.equals("0")) {
+			if (!annotation_count.equals("0")) {
 				annot_display = annotation_count + " mouse model";
 				if (!annotation_count.equals("1")) {
-					annot_display += "s";
-				}
-
-				annot_display += ", " + secondary_object_count + " mouse ortholog";
-
-				if (!secondary_object_count.equals("1")) {
-					annot_display += "s";
-				}
-
-			} else if (!annotation_count.equals("0")) {
-				annot_display = annotation_count + " mouse model";
-				if (!annotation_count.equals("1")) {
-					annot_display += "s";
-				}
-				// Secondly, how many orthologs do we have?
-
-			} else if (!secondary_object_count.equals("0")) {
-				annot_display = secondary_object_count + " mouse ortholog";
-				if (!secondary_object_count.equals("1")) {
 					annot_display += "s";
 				}
 			}
-
 		} else if (vocabulary.equals(IndexConstants.GO_TYPE_NAME)) {
 			if (!annotation_count.equals("0")) {
 				annot_display = annotation_objects + " gene";

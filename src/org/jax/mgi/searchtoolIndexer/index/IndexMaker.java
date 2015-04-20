@@ -178,23 +178,21 @@ public class IndexMaker {
 
 		HashMap<String, String> gathererMap = new HashMap<String, String>();
 
-		String gathererPackage = "org.jax.mgi.searchtoolIndexer.gatherer.";
-
-		gathererMap.put("g", gathererPackage + "GenomeFeatureInexactGatherer");
-		gathererMap.put("ge", gathererPackage + "GenomeFeatureExactGatherer");
-		gathererMap.put("ga", gathererPackage + "GenomeFeatureAccIDGatherer");
-		gathererMap.put("gs", gathererPackage + "GenomeFeatureSymbolGatherer");
-		gathererMap.put("gd", gathererPackage + "GenomeFeatureDisplayGatherer");
-		gathererMap.put("gva", gathererPackage + "GenomeFeatureVocabAccIDGatherer");
-		gathererMap.put("gve", gathererPackage + "GenomeFeatureVocabExactGatherer");
-		gathererMap.put("gvd", gathererPackage + "GenomeFeatureVocabDagGatherer");
-		gathererMap.put("v", gathererPackage + "VocabInexactGatherer");
-		gathererMap.put("ve", gathererPackage + "VocabExactGatherer");
-		gathererMap.put("va", gathererPackage + "VocabAccIDGatherer");
-		gathererMap.put("vd", gathererPackage + "VocabDisplayGatherer");
-		gathererMap.put("t", gathererPackage + "NonIDTokenGatherer");
-		gathererMap.put("o", gathererPackage + "OtherExactGatherer");
-		gathererMap.put("od", gathererPackage + "OtherDisplayGatherer");
+		gathererMap.put("g",   "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureInexactGatherer");
+		gathererMap.put("ge",  "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureExactGatherer");
+		gathererMap.put("ga",  "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureAccIDGatherer");
+		gathererMap.put("gs",  "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureSymbolGatherer");
+		gathererMap.put("gd",  "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureDisplayGatherer");
+		gathererMap.put("gva", "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureVocabAccIDGatherer");
+		gathererMap.put("gve", "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureVocabExactGatherer");
+		gathererMap.put("gvd", "org.jax.mgi.searchtoolIndexer.gatherer.GenomeFeatureVocabDagGatherer");
+		gathererMap.put("v",   "org.jax.mgi.searchtoolIndexer.gatherer.VocabInexactGatherer");
+		gathererMap.put("ve",  "org.jax.mgi.searchtoolIndexer.gatherer.VocabExactGatherer");
+		gathererMap.put("va",  "org.jax.mgi.searchtoolIndexer.gatherer.VocabAccIDGatherer");
+		gathererMap.put("vd",  "org.jax.mgi.searchtoolIndexer.gatherer.VocabDisplayGatherer");
+		gathererMap.put("t",   "org.jax.mgi.searchtoolIndexer.gatherer.NonIDTokenGatherer");
+		gathererMap.put("o",   "org.jax.mgi.searchtoolIndexer.gatherer.OtherExactGatherer");
+		gathererMap.put("od",  "org.jax.mgi.searchtoolIndexer.gatherer.OtherDisplayGatherer");
 
 		try {
 
@@ -207,8 +205,7 @@ public class IndexMaker {
 				System.exit(1);
 			}
 
-			gatherer = new Thread((AbstractGatherer) Class.forName(
-					gathererMap.get(args[1].toLowerCase())).getConstructor(IndexCfg.class).newInstance(config));
+			gatherer = new Thread((AbstractGatherer) Class.forName(gathererMap.get(args[1].toLowerCase())).getConstructor(IndexCfg.class).newInstance(config));
 
 			log.info("Creating " + gathererMap.get(args[1].toLowerCase()) + " index.");
 
@@ -216,8 +213,6 @@ public class IndexMaker {
 			// argument is.
 
 			INDEX_DIR = new File(args[0]);
-
-
 
 			// Create a new indexWriter, using the MGIAnalyzer Wrapper,
 			// the MGITokenAnalyzer, or the StandardAnalayzer.

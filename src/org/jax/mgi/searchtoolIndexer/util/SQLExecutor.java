@@ -20,93 +20,85 @@ import org.jax.mgi.shr.config.IndexCfg;
 
 public class SQLExecutor {
 
-    protected Connection conMGD = null;
-    private String user;
-    private String password;
-    private String mgdJDBCUrl;
+	protected Connection conMGD = null;
+	private String user;
+	private String password;
+	private String mgdJDBCUrl;
 
-    private Date start;
-    private Date end;
+	private Date start;
+	private Date end;
 
-    // now pulled from configuration, rather than hard-coding Sybase
-    protected String DB_DRIVER = null;
+	// now pulled from configuration, rather than hard-coding Sybase
+	protected String DB_DRIVER = null;
 
-    protected Logger log =
-        Logger.getLogger(this.getClass().getName());
+	protected Logger log = Logger.getLogger(this.getClass().getName());
 
-    /**
-     * The default constructor sets up all the configuration variables from
-     * IndexCfg.
-     *
-     * @param config
-     */
+	/**
+	 * The default constructor sets up all the configuration variables from
+	 * IndexCfg.
+	 *
+	 * @param config
+	 */
 
-    public SQLExecutor (IndexCfg config) {
-        try {
-	DB_DRIVER = config.get("DB_DRIVER");
-        Class.forName(DB_DRIVER);
-        user = config.get("MGI_PUBLICUSER");
-        password = config.get("MGI_PUBLICPASSWORD");
-        mgdJDBCUrl = config.get("MGD_JDBC_URL");
-        log.info("MGD JDBC URL: " + config.get("MGD_JDBC_URL"));
-        }
-        catch (Exception e) {log.error(e);}
-    }
+	public SQLExecutor (IndexCfg config) {
+		try {
+			DB_DRIVER = config.get("DB_DRIVER");
+			Class.forName(DB_DRIVER);
+			user = config.get("MGI_PUBLICUSER");
+			password = config.get("MGI_PUBLICPASSWORD");
+			mgdJDBCUrl = config.get("MGD_JDBC_URL");
+		}
+		catch (Exception e) {log.error(e);}
+	}
 
-    /**
-     * Sets up the connection to the MGD Database.
-     * @throws SQLException
-     */
+	/**
+	 * Sets up the connection to the MGD Database.
+	 * @throws SQLException
+	 */
 
-    private void getMGDConnection() throws SQLException {
-        conMGD = DriverManager.getConnection(mgdJDBCUrl, user, password);
-    }
+	private void getMGDConnection() throws SQLException {
+		conMGD = DriverManager.getConnection(mgdJDBCUrl, user, password);
+	}
 
-    /**
-     * Clean up the connections to the database, if they have been initialized.
-     * @throws SQLException
-     */
+	/**
+	 * Clean up the connections to the database, if they have been initialized.
+	 * @throws SQLException
+	 */
 
-    public void cleanup() throws SQLException {
-        if (conMGD != null) {
-            conMGD.close();
-        }
-    }
+	public void cleanup() throws SQLException {
+		if (conMGD != null) {
+			conMGD.close();
+		}
+	}
 
-    /**
-     * Execute a query against MGD, setting up the connection if needed.
-     * @param query
-     * @return
-     */
+	/**
+	 * Execute a query against MGD, setting up the connection if needed.
+	 * @param query
+	 */
 
-    public ResultSet executeMGD (String query) {
+	public ResultSet executeMGD (String query) {
 
-        ResultSet set;
+		ResultSet set;
 
-        try {
-            if (conMGD == null) {
-                getMGDConnection();
-            }
+		try {
+			if (conMGD == null) {
+				getMGDConnection();
+			}
 
-            java.sql.Statement stmt = conMGD.createStatement();
-            start = new Date();
-            set = stmt.executeQuery(query);
-            end = new Date();
-            return set;
-        } catch (Exception e) {
-            log.error(e);
-            System.exit(1);
-            return null;
-        }
-    }
+			java.sql.Statement stmt = conMGD.createStatement();
+			start = new Date();
+			set = stmt.executeQuery(query);
+			end = new Date();
+			return set;
+		} catch (Exception e) {
+			log.error(e);
+			System.exit(1);
+			return null;
+		}
+	}
 
-    /**
-     * Return the timing of the last query.
-     * @return
-     */
-
-    public long getTiming() {
-        return end.getTime() - start.getTime();
-    }
+	public long getTiming() {
+		return end.getTime() - start.getTime();
+	}
 
 }

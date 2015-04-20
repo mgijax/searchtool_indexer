@@ -82,13 +82,30 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Select all marker related accession id's, where the id is
 		// not private, where its for the mouse, and the marker has not
 		// been withdrawn. Order to prefer lower logical databases.
+		// Lower half of union brings in all non-private seq IDs for
+		// sequences associated to markers.
 
-		String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, a._LogicalDB_key"
-				+ " FROM ACC_Accession a,  MRK_Marker m"
-				+ " where private = 0 and _MGIType_key = 2 and"
-				+ " a._Object_key = m._Marker_key and m._Organism_key = 1"
-				+ " and m._Marker_Status_key != 2 and m._Marker_Type_key != 12"
-				+ "order by a._Object_key, a.accID, a._LogicalDB_key";
+		String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, "
+			+ "    a._LogicalDB_key "
+			+ "FROM ACC_Accession a, MRK_Marker m "
+			+ "WHERE a.private = 0 "
+			+ "    AND a._MGIType_key = 2 "
+			+ "    AND a._Object_key = m._Marker_key "
+			+ "    AND m._Organism_key = 1"
+			+ "    AND m._Marker_Status_key != 2 "
+			+ "    AND m._Marker_Type_key != 12 "
+			+ "UNION "
+			+ "SELECT smc._Marker_key, a.accID, a._LogicalDB_key "
+			+ "FROM SEQ_Marker_Cache smc, "
+			+ "    MRK_Marker m, ACC_Accession a "
+			+ "WHERE smc._Marker_key = m._Marker_key "
+			+ "    AND m._Organism_key = 1 "
+			+ "    AND m._Marker_Status_key != 2 "
+			+ "    AND m._Marker_Type_key != 12 "
+			+ "    AND a._MGIType_key = 19 "
+			+ "    AND a._Object_key = smc._Sequence_key "
+			+ "    AND a.private = 0 "
+			+ "order by _Object_key, accID, _LogicalDB_key";
 
 		// Gather the data
 
@@ -97,8 +114,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 		String provider = "";
 
-		log.info("Time taken to gather marker's accession id result set: "
-				+ executor.getTiming());
+		log.info("Time taken to gather marker's accession id result set: " + executor.getTiming());
 
 		// keys are Entrez Gene IDs for this particular marker, so we don't
 		// repeat the same ID for NCBI Gene Model (we prefer to show Entrez
@@ -229,8 +245,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doOrthologAccession() throws SQLException,
-			InterruptedException {
+	private void doOrthologAccession() throws SQLException, InterruptedException {
 
 		log.info("Gathering Accession ID's for Orthologs");
 
@@ -243,7 +258,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ " MRK_ClusterMember nonmouse, "
 				+ " MRK_ClusterMember mouse, " + " MRK_Marker mm, "
 				+ " ACC_Accession aa, " + " MRK_Marker nm, "
-				+ " MGI_Organism o " + "where source.term = 'HomoloGene' "
+				+ " MGI_Organism o " + "where source.term in ('HomoloGene', 'HGNC') "
 				+ " and source._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mouse._Cluster_key "
 				+ " and mouse._Marker_key = mm._Marker_key "
@@ -263,8 +278,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		ResultSet rs_orth_acc = executor.executeMGD(ORTH_TO_MARKER_ACC_ID);
 		rs_orth_acc.next();
 
-		log.info("Time taken to gather Ortholog's Accession ID result set: "
-				+ executor.getTiming());
+		log.info("Time taken to gather Ortholog's Accession ID result set: " + executor.getTiming());
 
 		// Parse it
 
@@ -309,8 +323,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doAllelesByMarkerTransgene() throws SQLException,
-			InterruptedException {
+	private void doAllelesByMarkerTransgene() throws SQLException, InterruptedException {
 
 		// SQL for this Subsection
 
@@ -327,12 +340,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 		// Gather the data
 
-		ResultSet rs_transgene = executor
-				.executeMGD(ALLELE_MARKER_TRANSGENE_SEARCH);
+		ResultSet rs_transgene = executor.executeMGD(ALLELE_MARKER_TRANSGENE_SEARCH);
 		rs_transgene.next();
 
-		log.info("Time taken gather marker transgene -> alelle data set: "
-				+ executor.getTiming());
+		log.info("Time taken gather marker transgene -> alelle data set: " + executor.getTiming());
 
 		// Parse it
 
@@ -376,8 +387,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doAllelesByESCellLines() throws SQLException,
-			InterruptedException {
+	private void doAllelesByESCellLines() throws SQLException, InterruptedException {
 
 		// SQL for this Subsection
 
@@ -397,8 +407,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
 		rs_escell.next();
 
-		log.info("Time taken gather es cell line data set: "
-				+ executor.getTiming());
+		log.info("Time taken gather es cell line data set: " + executor.getTiming());
 
 		// Parse it
 
@@ -439,7 +448,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 	 */
 
 	private void doAllelesBySequence() throws SQLException,
-			InterruptedException {
+	InterruptedException {
 
 		// SQL for this Subsection
 
@@ -452,15 +461,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ " where a._MGIType_key = 19 and a.private != 1"
 				+ " and saa._Sequence_key = a._Object_key and saa._Allele_key is not null";
 
-		// Gather the data
-
 		ResultSet rs_all = executor.executeMGD(OTHER_ALL_BY_SEQUENCE_SEARCH);
 		rs_all.next();
 
-		log.info("Time taken gather allele by sequence data set: "
-				+ executor.getTiming());
-
-		// Parse it
+		log.info("Time taken gather allele by sequence data set: " + executor.getTiming());
 
 		while (!rs_all.isAfterLast()) {
 
@@ -502,8 +506,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doAllelesByESCellLineNames() throws SQLException,
-			InterruptedException {
+	private void doAllelesByESCellLineNames() throws SQLException, InterruptedException {
 
 		// SQL for this Subsection
 
@@ -523,10 +526,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
 		rs_escell.next();
 
-		log.info("Time taken gather es cell line name data set: "
-				+ executor.getTiming());
-
-		// Parse it
+		log.info("Time taken gather es cell line name data set: " + executor.getTiming());
 
 		while (!rs_escell.isAfterLast()) {
 			builder.setData(rs_escell.getString("cellLine"));
@@ -540,8 +540,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			builder.clear();
 			rs_escell.next();
 		}
-
-		// Clean up
 
 		log.info("Done creating documents for es cell lines!");
 		rs_escell.close();

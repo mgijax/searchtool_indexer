@@ -2,7 +2,6 @@ package org.jax.mgi.searchtoolIndexer.gatherer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.GenomeFeatureVocabDagLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
@@ -402,20 +401,30 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
 		String OMIM_HUMAN_MARKER_DISPLAY_KEY =
-				" select distinct m._Marker_key, a._Term_key "
-						+ "from VOC_Annot a, MRK_Cluster mc, MRK_ClusterMember mcm, "
-						+ "  MRK_ClusterMember mcm2, VOC_Term vt, MRK_Marker m "
-						+ "where mcm._Marker_key = a._Object_key "
-						+ " and a._AnnotType_key = 1006 "
-						+ " and m.symbol not like 'tg%cre%' "
-						+ " and mc._ClusterSource_key = vt._Term_key "
-						+ " and vt.term = 'HomoloGene' "
-						+ " and m._Marker_Status_key != 2 "
-						+ " and mcm._Cluster_key = mc._Cluster_key "
-						+ " and mc._Cluster_key = mcm2._Cluster_key "
-						+ " and mcm2._Marker_key = m._Marker_key "
-						+ " and m._Organism_key = 1 "
-						+ "order by a._Term_key";
+			
+			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
+			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " + 
+			"hcm._cluster_key = mc._cluster_key and mc._ClusterSource_key = 13764519 and mc._ClusterType_key = 9272150 and mc._cluster_key = mcm._cluster_key and " +
+			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key in (1,3) order by a._Term_key";
+		
+//				" select distinct m._Marker_key, a._Term_key "
+//						+ "from VOC_Annot a, MRK_Cluster mc, MRK_ClusterMember mcm, "
+//						+ "  MRK_ClusterMember mcm2, VOC_Term vt, MRK_Marker m "
+//						+ "where mcm._Marker_key = a._Object_key "
+//						+ " and a._AnnotType_key = 1006 "
+//						+ " and m.symbol not like 'tg%cre%' "
+//						+ " and mc._ClusterSource_key = vt._Term_key "
+//						+ " and vt.term = 'HomoloGene and HGNC' "
+//						+ " and m._Marker_Status_key != 2 "
+//						+ " and mcm._Cluster_key = mc._Cluster_key "
+//						+ " and mc._Cluster_key = mcm2._Cluster_key "
+//						+ " and mcm2._Marker_key = m._Marker_key "
+//						+ " and m._Organism_key = 1 "
+//						+ "order by a._Term_key";
+		
+		
+
+		
 
 		vsOrtho.setDisplay_key(OMIM_HUMAN_MARKER_DISPLAY_KEY);
 		vsOrtho.setObject_type("MARKER");
@@ -437,7 +446,6 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 */
 
 	private void doSingleNonADVocab(VocabSpec vs) throws SQLException, InterruptedException {
-
 		ResultSet rs_vocabTerm = executor.executeMGD(vs.getVoc_key());
 
 		ResultSet marker_display_rs = executor.executeMGD(vs.getDisplay_key());
@@ -499,7 +507,6 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 				// Find all of the genes that are directly annotated to this
 				// vocabulary term, and append them into this document
-
 				while (!marker_display_rs.isAfterLast() && marker_display_rs.getInt("_Term_key") <= place) {
 					if (marker_display_rs.getInt("_Term_key") == place) {
 						builder.appendGene_ids(marker_display_rs.getString("_Marker_key"));
@@ -510,8 +517,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 				// Add in all the other vocabulary terms that are children
 				// on this term in term_key order.
 				if (child_rs != null) {
-					while (!child_rs.isAfterLast()
-							&& child_rs.getInt("_AncestorObject_key") <= place) {
+					while (!child_rs.isAfterLast() && child_rs.getInt("_AncestorObject_key") <= place) {
 						if (child_rs.getInt("_AncestorObject_key") == place) {
 							builder.appendChild_ids(child_rs.getString("_DescendentObject_key"));
 						}

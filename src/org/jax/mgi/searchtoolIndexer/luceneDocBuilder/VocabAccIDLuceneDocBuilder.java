@@ -200,21 +200,9 @@ public class VocabAccIDLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		}
 	}
 
-	/**
-	 * Get the provider.
-	 * 
-	 * @return
-	 */
-
 	public String getProvider() {
 		return provider;
 	}
-
-	/**
-	 * Sets the provider.
-	 * 
-	 * @param provider
-	 */
 
 	public void setProvider(String provider) {
 		if (provider != null) {

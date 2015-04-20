@@ -50,32 +50,14 @@ public class VocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
 	protected Document prepareDocument() {
 
-		doc.add(new Field(IndexConstants.COL_DATA,
-				this.data.toString().replaceAll("\\s+", " ")
-						.replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(),
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data,
-				Field.Store.YES, Field.Index.NO));
-
-		doc.add(new Field(IndexConstants.COL_VOCABULARY, this.vocabulary,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY,
-				this.display_type, Field.Store.YES, Field.Index.NO));
-
-		doc.add(new Field(IndexConstants.COL_PROVIDER, this.provider,
-				Field.Store.YES, Field.Index.NO));
-
-		doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
+		doc.add(new Field(IndexConstants.COL_DATA, data.toString().replaceAll("\\s+", " ").replaceAll("^\\s", "").replaceAll("\\s$", "").toLowerCase(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_RAW_DATA, this.raw_data, Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_VOCABULARY, this.vocabulary, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_DATA_TYPE, this.data_type, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_TYPE_DISPLAY, this.display_type, Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_PROVIDER, this.provider, Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key, Field.Store.YES, Field.Index.UN_TOKENIZED));
 		return doc;
 	}
 
@@ -84,9 +66,7 @@ public class VocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 	 */
 
 	public String toString() {
-		return "Id: " + this.db_key + "  Raw Data: " + this.data
-				+ "  Data Type: " + this.data_type + "  Vocabulary: "
-				+ this.vocabulary + "  Unique Key: " + this.unique_key;
+		return "Id: " + db_key + "  Raw Data: " + data + "  Data Type: " + data_type + "  Vocabulary: " + vocabulary + "  Unique Key: " + unique_key;
 	}
 
 	/**
@@ -200,22 +180,9 @@ public class VocabExactLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		}
 	}
 
-	/**
-	 * Sets the provider.
-	 * 
-	 * @return
-	 */
-
 	public String getProvider() {
 		return provider;
 	}
-
-	/**
-	 * Gets the provider.
-	 * 
-	 * @param provider
-	 *            String
-	 */
 
 	public void setProvider(String provider) {
 		if (provider != null) {

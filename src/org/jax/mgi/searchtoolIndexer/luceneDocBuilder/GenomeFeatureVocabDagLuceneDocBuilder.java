@@ -30,12 +30,12 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
 	 */
 
 	protected void clearLocal() {
-		this.gene_ids = new StringBuffer("");
-		this.vocabulary = "";
-		this.child_ids = new StringBuffer("");
-		this.acc_id = "";
-		this.unique_key = "";
-		this.object_type = "";
+		gene_ids = new StringBuffer("");
+		vocabulary = "";
+		child_ids = new StringBuffer("");
+		acc_id = "";
+		unique_key = "";
+		object_type = "";
 	}
 
 	/**
@@ -45,25 +45,12 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
 	 */
 
 	protected Document prepareDocument() {
-
-		doc.add(new Field(IndexConstants.COL_DB_KEY, this.db_key,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_VOCABULARY, this.vocabulary,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_FEATURE_IDS, this.gene_ids.toString(),
-				Field.Store.YES, Field.Index.NO));
-
-		doc.add(new Field(IndexConstants.COL_CHILD_IDS, this.child_ids.toString(),
-				Field.Store.YES, Field.Index.NO));
-
-		doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, this.unique_key,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
-		doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, this.object_type,
-				Field.Store.YES, Field.Index.UN_TOKENIZED));
-
+		doc.add(new Field(IndexConstants.COL_DB_KEY, db_key, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_VOCABULARY, vocabulary, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_FEATURE_IDS, gene_ids.toString(), Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_CHILD_IDS, child_ids.toString(), Field.Store.YES, Field.Index.NO));
+		doc.add(new Field(IndexConstants.COL_UNIQUE_KEY, unique_key, Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field(IndexConstants.COL_OBJECT_TYPE, object_type, Field.Store.YES, Field.Index.UN_TOKENIZED));
 		return doc;
 	}
 
@@ -72,26 +59,8 @@ public class GenomeFeatureVocabDagLuceneDocBuilder extends AbstractLuceneDocBuil
 	 */
 
 	public String toString() {
-		return " Database Key: " + this.db_key + " Vocabulary: "
-				+ this.vocabulary
-				+ " Gene Ids: " + this.gene_ids + " Child Ids: "
-				+ this.child_ids + " Accession Id: " + this.acc_id;
+		return " Database Key: " + db_key + " Vocabulary: " + vocabulary + " Gene Ids: " + gene_ids + " Child Ids: " + child_ids + " Accession Id: " + acc_id;
 	}
-
-	// /**
-	// * Append to the contents field, we have some items that span multiple
-	// * rows in the database, this facilitates them.
-	// * @param contents
-	// */
-	//
-	// public void appendContents(String contents) {
-	// if (contents != null) {
-	// this.data = this.data + " " + contents;
-	// }
-	// else {
-	// this.hasError = true;
-	// }
-	// }
 
 	/**
 	 * Return the gene ids.
