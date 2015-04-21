@@ -73,7 +73,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		doProbes();
 		doAssays();
 		doAntibodies();
-		doAntigens();
 		doExperiments();
 		doImages();
 		doSequences();
@@ -301,61 +300,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		log.info("Done creating documents for antibodies!");
 		rs_anti.close();
-	}
-
-	/**
-	 * Gather the antigen data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doAntigens() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection.
-
-		// gather up the non private accession id's for anitgens.
-
-		String OTHER_ANTIGEN_SEARCH = "SELECT distinct a._Accession_key, "
-				+ "a.accID, a._Object_key, 'ANTIGEN' as _MGIType_key, "
-				+ "a.preferred" + " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 7";
-
-		// Gather the data
-
-		ResultSet rs_antigen = executor.executeMGD(OTHER_ANTIGEN_SEARCH);
-		rs_antigen.next();
-
-		log.info("Time taken gather antigen data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_antigen.isAfterLast()) {
-
-			builder.setType(rs_antigen.getString("_MGIType_key"));
-			builder.setData(rs_antigen.getString("accID"));
-			builder.setDb_key(rs_antigen.getString("_Object_key"));
-			builder.setAccessionKey(rs_antigen.getString("_Accession_key"));
-			builder.setPreferred(rs_antigen.getString("preferred"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_antigen.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for antigens!");
-		rs_antigen.close();
-
 	}
 
 	/**

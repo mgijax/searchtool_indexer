@@ -77,7 +77,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		doReferences();
 		doSequences();
 		doAntibodies();
-		doAntigens();
 		doExperiments();
 		doImages();
 		doAMA();
@@ -682,55 +681,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		rs_antibody.close();
 	}
 
-	/**
-	 * Gather the antigen data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doAntigens() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// gather up antigen key, type and name
-
-		String OTHER_ANTIGEN_DISPLAY_KEY = "select distinct _Antigen_key, '"
-				+ IndexConstants.OTHER_ANTIGEN
-				+ "' as type, antigenName from GXD_Antigen";
-
-		// Gather the data
-
-		ResultSet rs_antigen = executor.executeMGD(OTHER_ANTIGEN_DISPLAY_KEY);
-		rs_antigen.next();
-		log.info("Time taken gather antigen result set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_antigen.isAfterLast()) {
-
-			builder.setDb_key(rs_antigen.getString("_Antigen_key"));
-			builder.setDataType(rs_antigen.getString("type"));
-			builder.setName(rs_antigen.getString("antigenName"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_antigen.next();
-		}
-
-		// Clean up
-
-		log.info("Done Antigen!");
-		rs_antigen.close();
-	}
 
 	/**
 	 * Gather experiment data.
