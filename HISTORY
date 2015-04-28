@@ -1,3 +1,8 @@
+TAG: searchtool_indexer-5-2-2-2
+DATE: 04/28/2015
+STAFF: jsb
+CHANGES: removed handling of antigen IDs
+
 TAG: searchtool_indexer-5-2-2-1
 DATE: 04/20/2015
 STAFF: oblod
