@@ -51,8 +51,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 	// The single LuceneDocBuilder for this Object.
 
-	private OtherExactLuceneDocBuilder	builder				=
-																	new OtherExactLuceneDocBuilder();
+	private OtherExactLuceneDocBuilder	builder	= new OtherExactLuceneDocBuilder();
 
 	private ProviderHashMap				phm;
 
@@ -68,44 +67,36 @@ public class OtherExactGatherer extends DatabaseGatherer {
 	 */
 
 	public void runLocal() throws Exception {
+
+		//Generic Searches
+		doAccessionByType(IndexConstants.OTHER_GENOTYPE, "12", true);
+		doAccessionByType(IndexConstants.OTHER_REFERENCE, "1", true);
+		doAccessionByType(IndexConstants.OTHER_PROBE, "3", true);
+		doAccessionByType(IndexConstants.OTHER_ASSAY, "8", false);
+		doAccessionByType(IndexConstants.OTHER_ANTIBODY, "6", false);
+		doAccessionByType(IndexConstants.OTHER_EXPERIMENT, "4", false);
+		doAccessionByType(IndexConstants.OTHER_IMAGE, "9", false);		
+
+		// Custom Searches
 		doOrthologs();
-		doReferences();
-		doProbes();
-		doAssays();
-		doAntibodies();
-		doExperiments();
-		doImages();
 		doSequences();
 		doSequencesByProbe();
 		doAMA();
 	}
 
-	/**
-	 * Gather reference data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
+	public void doAccessionByType(String mgiTypeKey, String mgiTypeKeyId, boolean setProvider) throws SQLException, InterruptedException {
 
-	private void doReferences() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Gather up the non private accession ids for references.
-
-		String OTHER_REF_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
-				+ "a._Object_key, '" + IndexConstants.OTHER_REFERENCE
+		// If this query does not suit your needs create a custom query.
+		String OTHER_GENERIC_SEARCH = "SELECT distinct a._Accession_key, "
+				+ "a.accID, a._Object_key, '" + mgiTypeKey
 				+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
 				+ " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 1";
+				+ " where a.private != 1 and a._MGIType_key = " + mgiTypeKeyId;
 
-		// Gather the data
-
-		ResultSet rs_ref = executor.executeMGD(OTHER_REF_SEARCH);
+		ResultSet rs_ref = executor.executeMGD(OTHER_GENERIC_SEARCH);
 		rs_ref.next();
 
-		log.info("Time taken gather reference data set: "
-				+ executor.getTiming());
+		log.info("Time taken gather reference data set: " + executor.getTiming());
 
 		// Parse it
 
@@ -116,7 +107,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 			builder.setDb_key(rs_ref.getString("_Object_key"));
 			builder.setAccessionKey(rs_ref.getString("_Accession_key"));
 			builder.setPreferred(rs_ref.getString("preferred"));
-			builder.setProvider(phm.get(rs_ref.getString("_LogicalDB_key")));
+			if(setProvider) builder.setProvider(phm.get(rs_ref.getString("_LogicalDB_key")));
 
 			// Place the document on the stack.
 
@@ -132,284 +123,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done creating documents for references!");
+		log.info("Done creating documents for " + mgiTypeKey + "!");
 		rs_ref.close();
 	}
 
-	/**
-	 * Gather the probe data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
 
-	private void doProbes() throws SQLException, InterruptedException {
 
-		// SQL For this Subsection
 
-		// gather up the non private accession id's for probes.
-
-		String OTHER_PROBE_SEARCH = "SELECT distinct a._Accession_key, "
-				+ "a.accID, a._Object_key, '" + IndexConstants.OTHER_PROBE
-				+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
-				+ " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 3";
-
-		// Gather the data.
-
-		ResultSet rs_prb = executor.executeMGD(OTHER_PROBE_SEARCH);
-		rs_prb.next();
-
-		log.info("Time taken gather probe data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_prb.isAfterLast()) {
-
-			builder.setType(rs_prb.getString("_MGIType_key"));
-			builder.setData(rs_prb.getString("accID"));
-			builder.setDb_key(rs_prb.getString("_Object_key"));
-			builder.setAccessionKey(rs_prb.getString("_Accession_key"));
-			builder.setPreferred(rs_prb.getString("preferred"));
-			builder.setProvider(phm.get(rs_prb.getString("_LogicalDB_key")));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total
-						+ " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_prb.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for probes!");
-		rs_prb.close();
-	}
-
-	/**
-	 * Gather the assay data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doAssays() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection.
-
-		// gather up the non private accession ids for assays
-
-		String OTHER_ASSAY_SEARCH = "SELECT distinct a._Accession_key, "
-				+ "a.accID, a._Object_key, 'ASSAY' as _MGIType_key, "
-				+ "a.preferred" + " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 8";
-
-		// Gather the data
-
-		ResultSet rs_assay = executor.executeMGD(OTHER_ASSAY_SEARCH);
-		rs_assay.next();
-
-		log.info("Time taken gather assay data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_assay.isAfterLast()) {
-
-			builder.setType(rs_assay.getString("_MGIType_key"));
-			builder.setData(rs_assay.getString("accID"));
-			builder.setDb_key(rs_assay.getString("_Object_key"));
-			builder.setAccessionKey(rs_assay.getString("_Accession_key"));
-			builder.setPreferred(rs_assay.getString("preferred"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_assay.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for assays!");
-		rs_assay.close();
-
-	}
-
-	/**
-	 * Gather the antibody data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doAntibodies() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// gather up the non private accession id's for anitbodies.
-
-		String OTHER_ANTIBODY_SEARCH = "SELECT distinct a._Accession_key, "
-				+ "a.accID, a._Object_key, 'ANTIBODY' as _MGIType_key, "
-				+ "a.preferred" + " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 6";
-
-		// Gather the data
-
-		ResultSet rs_anti = executor.executeMGD(OTHER_ANTIBODY_SEARCH);
-		rs_anti.next();
-
-		log.info("Time taken gather antibody data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_anti.isAfterLast()) {
-
-			builder.setType(rs_anti.getString("_MGIType_key"));
-			builder.setData(rs_anti.getString("accID"));
-			builder.setDb_key(rs_anti.getString("_Object_key"));
-			builder.setAccessionKey(rs_anti.getString("_Accession_key"));
-			builder.setPreferred(rs_anti.getString("preferred"));
-
-			// Place the documents on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_anti.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for antibodies!");
-		rs_anti.close();
-	}
-
-	/**
-	 * Gather the experiment data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doExperiments() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Gather up the non private accession id's for experiments.
-
-		String OTHER_EXPERIMENT_SEARCH = "SELECT distinct a._Accession_key, "
-				+ " a.accID, a._Object_key, 'EXPERIMENT' as _MGIType_key,"
-				+ " a.preferred" + " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = 4";
-
-		// Gather the data
-
-		ResultSet rs_exp = executor.executeMGD(OTHER_EXPERIMENT_SEARCH);
-		rs_exp.next();
-
-		log.info("Time taken gather experiment data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_exp.isAfterLast()) {
-
-			builder.setType(rs_exp.getString("_MGIType_key"));
-			builder.setData(rs_exp.getString("accID"));
-			builder.setDb_key(rs_exp.getString("_Object_key"));
-			builder.setAccessionKey(rs_exp.getString("_Accession_key"));
-			builder.setPreferred(rs_exp.getString("preferred"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_exp.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for experiments!");
-		rs_exp.close();
-
-	}
-
-	/**
-	 * Gather the image data.
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-
-	private void doImages() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// Gather up the non private accession id's for images.
-
-		String OTHER_IMAGE_SEARCH = "SELECT distinct a._Accession_key,"
-				+ " a.accID, a._Object_key, 'IMAGE' as _MGIType_key,"
-				+ " a.preferred" + " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key =9";
-
-		// Gather the data.
-
-		ResultSet rs_image = executor.executeMGD(OTHER_IMAGE_SEARCH);
-		rs_image.next();
-
-		log.info("Time taken gather image data set: "
-				+ executor.getTiming());
-
-		// Parse it
-
-		while (!rs_image.isAfterLast()) {
-
-			builder.setType(rs_image.getString("_MGIType_key"));
-			builder.setData(rs_image.getString("accID"));
-			builder.setDb_key(rs_image.getString("_Object_key"));
-			builder.setAccessionKey(rs_image.getString("_Accession_key"));
-			builder.setPreferred(rs_image.getString("preferred"));
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-			rs_image.next();
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for images!");
-		rs_image.close();
-	}
 
 	/**
 	 * Gather the sequence data.
@@ -515,8 +235,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 			builder.setDb_key(rs_seq_by_probe.getString("_Object_key"));
 			builder.setAccessionKey(rs_seq_by_probe.getString("_Accession_key"));
 			builder.setPreferred(rs_seq_by_probe.getString("preferred"));
-			builder.setProvider(phm.get(rs_seq_by_probe
-					.getString("_LogicalDB_key")));
+			builder.setProvider(phm.get(rs_seq_by_probe.getString("_LogicalDB_key")));
 
 			// Place the document on the stack.
 
@@ -605,8 +324,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 			// This has a realized provider string, we add in the species.
 
-			builder.setProvider(phm.get(rs_orthologs.getString("_LogicalDB_key"))
-					+ " - " + InitCap.initCap(rs_orthologs.getString("commonName")));
+			builder.setProvider(phm.get(rs_orthologs.getString("_LogicalDB_key")) + " - " + InitCap.initCap(rs_orthologs.getString("commonName")));
 
 			// Place the document on the stack.
 
@@ -660,12 +378,10 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// gather the data
 
-		ResultSet rs_homologene =
-				executor.executeMGD(HOMOLOGENE_CLUSTER_SEARCH);
+		ResultSet rs_homologene = executor.executeMGD(HOMOLOGENE_CLUSTER_SEARCH);
 		rs_homologene.next();
 
-		log.info("Time taken to gather HomoloGene class id data set: "
-				+ executor.getTiming());
+		log.info("Time taken to gather HomoloGene class id data set: " + executor.getTiming());
 
 		// Parse it
 
@@ -675,12 +391,10 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 			builder.setType(IndexConstants.OTHER_HOMOLOGY);
 			builder.setData(rs_homologene.getString("HomoloGeneID"));
-
 			builder.setDb_key(rs_homologene.getString("HomoloGeneID"));
 			builder.setAccessionKey(rs_homologene.getString("_Accession_key"));
 			builder.setPreferred(rs_homologene.getString("preferred"));
-			builder.setProvider(
-					phm.get(rs_homologene.getString("_LogicalDB_key")));
+			builder.setProvider(phm.get(rs_homologene.getString("_LogicalDB_key")));
 
 			// Place the document on the stack.
 
@@ -730,8 +444,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		ResultSet rs_ama = executor.executeMGD(OTHER_AMA_SEARCH);
 		rs_ama.next();
 
-		log.info("Time taken gather ama data set: "
-				+ executor.getTiming());
+		log.info("Time taken gather ama data set: " + executor.getTiming());
 
 		// Parse it
 

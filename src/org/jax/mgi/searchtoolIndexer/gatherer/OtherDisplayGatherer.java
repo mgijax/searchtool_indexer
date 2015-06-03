@@ -76,10 +76,45 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		doAssays();
 		doReferences();
 		doSequences();
+		doGenoTypes();
 		doAntibodies();
 		doExperiments();
 		doImages();
 		doAMA();
+	}
+
+	private void doGenoTypes() throws SQLException, InterruptedException {
+		String OTHER_GENOTYPE_DISPLAY = "select _genotype_key, '" + IndexConstants.OTHER_GENOTYPE + "' as type from gxd_genotype";
+
+		ResultSet rs = executor.executeMGD(OTHER_GENOTYPE_DISPLAY);
+		rs.next();
+
+		log.info("Time taken gather probe result set: " + executor.getTiming());
+
+		// Parse it
+
+		while (!rs.isAfterLast()) {
+
+			builder.setDb_key(rs.getString("_genotype_key"));
+			builder.setDataType(rs.getString("type"));
+			builder.setName("Click Here <a href=\"\">Here</a> for more information.");
+
+			// Place the document on the stack.
+
+			documentStore.push(builder.getDocument());
+			total++;
+			if (total >= output_threshold) {
+				log.debug("We have now gathered " + total + " documents!");
+				output_threshold += output_incrementer;
+			}
+			builder.clear();
+			rs.next();
+		}
+
+		// Clean up
+
+		log.info("Done Probes!");
+		rs.close();
 	}
 
 	/**
@@ -105,8 +140,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		ResultSet rs = executor.executeMGD(OTHER_PROBE_DISPLAY_KEY);
 		rs.next();
 
-		log.info("Time taken gather probe result set: "
-				+ executor.getTiming());
+		log.info("Time taken gather probe result set: " + executor.getTiming());
 
 		// Parse it
 
