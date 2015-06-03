@@ -87,7 +87,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 	public void doAccessionByType(String mgiTypeKey, String mgiTypeKeyId, boolean setProvider) throws SQLException, InterruptedException {
 
 		// If this query does not suit your needs create a custom query.
-		String OTHER_GENERIC_SEARCH = "SELECT distinct a._Accession_key, "
+		String OTHER_GENERIC_SEARCH = "SELECT a._Accession_key, "
 				+ "a.accID, a._Object_key, '" + mgiTypeKey
 				+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
 				+ " FROM ACC_Accession a"
@@ -96,7 +96,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		ResultSet rs_ref = executor.executeMGD(OTHER_GENERIC_SEARCH);
 		rs_ref.next();
 
-		log.info("Time taken gather reference data set: " + executor.getTiming());
+		log.info("Time taken gather " + mgiTypeKey + " data set: " + executor.getTiming());
 
 		// Parse it
 
@@ -145,7 +145,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// gather up the non private accession id's for sequences, for mouse
 		// only sequences.
 
-		String OTHER_SEQ_SEARCH = "SELECT distinct a._Accession_key, a.accID,"
+		String OTHER_SEQ_SEARCH = "SELECT a._Accession_key, a.accID,"
 				+ " a._Object_key, '" + IndexConstants.OTHER_SEQUENCE
 				+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
 				+ " FROM ACC_Accession a, SEQ_Sequence s"
@@ -207,7 +207,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// sequences that these probes point at for non private accession ids
 		// where the organism is a mouse.
 
-		String OTHER_SEQ_BY_PROBE_SEARCH = "SELECT distinct a._Accession_key, "
+		String OTHER_SEQ_BY_PROBE_SEARCH = "SELECT a._Accession_key, "
 				+ " ac.accID, a._Object_key, 'SEQUENCE' as _MGIType_key,"
 				+ " a.preferred, ac._LogicalDB_key"
 				+ " FROM ACC_Accession a, SEQ_Sequence s,"
@@ -272,7 +272,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Get accession IDs for non-mouse markers involved in HomoloGene
 		// homology classes.
 
-		String OTHER_ORTHOLOG_SEARCH = "select distinct aa._Accession_key, "
+		String OTHER_ORTHOLOG_SEARCH = "select aa._Accession_key, "
 				+ " aa.accID, "
 				+ " mm._Marker_key, "
 				+ " 'ORTHOLOG' as _MGIType_key, "
@@ -361,7 +361,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Get accession IDs for the HomoloGene classes themselves.
 
 		String HOMOLOGENE_CLUSTER_SEARCH =
-				"select distinct aa._Accession_key, "
+				"select aa._Accession_key, "
 						+ " aa._Object_key, "
 						+ " 'HOMOLOGY' as _MGIType_key, "
 						+ " aa.preferred, "
@@ -431,7 +431,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather up the adult mouse anatomy term accession id's, only for the
 		// preferred accession id's
 
-		String OTHER_AMA_SEARCH = "SELECT distinct a._Accession_key, a.accID, "
+		String OTHER_AMA_SEARCH = "SELECT a._Accession_key, a.accID, "
 				+ "a._Object_key, 'AMA' as _MGIType_key, "
 				+ "a.preferred, a._LogicalDB_key"
 				+ " from acc_accession a, VOC_Term v"

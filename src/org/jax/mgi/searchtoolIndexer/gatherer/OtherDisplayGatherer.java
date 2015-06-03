@@ -287,7 +287,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// gather up sequence key, type and description
 
-		String OTHER_SEQ_DISPLAY_KEY = "select distinct _Sequence_key, '"
+		String OTHER_SEQ_DISPLAY_KEY = "select _Sequence_key, '"
 				+ IndexConstants.OTHER_SEQUENCE
 				+ "' as type, s.description, v1.term AS sequenceType"
 				+ " FROM SEQ_Sequence s, VOC_Term v1"
