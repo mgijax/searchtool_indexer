@@ -84,7 +84,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 	}
 
 	private void doGenoTypes() throws SQLException, InterruptedException {
-		String OTHER_GENOTYPE_DISPLAY = "select _genotype_key, '" + IndexConstants.OTHER_GENOTYPE + "' as type from gxd_genotype";
+		String OTHER_GENOTYPE_DISPLAY = "select gg._genotype_key, '" + IndexConstants.OTHER_GENOTYPE + "' as type, a.accid from gxd_genotype gg, acc_accession a where gg._genotype_key = a._object_key and a._mgitype_key = 12";
 
 		ResultSet rs = executor.executeMGD(OTHER_GENOTYPE_DISPLAY);
 		rs.next();
@@ -96,9 +96,10 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		while (!rs.isAfterLast()) {
 
 			builder.setDb_key(rs.getString("_genotype_key"));
+			builder.setData(rs.getString("accid"));
 			builder.setDataType(rs.getString("type"));
-			builder.setName("Click Here <a href=\"\">Here</a> for more information.");
-
+			builder.setName("Click \"MGI Genotype\" or more information about: Genotype " + rs.getString("accid"));
+			
 			// Place the document on the stack.
 
 			documentStore.push(builder.getDocument());
@@ -298,8 +299,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		ResultSet rs_seq = executor.executeMGD(OTHER_SEQ_DISPLAY_KEY);
 
 		rs_seq.next();
-		log.info("Time taken gather sequence result set: "
-				+ executor.getTiming());
+		log.info("Time taken gather sequence result set: " + executor.getTiming());
 
 		// Parse it
 
