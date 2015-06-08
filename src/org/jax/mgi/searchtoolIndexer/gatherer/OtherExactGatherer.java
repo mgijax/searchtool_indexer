@@ -147,13 +147,15 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// but only for genotypes which have phenotype or disease
 		// annotations
 
+		// note that most genotype IDs are flagged as private, so we
+		// must ignore the 'private' flag
+
 		String OTHER_GENOTYPE_SEARCH = "SELECT a._Accession_key, "
 			+ "a.accID, a._Object_key, '"
 			+ IndexConstants.OTHER_GENOTYPE
 			+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
 			+ " FROM ACC_Accession a"
-			+ " where a.private = 0 "
-			+ " and a._MGIType_key = 12 "
+			+ " where a._MGIType_key = 12 "
 			+ " and exists (select 1 from VOC_Annot va "
 			+ "   where va._AnnotType_key in (1002, 1005) "
 			+ "   and va._Object_key = a._Object_key)";
