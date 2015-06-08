@@ -1,6 +1,7 @@
 package org.jax.mgi.searchtoolIndexer.gatherer;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -83,22 +84,77 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		doAMA();
 	}
 
+	// get a mapping from each (String) genotype key to a String with the
+	// comma-separate marker symbols for its allele pairs.  Only includes
+	// genotypes with phenotype or disease annotations.
+	private Map<String,String> getMarkers()
+	    throws SQLException, InterruptedException {
+	        String MARKERS = "select distinct g._Genotype_key, m.symbol "
+		    + "from gxd_genotype g, gxd_allelegenotype gag, "
+		    + "  mrk_marker m "
+		    + "where g._Genotype_key = gag._Genotype_key "
+		    + "  and gag._Marker_key = m._Marker_key "
+		    + "order by g._Genotype_key, m.symbol";
+
+		ResultSet rs = executor.executeMGD(MARKERS);
+		rs.next();
+
+		Map<String,String> m = new HashMap<String,String>();
+
+		int mCt = 0;	// count of markers included in genotypes
+		int gCt = 0;	// count of genotypes
+
+		while (!rs.isAfterLast()) {
+		    String genotypeKey = rs.getString("_Genotype_key");
+		    String symbol = rs.getString("symbol");
+
+		    mCt++;
+
+		    if (m.containsKey(genotypeKey)) {
+			m.put(genotypeKey, m.get(genotypeKey) + ", " + symbol);
+		    } else {
+			m.put(genotypeKey, symbol);
+			gCt++;
+		    }
+		}
+		log.info("Got " + mCt + " markers in " + gCt + " genotypes");
+		return m;
+	}
+
 	private void doGenotypes() throws SQLException, InterruptedException {
-		String OTHER_GENOTYPE_DISPLAY = "select gg._genotype_key, '" + IndexConstants.OTHER_GENOTYPE + "' as type, a.accid from gxd_genotype gg, acc_accession a where gg._genotype_key = a._object_key and a._mgitype_key = 12";
+		Map<String,String> markers = getMarkers();
+
+		String OTHER_GENOTYPE_DISPLAY = "select gg._genotype_key, '"
+		    + IndexConstants.OTHER_GENOTYPE
+		    + "' as type, a.accid "
+		    + "from gxd_genotype gg, acc_accession a "
+		    + "where gg._genotype_key = a._object_key "
+		    + "  and a._mgitype_key = 12"
+		    + "  and exists (select 1 from voc_annot va "
+		    + "    where va._AnnotType_key in (1002,1005) "
+		    + "    and va._Object_key = gg._Genotype_key)";
 
 		ResultSet rs = executor.executeMGD(OTHER_GENOTYPE_DISPLAY);
 		rs.next();
 
 		log.info("Time taken gather genotype result set: " + executor.getTiming());
 
+		double startCount = total;
+
 		// Parse it
 
 		while (!rs.isAfterLast()) {
+			String genotypeKey = rs.getString("_Genotype_key");
 
-			builder.setDb_key(rs.getString("_genotype_key"));
+			builder.setDb_key(genotypeKey);
 			builder.setData(rs.getString("accid"));
 			builder.setDataType(rs.getString("type"));
-			builder.setName("Click \"MGI Genotype\" for more information about: Genotype " + rs.getString("accid"));
+
+			if (markers.containsKey(genotypeKey)) {
+			    builder.setName("Genotype contains alleles and/or transgenes of: " + markers.get(genotypeKey));
+			} else {
+			    builder.setName("Genotype " + rs.getString("accid"));
+			}
 			
 			// Place the document on the stack.
 
@@ -114,7 +170,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done Genotypes!");
+		log.info("Done Genotypes (" + (total - startCount) + ")!");
 		rs.close();
 	}
 

@@ -69,7 +69,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 	public void runLocal() throws Exception {
 
 		//Generic Searches
-		doAccessionByType(IndexConstants.OTHER_GENOTYPE, "12", true);
 		doAccessionByType(IndexConstants.OTHER_REFERENCE, "1", true);
 		doAccessionByType(IndexConstants.OTHER_PROBE, "3", true);
 		doAccessionByType(IndexConstants.OTHER_ASSAY, "8", false);
@@ -82,16 +81,18 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		doSequences();
 		doSequencesByProbe();
 		doAMA();
+		doGenotypes();
 	}
 
 	public void doAccessionByType(String mgiTypeKey, String mgiTypeKeyId, boolean setProvider) throws SQLException, InterruptedException {
 
 		// If this query does not suit your needs create a custom query.
 		String OTHER_GENERIC_SEARCH = "SELECT a._Accession_key, "
-				+ "a.accID, a._Object_key, '" + mgiTypeKey
-				+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
-				+ " FROM ACC_Accession a"
-				+ " where a.private != 1 and a._MGIType_key = " + mgiTypeKeyId;
+			+ "a.accID, a._Object_key, '" + mgiTypeKey
+			+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
+			+ " FROM ACC_Accession a"
+			+ " where a.private != 1 "
+			+ " and a._MGIType_key = " + mgiTypeKeyId;
 
 		ResultSet rs_ref = executor.executeMGD(OTHER_GENERIC_SEARCH);
 		rs_ref.next();
@@ -130,6 +131,72 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 
 
+
+	/**
+	 * Gather the genotype data.
+	 * 
+	 * @throws SQLException
+	 * @throws InterruptedException
+	 */
+
+	private void doGenotypes() throws SQLException, InterruptedException {
+
+		// SQL for this Subsection
+
+		// gather up the non private accession id's for genotypes --
+		// but only for genotypes which have phenotype or disease
+		// annotations
+
+		String OTHER_GENOTYPE_SEARCH = "SELECT a._Accession_key, "
+			+ "a.accID, a._Object_key, '"
+			+ IndexConstants.OTHER_GENOTYPE
+			+ "' as _MGIType_key, a.preferred, a._LogicalDB_key"
+			+ " FROM ACC_Accession a"
+			+ " where a.private = 0 "
+			+ " and a._MGIType_key = 12 "
+			+ " and exists (select 1 from VOC_Annot va "
+			+ "   where va._AnnotType_key in (1002, 1005) "
+			+ "   and va._Object_key = a._Object_key)";
+
+		// Gather the data.
+
+		ResultSet rs_geno = executor.executeMGD(OTHER_GENOTYPE_SEARCH);
+		rs_geno.next();
+
+		log.info("Time taken gather genotype data set: " + executor.getTiming());
+
+		double startCount = total;
+
+		// Parse it
+
+		while (!rs_geno.isAfterLast()) {
+
+			builder.setType(rs_geno.getString("_MGIType_key"));
+			builder.setData(rs_geno.getString("accID"));
+			builder.setDb_key(rs_geno.getString("_Object_key"));
+			builder.setAccessionKey(rs_geno.getString("_Accession_key"));
+			builder.setPreferred(rs_geno.getString("preferred"));
+			builder.setProvider(phm.get(rs_geno.getString("_LogicalDB_key")));
+
+			// Place the document on the stack.
+
+			documentStore.push(builder.getDocument());
+			builder.clear();
+			total++;
+			if (total >= output_threshold) {
+				log.debug("We have now gathered " + total + " documents!");
+				output_threshold += output_incrementer;
+			}
+
+			rs_geno.next();
+		}
+
+		// Clean up
+
+		log.info("Done creating " + (total - startCount)
+			+ " documents for genotypes!");
+		rs_geno.close();
+	}
 
 	/**
 	 * Gather the sequence data.
