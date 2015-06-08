@@ -94,6 +94,9 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		    + "  mrk_marker m "
 		    + "where g._Genotype_key = gag._Genotype_key "
 		    + "  and gag._Marker_key = m._Marker_key "
+		    + "  and exists (select 1 from voc_annot va "
+		    + "    where va._AnnotType_key in (1002,1005) "
+		    + "    and va._Object_key = g._Genotype_key) "
 		    + "order by g._Genotype_key, m.symbol";
 
 		ResultSet rs = executor.executeMGD(MARKERS);
