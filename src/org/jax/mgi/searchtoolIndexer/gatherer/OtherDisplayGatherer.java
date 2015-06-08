@@ -119,6 +119,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			m.put(genotypeKey, symbol);
 			gCt++;
 		    }
+		    rs.next();
 		}
 		log.info("Got " + mCt + " markers in " + gCt + " genotypes");
 		return m;
