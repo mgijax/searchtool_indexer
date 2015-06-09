@@ -155,7 +155,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			builder.setDataType(rs.getString("type"));
 
 			if (markers.containsKey(genotypeKey)) {
-			    builder.setName("Genotype contains: " + markers.get(genotypeKey));
+			    builder.setName("Involving: " + markers.get(genotypeKey));
 			} else {
 			    builder.setName("Genotype " + rs.getString("accid"));
 			}
