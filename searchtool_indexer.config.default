@@ -28,7 +28,4 @@ DB_DRIVER=org.postgresql.Driver
 
 CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/searchtool_indexer.jar:${MGI_JAVALIB}/core.jar:${LUCENECORE}:${LUCENESNOWBALL}:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
 
-MGD_JDBC_URL=${MGD_JDBC_URL_PUB}
-
 export CLASSPATH
-export MGD_JDBC_URL
