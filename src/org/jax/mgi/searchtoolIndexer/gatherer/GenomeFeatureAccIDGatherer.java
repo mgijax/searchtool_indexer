@@ -83,7 +83,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// not private, where its for the mouse, and the marker has not
 		// been withdrawn. Order to prefer lower logical databases.
 		// Lower half of union brings in all non-private seq IDs for
-		// sequences associated to markers.
+		// sequences associated to markers.  Exclude MyGene IDs, though.
 
 		String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, "
 			+ "    a._LogicalDB_key "
@@ -94,6 +94,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			+ "    AND m._Organism_key = 1"
 			+ "    AND m._Marker_Status_key != 2 "
 			+ "    AND m._Marker_Type_key != 12 "
+			+ "    AND a._LogicalDB_key != 178 "
 			+ "UNION "
 			+ "SELECT smc._Marker_key, a.accID, a._LogicalDB_key "
 			+ "FROM SEQ_Marker_Cache smc, "
@@ -271,6 +272,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ " and nm._Organism_key = o._Organism_key "
 				+ " and nm._Marker_Status_key != 2 "
 				+ " and nonmouse._Marker_key = aa._Object_key "
+				+ " and aa._LogicalDB_key != 178 "
 				+ " and aa._MGIType_key = 2 " + " and aa.private = 0";
 
 		// Gather the data
