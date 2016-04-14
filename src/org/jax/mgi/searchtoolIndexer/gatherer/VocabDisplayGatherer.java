@@ -13,24 +13,24 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * The vocab display gatherer is responsible for gathering all the possible
  * display information for our various vocabulary data sources. Like all
  * vocabulary related gatherers it is split into non AD and AD data sources.
- * 
+ *
  * This information is then used to populate the vocabDisplay index.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has An instance of the IndexCfg object, which is used to setup this object.
- * 
+ *
  * @does Upon being started this runs through a group of methods, each of which
  *       are responsible for gathering documents from a different accession id
  *       type.
- * 
+ *
  *       Each subprocess basically operates as follows:
- * 
+ *
  *       Gather the data for the specific sub type, parse it while creating
  *       Lucene documents and adding them to the stack.
- * 
+ *
  *       After it completes parsing, it cleans up its result sets, and exits.
- * 
+ *
  *       After all of these methods complete, we set gathering complete to true
  *       in the shared document stack and exit.
  */
@@ -68,7 +68,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 	 * Gather up all of the display information for non AD vocab terms. This is
 	 * by far the most complex thing we do in indexing, as such the code is
 	 * documented inline much more carefully.
-	 * 
+	 *
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
@@ -88,7 +88,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		// Gather EMAPS stage ranges
 		// Create a Hash of EMAPS stage names to term
 		HashMap<String, String> termToEmapsStageMap = new HashMap<String, String>();
-		String VOC_TERM_EMAPS_STAGE = "select _Term_key, stage from VOC_Term_EMAPS";
+		String VOC_TERM_EMAPS_STAGE = "select vte._Term_key, gts.stage from VOC_Term_EMAPS vte, GXD_TheilerStage gts where vte._Stage_key = gts._Stage_key";
 		ResultSet emaps_stage_rs = executor.executeMGD(VOC_TERM_EMAPS_STAGE);
 		while (emaps_stage_rs.next()) {
 			termToEmapsStageMap.put(emaps_stage_rs.getString("_Term_key"), "TS" + emaps_stage_rs.getString("stage"));

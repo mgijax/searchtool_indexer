@@ -11,18 +11,18 @@ import org.jax.mgi.shr.searchtool.IndexConstants;
  * This class is responsible for gatherings up the relationiships between a
  * given vocabulary term, and the markers that are directly annotated to it. We
  * also gather up the parent/child relationships for a given term.
- * 
+ *
  * This information is then used to populate the markerVocabDag index.
- * 
+ *
  * @author mhall
- * 
+ *
  * @has An instance of the IndexCfg object, which is used to setup this object.
- * 
+ *
  * @does Upon being started, it begins gathering up its needed data components.
  *       Each component basically makes a call to the database and then starts
  *       parsing through its result set. For each record, we generate a Lucene
  *       document, and place it on the shared stack.
- * 
+ *
  *       After all of the components are finished, we notify the stack that
  *       gathering is complete, clean up our jdbc connections and exit.
  */
@@ -46,7 +46,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 * Gather up all of the display information for non AD vocab terms. We do
 	 * this individually for each vocabulary type, so if requirements change for
 	 * any specific type, we can change them independently.
-	 * 
+	 *
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
@@ -101,9 +101,9 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		doSingleNonADVocab(vsGO);
 
-		
+
 		// For now EMAPA results are not returned oblod 1/23/2014
-		
+
 		log.info("Collecting EMAPS Records!");
 
 		// Gather term key, term, accession id, and vocabulary name for EMAPS
@@ -119,40 +119,56 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		// Gather the marker keys for given emaps terms.
 
-//		String EMAPS_MARKER_DISPLAY_KEY = "select distinct _Term_key,"
-//				+ " _Marker_key " + "from VOC_Marker_Cache"
-//				+ " where annotType = 'EMAPS'"
-//				+ " order by _Term_key";
-		
 		// The expression flag in the GXD_Expression table includes "Ambiguous Results"
 		// This query takes the GXD Expression and removes the ambiguous results via the gisr._Strength_key in (2, 4, 5, 6, 7, 8)
 		// Select * from GXD_Strength to get a list of Strength's
 		// This query also uses the new EMAPS_Mapping table to get only id's of AD terms that are mapped to EMAPS terms
 		// This query also has to look at Insitu results and at GelLane results
-		
+
 		String EMAPS_MARKER_DISPLAY_KEY = "select"
-			+ " distinct ge._Marker_key as _Marker_key, ac2._Object_key as _Term_key"
-			+ "	from MRK_Marker mm, GXD_Expression ge, GXD_Assay ga, GXD_Specimen gs, GXD_InSituResult gisr, GXD_ISResultStructure girs, ACC_Accession ac1, MGI_EMAPS_Mapping mem, ACC_Accession ac2"
-			+ " where ge._Marker_key = mm._Marker_key and mm._Marker_Status_key != 2 and ge.expressed = 1 and ge.isForGXD = 1 and"
-			+ " ge._Marker_key = ga._Marker_key and ga._Assay_key = gs._Assay_key and gs._Specimen_key = gisr._Specimen_key and"
-			+ " gisr._Result_key = girs._Result_key and gisr._Strength_key in (2, 4, 5, 6, 7, 8) and girs._Structure_key = ge._Structure_key and"
-			+ " ge._Structure_key = ac1._Object_key and ac1._MGIType_key = 38 and ac1.accid = mem.accid and mem.emapsid = ac2.accid and ac2._MGIType_key = 13"
+			+ " distinct ge._Marker_key as _Marker_key, vts._Term_key as _Term_key "
+			+ " from  MRK_Marker mm, GXD_Expression ge, GXD_Assay ga, "
+			+ "  GXD_Specimen gs, GXD_InSituResult gisr, "
+			+ "  GXD_ISResultStructure girs, VOC_Term_EMAPS vts "
+			+ " where ge._Marker_key = mm._Marker_key "
+			+ "   and mm._Marker_Status_key != 2 "
+			+ "   and ge.expressed = 1 "
+			+ "   and ge.isForGXD = 1 "
+			+ "   and ge._Marker_key = ga._Marker_key "
+			+ "   and ga._Assay_key = gs._Assay_key "
+			+ "   and gs._Specimen_key = gisr._Specimen_key "
+			+ "   and gisr._Result_key = girs._Result_key "
+			+ "   and gisr._Strength_key in (2, 4, 5, 6, 7, 8) "
+			+ "   and girs._EMAPA_Term_key = ge._EMAPA_Term_key "
+			+ "   and girs._Stage_key = ge._Stage_key "
+			+ "   and ge._EMAPA_Term_key = vts._EMAPA_Term_key "
+			+ "   and ge._Stage_key = vts._Stage_key "
 			+ " union"
-			+ " select"
-			+ " distinct ge._Marker_key as _Marker_key, ac2._Object_key as _Term_key"
-			+ " from MRK_Marker mm, GXD_Expression ge, GXD_Assay ga, GXD_GelLane ggl, GXD_GelLaneStructure ggs, GXD_GelBand gb, ACC_Accession ac1, MGI_EMAPS_Mapping mem, ACC_Accession ac2"
-			+ " where ge._Marker_key = mm._Marker_key and mm._Marker_Status_key != 2 and ge.expressed = 1 and ge.isForGXD = 1 and"
-			+ " ge._Marker_key = ga._Marker_key and ga._Assay_key = ggl._Assay_key and ggl._GelLane_key = gb._GelLane_key and"
-			+ " gb._Strength_key in (2, 4, 5, 6, 7, 8) and ggl._GelLane_key = ggs._GelLane_key and ge._Structure_key = ggs._Structure_key and"
-			+ " ge._Structure_key = ac1._Object_key and ac1._MGIType_key = 38 and ac1.accid = mem.accid and mem.emapsid = ac2.accid and ac2._MGIType_key = 13"
-			+ " order by _Term_key";
+			+ " select distinct "
+			+ "  ge._Marker_key as _Marker_key, vts._Term_key as _Term_key "
+			+ " from MRK_Marker mm, GXD_Expression ge, GXD_Assay ga, GXD_GelLane ggl,"
+			+ "  GXD_GelLaneStructure ggs, GXD_GelBand gb, VOC_Term_EMAPS vts "
+			+ " where ge._Marker_key = mm._Marker_key "
+			+ "  and mm._Marker_Status_key != 2 "
+			+ "  and ge.expressed = 1 "
+			+ "  and ge.isForGXD = 1 "
+			+ "  and ge._Marker_key = ga._Marker_key "
+			+ "  and ga._Assay_key = ggl._Assay_key "
+			+ "  and ggl._GelLane_key = gb._GelLane_key "
+			+ "  and gb._Strength_key in (2, 4, 5, 6, 7, 8) "
+			+ "  and ggl._GelLane_key = ggs._GelLane_key "
+			+ "  and ge._EMAPA_Term_key = ggs._EMAPA_Term_key "
+			+ "  and ge._Stage_key = ggs._Stage_key "
+			+ "  and ge._EMAPA_Term_key = vts._EMAPA_Term_key "
+			+ "  and ge._Stage_key = vts._Stage_key "
+			+ "  order by _Term_key ";
 
 
 		vsEMAPS.setDisplay_key(EMAPS_MARKER_DISPLAY_KEY);
 
 		// Gather the dag for a given emaps term.
 
-		
+
 		String EMAPS_DAG_KEY = "select dc._AncestorObject_key,"
 				+ " dc._DescendentObject_key"
 				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, VOC_Term vt"
@@ -167,8 +183,8 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsEMAPS.setObject_type("MARKER");
 
 		doSingleNonADVocab(vsEMAPS);
-		
-		
+
+
 		log.info("Collecting MP Records!");
 
 		// Gather term key, term, accession id, and vocabulary name for MP
@@ -401,12 +417,12 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
 		String OMIM_HUMAN_MARKER_DISPLAY_KEY =
-			
+
 			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
-			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " + 
+			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
 			"hcm._cluster_key = mc._cluster_key and mc._ClusterSource_key = 13764519 and mc._ClusterType_key = 9272150 and mc._cluster_key = mcm._cluster_key and " +
 			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key in (1,3) order by a._Term_key";
-		
+
 //				" select distinct m._Marker_key, a._Term_key "
 //						+ "from VOC_Annot a, MRK_Cluster mc, MRK_ClusterMember mcm, "
 //						+ "  MRK_ClusterMember mcm2, VOC_Term vt, MRK_Marker m "
@@ -421,10 +437,10 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 //						+ " and mcm2._Marker_key = m._Marker_key "
 //						+ " and m._Organism_key = 1 "
 //						+ "order by a._Term_key";
-		
-		
 
-		
+
+
+
 
 		vsOrtho.setDisplay_key(OMIM_HUMAN_MARKER_DISPLAY_KEY);
 		vsOrtho.setObject_type("MARKER");
@@ -440,7 +456,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 * method assumes that it will be given three sql strings, one to define the
 	 * term itself, one to define the set of markers to assign to terms for a
 	 * given vocabulary, and one to define the children of the given term.
-	 * 
+	 *
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
@@ -541,5 +557,5 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			child_rs.close();
 		}
 	}
-	
+
 }
