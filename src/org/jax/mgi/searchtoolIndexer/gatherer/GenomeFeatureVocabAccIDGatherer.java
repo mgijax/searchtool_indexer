@@ -9,29 +9,22 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gathering up any information that we need to
+ * This class is responsible for gathering data needed to
  * generate the markerAccID index.
- * 
- * 
- * @author mhall
  * 
  * @has An instance of the IndexCfg object, which is used to setup this object.
  * 
- * @does Upon being started, it begins gathering up its needed data components.
- *       Each component basically makes a call to the database and then starts
- *       parsing through its result set. For each record, we generate a Lucene
- *       document, and place it on the shared stack.
+ * @does Gathers required data by calling the database, parsing results set,
+ * 		generating a Lucene document, and placing it on the shared stack.
  * 
  *       After all of the components are finished, we notify the stack that
- *       gathering is complete, clean up our jdbc connections and exit.
+ *       gathering is complete, clean up jdbc connections, and exit.
  */
 
 public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 
 	// Class Variables
-
 	private GenomeFeatureVocabAccIDLuceneDocBuilder builder = new GenomeFeatureVocabAccIDLuceneDocBuilder();
-
 	private HashMap<String, String> providerMap = new HashMap<String, String>();
 
 	public GenomeFeatureVocabAccIDGatherer(IndexCfg config) {
@@ -52,7 +45,8 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
-
+		providerMap.put(IndexConstants.PROTEIN_ISOFORM_NAME, "Protein Isoform Ontology");
+			
 	}
 
 	public void runLocal() throws Exception {
@@ -74,6 +68,18 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		// As long as the column names remain the same, the SQL for any
 		// given vocabulary can move independently of each other.
 
+		log.info("Collecting Protein Isoform Ontology Accession ID's");
+
+		// Gather up protein isoform ontology accession ID's ignoring ID's that are obsolete.
+
+		String PROT_ISOFORM_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
+				+ " tv.term"
+				+ " from VOC_Term_View tv"
+				+ " where isObsolete != 1 and _Vocab_key = 112";
+
+		doVocabAccessionID(PROT_ISOFORM_ACCID_KEY);
+
+		
 		log.info("Collecting EMAPS Accession ID's");
 
 		// Gather up the emaps accession ID's, ignoring ID's that are obsolete.
@@ -86,6 +92,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " 'EMAPS'";
 
 		doVocabAccessionID(EMAPS_ACCID_KEY);
+
 
 //		log.info("Collecting EMAPA Accession ID's");
 //
@@ -152,6 +159,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 
 		doVocabAccessionID(INTERPRO_ACCID_KEY);
 
+
 		log.info("Collecting PIRSF Accession ID's");
 
 		// Gather up pirsf accession ID's ignoring ID's that are obsolete.
@@ -164,7 +172,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " 'PIRSF/Marker'";
 
 		doVocabAccessionID(PIRSF_ACCID_KEY);
-
+		
 		log.info("Collecting OMIM Accession ID's");
 
 		// Gather up omim non human accession ID's, ignoring ID's that are
@@ -216,9 +224,23 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 
 		log.info("Time taken gather result set: " + executor.getTiming());
 
+		String foo = rs_acc_id.getString("vocabName");
+		log.info("StringLen " + foo.length() );
+		
+		
+		log.info("entireMap " + providerMap );
+		log.info("accid " + rs_acc_id.getString("accId"));
+		log.info("vocabName " + rs_acc_id.getString("vocabName"));
+		log.info("providerMap vocabName" + providerMap.get(rs_acc_id.getString("vocabName")));
+		
+		
+		
+		
+		
 		// Parse it
 
 		while (!rs_acc_id.isAfterLast()) {
+
 			builder.setData(rs_acc_id.getString("accId"));
 			builder.setRaw_data(rs_acc_id.getString("term"));
 			builder.setDb_key(rs_acc_id.getString("_Term_key"));

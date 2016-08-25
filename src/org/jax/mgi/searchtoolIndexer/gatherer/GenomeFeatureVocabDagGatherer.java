@@ -300,6 +300,35 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		doSingleNonADVocab(vsInterpro);
 
+		
+		// PROTIEN ISOFORM ONTOLOGY
+
+		log.info("Collecting Protien Isoform Ontology Records!");
+
+		// Gather term key, term, accession id, and vocabulary
+
+		VocabSpec vsProtIso = new VocabSpec();
+
+		String PROT_ISO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
+				+ " tv.vocabName"
+				+ " FROM VOC_Term_View tv"
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 112"
+				+ " order by _Term_key";
+
+		vsProtIso.setVoc_key(PROT_ISO_VOC_KEY);
+
+		// Gather the marker keys for given pirsf terms.
+
+		String PROT_ISO__MARKER_DISPLAY_KEY = "select distinct _Term_key,"
+				+ " _Marker_key " + "from VOC_Marker_Cache"
+				+ " where annotType = 'Protein Isoform Ontology/Marker'" + " order by _Term_key";
+
+		vsProtIso.setDisplay_key(PROT_ISO__MARKER_DISPLAY_KEY);
+		vsProtIso.setObject_type("MARKER");
+
+		doSingleNonADVocab(vsProtIso);
+
+
 		// PIRSF
 
 		log.info("Collecting PIRSF Records!");

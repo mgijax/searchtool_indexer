@@ -58,6 +58,8 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.AD_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
+		providerMap.put(IndexConstants.PROTEIN_ISOFORM_NAME, "Protein Isoform Ontology");
+
 	}
 
 	public void runLocal() throws Exception {
@@ -171,7 +173,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		String GEN_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
 				+ " tv.vocabName" + " FROM VOC_Term_View tv"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key in "
-				+ "(44, 4, 5, 8, 46, 90, 91)" + " order by _Term_key";
+				+ "(44, 4, 5, 8, 46, 90, 91, 112)" + " order by _Term_key";
 
 		ResultSet rs_vocabTerm = executor.executeMGD(GEN_VOC_KEY);
 
