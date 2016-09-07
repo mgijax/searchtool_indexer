@@ -70,7 +70,7 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 				+ "ml._Label_Status_key, ml.labelTypeName"
 				+ " from MRK_Label ml, MRK_Marker m"
 				+ " where ml._Organism_key = 1 and ml._Marker_key = "
-				+ "m._Marker_key and m._Marker_Status_key !=2 ";
+				+ "m._Marker_key and m._Marker_Status_key = 1 ";
 
 		// Gather the data
 

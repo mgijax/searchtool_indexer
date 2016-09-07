@@ -81,7 +81,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 				+ " ml.labelTypeName, ml._Label_Status_key," + " ml._Label_key"
 				+ " from MRK_Label ml, MRK_Marker m"
 				+ " where  ml._Organism_key = 1 and ml._Marker_key = "
-				+ "m._Marker_key and m._Marker_Status_key !=2"
+				+ "m._Marker_key and m._Marker_Status_key = 1 "
 				+ "and ml.labelType in ('MS', 'OS') "
 				+ " and m._Marker_Type_key != 12";
 

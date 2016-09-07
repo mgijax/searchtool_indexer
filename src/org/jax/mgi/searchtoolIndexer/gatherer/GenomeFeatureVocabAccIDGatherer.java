@@ -45,7 +45,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
-		providerMap.put(IndexConstants.PROTEIN_ISOFORM_NAME, "Protein Isoform Ontology");
+		providerMap.put(IndexConstants.PROTEOFORM_NAME, "Proteoform");
 			
 	}
 
@@ -68,16 +68,16 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		// As long as the column names remain the same, the SQL for any
 		// given vocabulary can move independently of each other.
 
-		log.info("Collecting Protein Isoform Ontology Accession ID's");
+		log.info("Collecting PROTEOFORM Accession ID's");
 
-		// Gather up protein isoform ontology accession ID's ignoring ID's that are obsolete.
+		// Gather PROTEOFORM accession ID's ignoring ID's that are obsolete.
 
-		String PROT_ISOFORM_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
+		String PROTEOFORM_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
 				+ " tv.term"
 				+ " from VOC_Term_View tv"
 				+ " where isObsolete != 1 and _Vocab_key = 112";
 
-		doVocabAccessionID(PROT_ISOFORM_ACCID_KEY);
+		doVocabAccessionID(PROTEOFORM_ACCID_KEY);
 
 		
 		log.info("Collecting EMAPS Accession ID's");
@@ -223,19 +223,10 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		rs_acc_id.next();
 
 		log.info("Time taken gather result set: " + executor.getTiming());
-
-		String foo = rs_acc_id.getString("vocabName");
-		log.info("StringLen " + foo.length() );
-		
-		
-		log.info("entireMap " + providerMap );
-		log.info("accid " + rs_acc_id.getString("accId"));
-		log.info("vocabName " + rs_acc_id.getString("vocabName"));
-		log.info("providerMap vocabName" + providerMap.get(rs_acc_id.getString("vocabName")));
-		
-		
-		
-		
+		//log.info("entireMap " + providerMap );
+		//log.info("accid " + rs_acc_id.getString("accId"));
+		//log.info("vocabName " + rs_acc_id.getString("vocabName"));
+		//log.info("providerMap vocabName" + providerMap.get(rs_acc_id.getString("vocabName")));
 		
 		// Parse it
 

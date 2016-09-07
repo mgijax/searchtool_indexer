@@ -58,7 +58,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.AD_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
-		providerMap.put(IndexConstants.PROTEIN_ISOFORM_NAME, "Protein Isoform Ontology");
+		providerMap.put(IndexConstants.PROTEOFORM_NAME, "Proteoform");
 
 	}
 

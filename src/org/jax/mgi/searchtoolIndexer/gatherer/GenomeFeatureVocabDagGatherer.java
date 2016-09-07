@@ -131,7 +131,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			+ "  GXD_Specimen gs, GXD_InSituResult gisr, "
 			+ "  GXD_ISResultStructure girs, VOC_Term_EMAPS vts "
 			+ " where ge._Marker_key = mm._Marker_key "
-			+ "   and mm._Marker_Status_key != 2 "
+			+ "   and mm._Marker_Status_key = 1 "
 			+ "   and ge.expressed = 1 "
 			+ "   and ge.isForGXD = 1 "
 			+ "   and ge._Marker_key = ga._Marker_key "
@@ -149,7 +149,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			+ " from MRK_Marker mm, GXD_Expression ge, GXD_Assay ga, GXD_GelLane ggl,"
 			+ "  GXD_GelLaneStructure ggs, GXD_GelBand gb, VOC_Term_EMAPS vts "
 			+ " where ge._Marker_key = mm._Marker_key "
-			+ "  and mm._Marker_Status_key != 2 "
+			+ "  and mm._Marker_Status_key = 1 "
 			+ "  and ge.expressed = 1 "
 			+ "  and ge.isForGXD = 1 "
 			+ "  and ge._Marker_key = ga._Marker_key "
@@ -301,32 +301,32 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		doSingleNonADVocab(vsInterpro);
 
 		
-		// PROTIEN ISOFORM ONTOLOGY
+		// PROTEOFORM ONTOLOGY
 
-		log.info("Collecting Protien Isoform Ontology Records!");
+		log.info("Collecting PROTEOFORM Records!");
 
 		// Gather term key, term, accession id, and vocabulary
 
-		VocabSpec vsProtIso = new VocabSpec();
+		VocabSpec vsProteoform = new VocabSpec();
 
-		String PROT_ISO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
+		String PROTEOFORM_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
 				+ " tv.vocabName"
 				+ " FROM VOC_Term_View tv"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key = 112"
 				+ " order by _Term_key";
 
-		vsProtIso.setVoc_key(PROT_ISO_VOC_KEY);
+		vsProteoform.setVoc_key(PROTEOFORM_VOC_KEY);
 
 		// Gather the marker keys for given pirsf terms.
 
-		String PROT_ISO__MARKER_DISPLAY_KEY = "select distinct _Term_key,"
+		String PROTEOFORM__MARKER_DISPLAY_KEY = "select distinct _Term_key,"
 				+ " _Marker_key " + "from VOC_Marker_Cache"
-				+ " where annotType = 'Protein Isoform Ontology/Marker'" + " order by _Term_key";
+				+ " where annotType = 'Proteoform/Marker'" + " order by _Term_key";
 
-		vsProtIso.setDisplay_key(PROT_ISO__MARKER_DISPLAY_KEY);
-		vsProtIso.setObject_type("MARKER");
+		vsProteoform.setDisplay_key(PROTEOFORM__MARKER_DISPLAY_KEY);
+		vsProteoform.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsProtIso);
+		doSingleNonADVocab(vsProteoform);
 
 
 		// PIRSF
@@ -450,25 +450,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
 			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
 			"hcm._cluster_key = mc._cluster_key and mc._ClusterSource_key = 13764519 and mc._ClusterType_key = 9272150 and mc._cluster_key = mcm._cluster_key and " +
-			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key in (1,3) order by a._Term_key";
-
-//				" select distinct m._Marker_key, a._Term_key "
-//						+ "from VOC_Annot a, MRK_Cluster mc, MRK_ClusterMember mcm, "
-//						+ "  MRK_ClusterMember mcm2, VOC_Term vt, MRK_Marker m "
-//						+ "where mcm._Marker_key = a._Object_key "
-//						+ " and a._AnnotType_key = 1006 "
-//						+ " and m.symbol not like 'tg%cre%' "
-//						+ " and mc._ClusterSource_key = vt._Term_key "
-//						+ " and vt.term = 'HomoloGene and HGNC' "
-//						+ " and m._Marker_Status_key != 2 "
-//						+ " and mcm._Cluster_key = mc._Cluster_key "
-//						+ " and mc._Cluster_key = mcm2._Cluster_key "
-//						+ " and mcm2._Marker_key = m._Marker_key "
-//						+ " and m._Organism_key = 1 "
-//						+ "order by a._Term_key";
-
-
-
+			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key = 1 order by a._Term_key";
 
 
 		vsOrtho.setDisplay_key(OMIM_HUMAN_MARKER_DISPLAY_KEY);
