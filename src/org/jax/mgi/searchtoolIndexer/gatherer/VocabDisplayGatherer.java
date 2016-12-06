@@ -53,7 +53,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
 		providerMap.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
 		providerMap.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
-		providerMap.put(IndexConstants.OMIM_TYPE_NAME, "Disease");
+		providerMap.put(IndexConstants.DO_DATABASE_TYPE, "Disease");
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.AD_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
@@ -173,7 +173,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		String GEN_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
 				+ " tv.vocabName" + " FROM VOC_Term_View tv"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key in "
-				+ "(44, 4, 5, 8, 46, 90, 91, 112)" + " order by _Term_key";
+				+ "(125, 4, 5, 8, 46, 90, 91, 112)" + " order by _Term_key";
 
 		ResultSet rs_vocabTerm = executor.executeMGD(GEN_VOC_KEY);
 
@@ -234,13 +234,13 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 			}
 
 			// Set the annotation counts, and in the case of non human
-			// omim, the secondary object counts.
+			// DO (Disease Ontology), the secondary object counts.
 
 			HashMap<String, HashMap<String, String>> annotations = termToAnnotationsCountMap.get(rs_vocabTerm.getString("_Term_key"));
 			if (annotations != null) {
 				for(String key: annotations.keySet()) {
 					HashMap<String, String> typeMap = annotations.get(key);
-					if (!builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) || (builder.getVocabulary().equals(IndexConstants.OMIM_TYPE_NAME) && "12".equals(key))) {
+					if (!builder.getVocabulary().equals(IndexConstants.DO_DATABASE_TYPE) || (builder.getVocabulary().equals(IndexConstants.DO_DATABASE_TYPE) && "12".equals(key))) {
 						builder.setAnnotation_object_type(key);
 						builder.setAnnotation_objects(typeMap.get("objectCount"));
 						builder.setAnnotation_count(typeMap.get("annotCount"));

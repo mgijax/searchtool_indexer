@@ -73,8 +73,28 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		// all the other vocabs could be add to index all ALT ids
 		String VOC_ACCID_KEY = "select _Term_key, accId, vocabName "
 				+ "from VOC_Term_View where isObsolete != 1 "
-				+ "and _Vocab_key in (44, 4, 5, 8, 46, 90, 91) "
+				+ "and _Vocab_key in (125, 4, 5, 8, 46, 90, 91) "
 				
+				+ "union "
+				
+				// secondary DO terms from any provider
+				
+				+ "select vtv._Term_key, a.accId, 'Disease Ontology' as vocabName "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				+ "and a.preferred = 0"
+
+				+ "union "
+				
+				// add in numeric-only version of OMIM IDs for DO terms
+				
+				+ "select vtv._Term_key, a.numericPart::text, 'Disease Ontology' as vocabName "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				+ "and a.preferred = 0 and a._LogicalDB_key = 15 "
+
 				+ "union "
 				
 				+ "select vtv._Term_key, a.accId, 'Mammalian Phenotype' as vocabName "
@@ -114,12 +134,6 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 			builder.setRaw_data(rs_acc_id.getString("accId"));
 			builder.setDb_key(rs_acc_id.getString("_Term_key"));
 			builder.setVocabulary(rs_acc_id.getString("vocabName"));
-
-			// Omim terms have a provider which must be displayed.
-
-			if (rs_acc_id.getString("vocabName").equals(IndexConstants.OMIM_TYPE_NAME)) {
-				builder.setProvider("(OMIM)");
-			}
 			builder.setDataType(IndexConstants.ACCESSION_ID);
 			builder.setDisplay_type(providerMap.get(IndexConstants.ACCESSION_ID));
 

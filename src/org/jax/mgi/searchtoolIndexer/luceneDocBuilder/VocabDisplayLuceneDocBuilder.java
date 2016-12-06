@@ -402,19 +402,19 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 
 		String annot_display = "";
 
-		// If its omim, we will calculate the number of mouse models
+		// If its DO (Disease Ontology), we will calculate the number of mouse models
 
-		if (vocabulary.equals(IndexConstants.OMIM_TYPE_NAME)) {
+		if (vocabulary.equals(IndexConstants.DO_DATABASE_TYPE)) {
 			if (!annotation_count.equals("0")) {
-				annot_display = annotation_count + " mouse model";
-				if (!annotation_count.equals("1")) {
+				annot_display = annotation_objects + " mouse model";
+				if (!annotation_objects.equals("1")) {
 					annot_display += "s";
 				}
 			}
 		} else if (vocabulary.equals(IndexConstants.GO_TYPE_NAME)) {
 			if (!annotation_count.equals("0")) {
 				annot_display = annotation_objects + " gene";
-				if (!annotation_count.equals("1")) {
+				if (!annotation_objects.equals("1")) {
 					annot_display += "s";
 				}
 				annot_display += ", " + annotation_count + " annotation";
@@ -425,7 +425,7 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		} else if (vocabulary.equals(IndexConstants.INTERPRO_TYPE_NAME)) {
 			if (!annotation_count.equals("0")) {
 				annot_display = annotation_objects + " gene";
-				if (!annotation_count.equals("1")) {
+				if (!annotation_objects.equals("1")) {
 					annot_display += "s";
 				}
 				annot_display += ", " + annotation_count + " annotation";
@@ -436,7 +436,7 @@ public class VocabDisplayLuceneDocBuilder extends AbstractLuceneDocBuilder {
 		} else if (vocabulary.equals(IndexConstants.PIRSF_TYPE_NAME)) {
 			if (!annotation_count.equals("0")) {
 				annot_display = annotation_objects + " gene";
-				if (!annotation_count.equals("1")) {
+				if (!annotation_objects.equals("1")) {
 					annot_display += "s";
 				}
 			}

@@ -77,11 +77,11 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// gather up vocab term, that are not obsolete for all vocabs but ad.
-		// Currently this list includes: GO, MP, OMIM, InterPro, and PIRSF
+		// Currently this list includes: GO, MP, Disease Ontology (DO), InterPro, and PIRSF
 
 		String VOC_TERM_KEY = "select _Term_key, term, vocabName"
 				+ " from VOC_Term_View"
-				+ " where isObsolete != 1 and _Vocab_key in (44, 4, 5, 8, 46, 90)";
+				+ " where isObsolete != 1 and _Vocab_key in (125, 4, 5, 8, 46, 90)";
 
 		// Gather the data
 
@@ -125,12 +125,12 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// Gather up vocab synonyms for all vocabularies with the exception of
 		// AD.
 
-		// Currently this list includes: GO, MP, OMIM, Interpro and PIRSF
+		// Currently this list includes: GO, MP, Disease Ontology (DO), Interpro and PIRSF
 
 		String VOC_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName"
 				+ " from VOC_Term_View tv, MGI_Synonym s"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1 "
-				+ "and tv._Vocab_key in (44, 4, 5, 8, 46, 90)"
+				+ "and tv._Vocab_key in (125, 4, 5, 8, 46, 90)"
 				+ " and s._MGIType_key = 13 ";
 
 		// gather the data
@@ -176,14 +176,14 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// Gather up the vocabulary notes for all vocabs except for AD.
-		// Currently this list includes: GO, MP, OMIM, PIRSH and Interpro.
+		// Currently this list includes: GO, MP, Disease Ontology (DO), PIRSH and Interpro.
 		// This list is sorted in sequence order, so the notes can be
 		// reconstructed in the lucene document
 
 		String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
 				+ " from VOC_Term_View tv, VOC_text t"
 				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-				+ "and tv._Vocab_key in (44, 4, 5, 8, 46, 90)"
+				+ "and tv._Vocab_key in (125, 4, 5, 8, 46, 90)"
 				+ " order by tv._Term_key, t.sequenceNum";
 
 		// Gather the data
