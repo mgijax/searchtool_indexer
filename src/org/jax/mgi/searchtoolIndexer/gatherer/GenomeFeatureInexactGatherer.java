@@ -64,8 +64,8 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
 		providerMap.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
 		providerMap.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
-		providerMap.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
-		providerMap.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
+		providerMap.put(IndexConstants.DO_ORTH_TYPE_NAME, "Disease Ortholog");
+		providerMap.put(IndexConstants.DO_DATABASE_TYPE, "Disease Model");
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.AD_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
@@ -305,30 +305,30 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabTerm(PIRSF_TERM_KEY);
 
-		log.info("Collecting OMIM Terms");
+		log.info("Collecting DO Terms");
 
-		// Collect all omim vocabulary terms, where the term is not obsolete.
+		// Collect all Disease Ontology (DO) vocabulary terms, where the term is not obsolete.
 
-		String OMIM_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+		String DO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Genotype'";
+				+ " 'DO/Genotype'";
 
-		doVocabTerm(OMIM_TERM_KEY);
+		doVocabTerm(DO_TERM_KEY);
 
-		log.info("Collecting OMIM/Human Terms");
+		log.info("Collecting DO/Human Terms");
 
-		// Collect all omim/human terms where the term is not obsolete.
+		// Collect all Disease Ontology (DO)/human terms where the term is not obsolete.
 
-		String OMIM_HUMAN_TERM_KEY = "select tv._Term_key, tv.term, '"
-				+ IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName"
+		String DO_HUMAN_TERM_KEY = "select tv._Term_key, tv.term, '"
+				+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType = "
-				+ "'OMIM/Human Marker'";
+				+ "'DO/Human Marker'";
 
-		doVocabTerm(OMIM_HUMAN_TERM_KEY);
+		doVocabTerm(DO_HUMAN_TERM_KEY);
 
 		log.info("Done collecting all non AD vocab terms");
 
@@ -405,37 +405,37 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(MP_SYN_KEY);
 
-		log.info("Collecintg OMIM Synonyms");
+		log.info("Collecintg DO Synonyms");
 
-		// Gather up all the omim non human synonyms, where the term is not
+		// Gather up all the Disease Ontology (DO) non human synonyms, where the term is not
 		// obsolete.
 
-		String OMIM_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
+		String DO_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
 				+ " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s, "
 				+ "Voc_Annot_count_cache vacc"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-				+ " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+				+ " and tv._Vocab_key = 125 and s._MGIType_key = 13 "
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Genotype'";
+				+ " 'DO/Genotype'";
 
-		doVocabSynonym(OMIM_SYN_KEY);
+		doVocabSynonym(DO_SYN_KEY);
 
-		log.info("Collecintg OMIM/Human Synonyms");
+		log.info("Collecintg DO/Human Synonyms");
 
-		// Gather up all the omim human synyonms, where the term is not
+		// Gather up all the Disease Ontology (DO) human synyonms, where the term is not
 		// obsolete.
 
-		String OMIM_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"
-				+ IndexConstants.OMIM_ORTH_TYPE_NAME
+		String DO_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"
+				+ IndexConstants.DO_ORTH_TYPE_NAME
 				+ "' as vocabName, s._Synonym_key"
 				+ " from VOC_Term_View tv, MGI_Synonym s, "
 				+ "Voc_Annot_count_cache vacc"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-				+ " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+				+ " and tv._Vocab_key = 125 and s._MGIType_key = 13 "
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Human Marker'";
+				+ " 'DO/Human Marker'";
 
-		doVocabSynonym(OMIM_HUMAN_SYN_KEY);
+		doVocabSynonym(DO_HUMAN_SYN_KEY);
 	}
 
 	/**

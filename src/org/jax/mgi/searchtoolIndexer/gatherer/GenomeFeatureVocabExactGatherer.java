@@ -44,8 +44,8 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
 		providerMap.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
 		providerMap.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
-		providerMap.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
-		providerMap.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
+		providerMap.put(IndexConstants.DO_ORTH_TYPE_NAME, "Disease Ortholog");
+		providerMap.put(IndexConstants.DO_DATABASE_TYPE, "Disease Model");
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.AD_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
@@ -89,7 +89,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and"
 				+ " vacc.annotType = 'EMAPS'";
 
-		doVocabTerm(EMAPS_TERM_KEY);
+		doVocabTerm(EMAPS_TERM_KEY, "EMAPS");
 
 		log.info("Collecting GO terms!");
 
@@ -101,7 +101,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and"
 				+ " vacc.annotType = 'GO/Marker'";
 
-		doVocabTerm(GO_TERM_KEY);
+		doVocabTerm(GO_TERM_KEY, "GO");
 
 		log.info("Collecting MP Terms");
 
@@ -113,7 +113,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'Mammalian Phenotype/Genotype'";
 
-		doVocabTerm(MP_TERM_KEY);
+		doVocabTerm(MP_TERM_KEY, "MP");
 
 		log.info("Collecting Interpro Terms");
 
@@ -124,7 +124,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'InterPro/Marker'";
 
-		doVocabTerm(INTERPRO_TERM_KEY);
+		doVocabTerm(INTERPRO_TERM_KEY, "InterPro");
 
 		log.info("Collecting PIRSF Terms");
 
@@ -137,34 +137,34 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'PIRSF/Marker'";
 
-		doVocabTerm(PIRSF_TERM_KEY);
+		doVocabTerm(PIRSF_TERM_KEY, "PIRSF");
 
-		log.info("Collecting OMIM Terms");
+		log.info("Collecting DO Terms");
 
-		// Collect omim/non-human terms that are related to markers and are
+		// Collect Disease Ontology (DO)/non-human terms that are related to markers and are
 		// not obsolete.
 
-		String OMIM_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
+		String DO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Genotype'";
+				+ " 'DO/Genotype'";
 
-		doVocabTerm(OMIM_TERM_KEY);
+		doVocabTerm(DO_TERM_KEY, "DO/Mouse");
 
-		log.info("Collecting OMIM/Human Terms");
+		log.info("Collecting DO/Human Terms");
 
-		// Collect omim/human terms that are related to markers and are not
+		// Collect DO/human terms that are related to markers and are not
 		// obsolete.
 
-		String OMIM_HUMAN_TERM_KEY = "select tv._Term_key, tv.term," +
-				" '" + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName" +
+		String DO_HUMAN_TERM_KEY = "select tv._Term_key, tv.term," +
+				" '" + IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName" +
 				" from VOC_Term_View tv, VOC_Annot_Count_Cache vacc" +
-				" where tv.isObsolete != 1 and tv._Vocab_key = 44" +
+				" where tv.isObsolete != 1 and tv._Vocab_key = 125" +
 				" and tv._Term_key = vacc._Term_key and vacc.annotType" +
-				" = 'OMIM/Human Marker'";
+				" = 'DO/Human Marker'";
 
-		doVocabTerm(OMIM_HUMAN_TERM_KEY);
+		doVocabTerm(DO_HUMAN_TERM_KEY, "DO/Human");
 
 		log.info("Done collecting All Vocab Terms!");
 
@@ -209,7 +209,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType"
 				+ " = 'EMAPS'";
 
-		doVocabSynonym(EMAPS_SYN_KEY);
+		doVocabSynonym(EMAPS_SYN_KEY, "EMAPS");
 
 		log.info("Collecting GO Synonyms");
 
@@ -224,7 +224,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType"
 				+ " = 'GO/Marker'";
 
-		doVocabSynonym(GO_SYN_KEY);
+		doVocabSynonym(GO_SYN_KEY, "GO");
 
 		log.info("Collecting MP Synonyms");
 
@@ -239,38 +239,38 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType"
 				+ " = 'Mammalian Phenotype/Genotype'";
 
-		doVocabSynonym(MP_SYN_KEY);
+		doVocabSynonym(MP_SYN_KEY, "MP");
 
-		log.info("Collecitng OMIM Synonyms");
+		log.info("Collecting DO Synonyms");
 
-		// Collect omim/non-human synonyms that are related to markers and are
+		// Collect DO/non-human synonyms that are related to markers and are
 		// not obsolete.
 
-		String OMIM_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
+		String DO_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
 				+ " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
 				+ " Voc_Annot_count_cache vacc"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-				+ " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+				+ " and tv._Vocab_key = 125 and s._MGIType_key = 13 "
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Genotype'";
+				+ " 'DO/Genotype'";
 
-		doVocabSynonym(OMIM_SYN_KEY);
+		doVocabSynonym(DO_SYN_KEY, "DO/Mouse");
 
-		log.info("Collecting OMIM/Human Synonyms");
+		log.info("Collecting DO/Human Synonyms");
 
-		// Collect omim/human synonyms that are related to markers and are not
+		// Collect DO/human synonyms that are related to markers and are not
 		// obsolete.
 
-		String OMIM_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"
-				+ IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName,"
+		String DO_HUMAN_SYN_KEY = "select tv._Term_key, s.synonym, '"
+				+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName,"
 				+ " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
 				+ " Voc_Annot_count_cache vacc"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-				+ " and tv._Vocab_key = 44 and s._MGIType_key = 13 "
+				+ " and tv._Vocab_key = 125 and s._MGIType_key = 13 "
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Human Marker'";
+				+ " 'DO/Human Marker'";
 
-		doVocabSynonym(OMIM_HUMAN_SYN_KEY);
+		doVocabSynonym(DO_HUMAN_SYN_KEY, "DO/Human");
 
 		log.info("Done collecting All Vocab Non AD Synonyms!");
 
@@ -302,7 +302,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'GO/Marker' order by tv._Term_key, t.sequenceNum";
 
-		doVocabNote(GO_NOTE_KEY);
+		doVocabNote(GO_NOTE_KEY, "GO");
 
 		log.info("Collecting MP Notes/Definitions");
 
@@ -319,7 +319,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				+ " 'Mammalian Phenotype/Genotype'"
 				+ " order by tv._Term_key, t.sequenceNum";
 
-		doVocabNote(MP_NOTE_KEY);
+		doVocabNote(MP_NOTE_KEY, "MP");
 
 		log.info("Done collecting all Vocab Non AD Notes/Definitions");
 
@@ -332,17 +332,18 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabTerm(String sql) throws SQLException, InterruptedException {
+	private void doVocabTerm(String sql, String vocab) throws SQLException, InterruptedException {
 
 		ResultSet rs_non_ad_term = executor.executeMGD(sql);
 		rs_non_ad_term.next();
 
-		log.debug("Time taken gather result set: " + executor.getTiming());
+		log.debug("Time taken gather " + vocab + " term result set: " + executor.getTiming());
 
 		// Parse it
 
+		int count = 0;
 		while (!rs_non_ad_term.isAfterLast()) {
-
+			count++;
 			builder.setVocabulary(rs_non_ad_term.getString("vocabName"));
 			builder.setData(rs_non_ad_term.getString("term"));
 			builder.setRaw_data(rs_non_ad_term.getString("term"));
@@ -361,7 +362,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		rs_non_ad_term.close();
-
+		log.info("Processed " + count + " " + vocab + " terms"); 
 	}
 
 	/**
@@ -371,7 +372,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabSynonym(String sql)
+	private void doVocabSynonym(String sql, String vocab)
 			throws SQLException, InterruptedException {
 
 		// Gather the Data
@@ -379,11 +380,13 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		ResultSet rs_non_ad_syn = executor.executeMGD(sql);
 		rs_non_ad_syn.next();
 
-		log.debug("Time taken gather result set: " + executor.getTiming());
+		log.debug("Time taken gather " + vocab + " synonym result set: " + executor.getTiming());
 
 		// Parse it
 
+		int count = 0;
 		while (!rs_non_ad_syn.isAfterLast()) {
+			count++;
 			builder.setData(rs_non_ad_syn.getString("synonym"));
 			builder.setRaw_data(rs_non_ad_syn.getString("synonym"));
 			builder.setDb_key(rs_non_ad_syn.getString("_Term_key"));
@@ -402,7 +405,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		rs_non_ad_syn.close();
-
+		log.info("Processed " + count + " " + vocab + " synonyms");
 	}
 
 	/**
@@ -413,7 +416,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabNote(String sql)
+	private void doVocabNote(String sql, String vocab)
 			throws SQLException, InterruptedException {
 
 		// Gather the data.
@@ -421,13 +424,15 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		ResultSet rs_non_ad_note = executor.executeMGD(sql);
 		rs_non_ad_note.next();
 
-		log.debug("Time taken gather result set: " + executor.getTiming());
+		log.debug("Time taken gather " + vocab + " note result set: " + executor.getTiming());
 
 		// Parse it
 
 		int place = -1;
+		int count = 0;
 
 		while (!rs_non_ad_note.isAfterLast()) {
+			count++;
 			if (place != rs_non_ad_note.getInt("_Term_key")) {
 				if (place != -1) {
 					builder.setRaw_data(builder.getData());
@@ -452,6 +457,6 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		rs_non_ad_note.close();
-
+		log.info("Processed " + count + " " + vocab + " notes");
 	}
 }

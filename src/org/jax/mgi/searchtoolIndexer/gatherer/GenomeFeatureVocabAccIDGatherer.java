@@ -40,8 +40,8 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.MP_DATABASE_TYPE, "Phenotype");
 		providerMap.put(IndexConstants.PIRSF_DATABASE_TYPE, "Protein Family");
 		providerMap.put(IndexConstants.INTERPRO_DATABASE_TYPE, "Protein Domain");
-		providerMap.put(IndexConstants.OMIM_TYPE_NAME, "Disease Model");
-		providerMap.put(IndexConstants.OMIM_ORTH_TYPE_NAME, "Disease Ortholog");
+		providerMap.put(IndexConstants.DO_DATABASE_TYPE, "Disease Model");
+		providerMap.put(IndexConstants.DO_ORTH_TYPE_NAME, "Disease Ortholog");
 		providerMap.put(IndexConstants.GO_TYPE_NAME, "Function");
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
@@ -77,7 +77,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " from VOC_Term_View tv"
 				+ " where isObsolete != 1 and _Vocab_key = 112";
 
-		doVocabAccessionID(PROTEOFORM_ACCID_KEY);
+		doVocabAccessionID(PROTEOFORM_ACCID_KEY, "Proteoform");
 
 		
 		log.info("Collecting EMAPS Accession ID's");
@@ -91,7 +91,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'EMAPS'";
 
-		doVocabAccessionID(EMAPS_ACCID_KEY);
+		doVocabAccessionID(EMAPS_ACCID_KEY, "EMAPS");
 
 
 //		log.info("Collecting EMAPA Accession ID's");
@@ -125,7 +125,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ "and a.preferred = 0";
 				;
 
-		doVocabAccessionID(GO_ACCID_KEY);
+		doVocabAccessionID(GO_ACCID_KEY, "GO");
 
 		log.info("Collecting MP Accession ID's");
 
@@ -143,7 +143,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ "and vtv._Vocab_key = 5 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
 				+ "and a.preferred = 0";
 
-		doVocabAccessionID(MP_ACCID_KEY);
+		doVocabAccessionID(MP_ACCID_KEY, "MP");
 
 		log.info("Collecting Interpro Accession ID's");
 
@@ -157,7 +157,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'InterPro/Marker'";
 
-		doVocabAccessionID(INTERPRO_ACCID_KEY);
+		doVocabAccessionID(INTERPRO_ACCID_KEY, "InterPro");
 
 
 		log.info("Collecting PIRSF Accession ID's");
@@ -171,36 +171,36 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'PIRSF/Marker'";
 
-		doVocabAccessionID(PIRSF_ACCID_KEY);
+		doVocabAccessionID(PIRSF_ACCID_KEY, "PIRSF");
 		
-		log.info("Collecting OMIM Accession ID's");
+		log.info("Collecting DO Accession ID's");
 
-		// Gather up omim non human accession ID's, ignoring ID's that are
+		// Gather up Disease Ontology (DO) non human accession ID's, ignoring ID's that are
 		// obsolete.
 
-		String OMIM_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
+		String DO_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
 				+ " tv.term"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where isObsolete != 1 and _Vocab_key = 44"
+				+ " where isObsolete != 1 and _Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Genotype'";
+				+ " 'DO/Genotype'";
 
-		doVocabAccessionID(OMIM_ACCID_KEY);
+		doVocabAccessionID(DO_ACCID_KEY, "DO/Mouse");
 
-		log.info("Collecting OMIM/Human Accession ID's");
+		log.info("Collecting DO/Human Accession ID's");
 
-		// Gather up omim human accession ID's, ignorning ID's that are
+		// Gather up Disease Ontology (DO) human accession ID's, ignorning ID's that are
 		// obsolete.
 
-		String OMIM_HUMAN_ACCID_KEY = "select tv._Term_key, tv.accId," + " '"
-				+ IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName,"
+		String DO_HUMAN_ACCID_KEY = "select tv._Term_key, tv.accId," + " '"
+				+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName,"
 				+ " tv.term"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where isObsolete != 1 and _Vocab_key = 44"
+				+ " where isObsolete != 1 and _Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'OMIM/Human Marker'";
+				+ " 'DO/Human Marker'";
 
-		doVocabAccessionID(OMIM_HUMAN_ACCID_KEY);
+		doVocabAccessionID(DO_HUMAN_ACCID_KEY, "DO/Human");
 
 		log.info("Done collecting All Vocab Accession IDs!");
 
@@ -214,7 +214,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabAccessionID(String sql) throws SQLException,
+	private void doVocabAccessionID(String sql, String vocab) throws SQLException,
 			InterruptedException {
 
 		// Gather the data
@@ -222,7 +222,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		ResultSet rs_acc_id = executor.executeMGD(sql);
 		rs_acc_id.next();
 
-		log.info("Time taken gather result set: " + executor.getTiming());
+		log.info("Time taken gather " + vocab + " result set: " + executor.getTiming());
 		//log.info("entireMap " + providerMap );
 		//log.info("accid " + rs_acc_id.getString("accId"));
 		//log.info("vocabName " + rs_acc_id.getString("vocabName"));
@@ -230,8 +230,10 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		
 		// Parse it
 
+		int count = 0;
 		while (!rs_acc_id.isAfterLast()) {
 
+			count++;
 			builder.setData(rs_acc_id.getString("accId"));
 			builder.setRaw_data(rs_acc_id.getString("term"));
 			builder.setDb_key(rs_acc_id.getString("_Term_key"));
@@ -250,6 +252,6 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		// Clean up
 
 		rs_acc_id.close();
-
+		log.info("Processed " + count + " " + vocab + " IDs");
 	}
 }

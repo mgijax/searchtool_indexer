@@ -99,7 +99,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsGO.setDag_key(GO_DAG_KEY);
 		vsGO.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsGO);
+		doSingleNonADVocab(vsGO, "GO");
 
 
 		// For now EMAPA results are not returned oblod 1/23/2014
@@ -182,7 +182,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsEMAPS.setDag_key(EMAPS_DAG_KEY);
 		vsEMAPS.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsEMAPS);
+		doSingleNonADVocab(vsEMAPS, "EMAPS");
 
 
 		log.info("Collecting MP Records!");
@@ -226,7 +226,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsMP.setDag_key(MP_DAG_KEY);
 		vsMP.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsMP);
+		doSingleNonADVocab(vsMP, "MP/Marker");
 
 		log.info("Collecting MP Alleles Records!");
 
@@ -269,7 +269,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsMPAllele.setDag_key(MP_ALLELE_DAG_KEY);
 		vsMPAllele.setObject_type("ALLELE");
 
-		doSingleNonADVocab(vsMPAllele);
+		doSingleNonADVocab(vsMPAllele, "MP/Allele");
 
 		// Interpro
 
@@ -298,7 +298,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsInterpro.setDisplay_key(INTERPRO_MARKER_DISPLAY_KEY);
 		vsInterpro.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsInterpro);
+		doSingleNonADVocab(vsInterpro, "InterPro");
 
 		
 		// PROTEOFORM ONTOLOGY
@@ -326,7 +326,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsProteoform.setDisplay_key(PROTEOFORM__MARKER_DISPLAY_KEY);
 		vsProteoform.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsProteoform);
+		doSingleNonADVocab(vsProteoform, "Proteoform");
 
 
 		// PIRSF
@@ -355,97 +355,97 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsPIRSF.setDisplay_key(PIRSF_MARKER_DISPLAY_KEY);
 		vsPIRSF.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsPIRSF);
+		doSingleNonADVocab(vsPIRSF, "PIRSF");
 
-		// OMIM
+		// Disease Ontology (DO)
 
-		log.info("Collecting OMIM Marker Records!");
+		log.info("Collecting DO Marker Records!");
 
-		// Gather term key, term, accession id, and vocabulary name for omin
+		// Gather term key, term, accession id, and vocabulary name for Disease Ontology (DO)
 		// non human.
 
-		VocabSpec vsOMIM = new VocabSpec();
+		VocabSpec vsDO = new VocabSpec();
 
-		String OMIM_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
+		String DO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
 				+ " tv.vocabName"
 				+ " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
-				+ " and vacc.annotType = 'OMIM/Genotype' and vacc._Term_key ="
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
+				+ " and vacc.annotType = 'DO/Genotype' and vacc._Term_key ="
 				+ " tv._Term_key" + " order by _Term_key";
 
-		vsOMIM.setVoc_key(OMIM_VOC_KEY);
+		vsDO.setVoc_key(DO_VOC_KEY);
 
-		// Gather the marker keys for given omim non human terms. (via
-		// annotations of OMIM disease terms to mouse genotypes)
+		// Gather the marker keys for given Disease Ontology (DO) non human terms. (via
+		// annotations of DO disease terms to mouse genotypes)
 		//
 		// Excludes: Transgenes involving Cre
 
-		String OMIM_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
+		String DO_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
 				+ " vmc._Marker_key"
 				+ " from VOC_Marker_Cache vmc, mrk_label ml"
-				+ " where annotType = 'OMIM/Genotype' and vmc._Marker_key = "
+				+ " where annotType = 'DO/Genotype' and vmc._Marker_key = "
 				+ " ml._Marker_key and ml.label not like 'tg%cre%' and"
 				+ " ml.labelType = 'MS'" + " order by _Term_key";
 
-		vsOMIM.setDisplay_key(OMIM_MARKER_DISPLAY_KEY);
-		vsOMIM.setObject_type("MARKER");
+		vsDO.setDisplay_key(DO_MARKER_DISPLAY_KEY);
+		vsDO.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsOMIM);
+		doSingleNonADVocab(vsDO, "DO/Marker");
 
-		log.info("Collecting OMIM Alleles Records!");
+		log.info("Collecting DO Alleles Records!");
 
 		// Gather term key, term, accession id, and vocabulary name for omin
 		// non human.
 
-		VocabSpec vsOMIMAllele = new VocabSpec();
+		VocabSpec vsDOAllele = new VocabSpec();
 
-		String OMIM_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
+		String DO_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
 				+ " tv.vocabName"
 				+ " FROM VOC_Term_View tv, VOC_Allele_Cache vac"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
-				+ " and vac.annotType = 'OMIM/Genotype' and vac._Term_key ="
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
+				+ " and vac.annotType = 'DO/Genotype' and vac._Term_key ="
 				+ " tv._Term_key" + " order by _Term_key";
 
-		vsOMIMAllele.setVoc_key(OMIM_VOC_ALLELE_KEY);
+		vsDOAllele.setVoc_key(DO_VOC_ALLELE_KEY);
 
-		// Gather the marker keys for given omim non human terms.
+		// Gather the marker keys for given Disease Ontology (DO) non human terms.
 
-		String OMIM_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key,"
+		String DO_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key,"
 				+ " vac._Allele_key as _Marker_key"
 				+ " from VOC_Allele_Cache vac, all_label al"
-				+ " where annotType = 'OMIM/Genotype' and vac._Allele_key = "
+				+ " where annotType = 'DO/Genotype' and vac._Allele_key = "
 				+ " al._Allele_key and al.labelType = 'AS'"
 				+ " order by _Term_key";
 
-		vsOMIMAllele.setDisplay_key(OMIM_ALLELE_DISPLAY_KEY);
-		vsOMIMAllele.setObject_type("ALLELE");
+		vsDOAllele.setDisplay_key(DO_ALLELE_DISPLAY_KEY);
+		vsDOAllele.setObject_type("ALLELE");
 
-		doSingleNonADVocab(vsOMIMAllele);
+		doSingleNonADVocab(vsDOAllele, "DO/Allele");
 
-		// OMIM Human Orthologs
+		// Disease Ontology (DO) Human Orthologs
 
 		VocabSpec vsOrtho = new VocabSpec();
 
-		// Gather term key, term, accession id, and vocabulary name for omim
+		// Gather term key, term, accession id, and vocabulary name for DO
 		// human.
 
-		String OMIM_HUMAN_VOC_KEY = "SELECT tv._Term_key, tv.term, tv.accID,"
-				+ " '" + IndexConstants.OMIM_ORTH_TYPE_NAME + "' as vocabName"
+		String DO_HUMAN_VOC_KEY = "SELECT tv._Term_key, tv.term, tv.accID,"
+				+ " '" + IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName"
 				+ " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 44"
-				+ " and vacc.annotType = 'OMIM/Human Marker'"
+				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
+				+ " and vacc.annotType = 'DO/Human Marker'"
 				+ " and vacc._Term_key =" + " tv._Term_key"
 				+ " order by _Term_key";
 
-		vsOrtho.setVoc_key(OMIM_HUMAN_VOC_KEY);
+		vsOrtho.setVoc_key(DO_HUMAN_VOC_KEY);
 
-		// Gather the marker keys for given omim/human terms. (via the
-		// VOC_Marker_Cache -- human marker OMIM IDs, not OMIM disease IDs)
+		// Gather the marker keys for given DO/human terms. (via the
+		// VOC_Marker_Cache -- human marker DO IDs, not DO disease IDs)
 		//
 		// Excludes: Transgenes involving Cre
 
 		// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
-		String OMIM_HUMAN_MARKER_DISPLAY_KEY =
+		String DO_HUMAN_MARKER_DISPLAY_KEY =
 
 			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
 			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
@@ -453,10 +453,10 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key = 1 order by a._Term_key";
 
 
-		vsOrtho.setDisplay_key(OMIM_HUMAN_MARKER_DISPLAY_KEY);
+		vsOrtho.setDisplay_key(DO_HUMAN_MARKER_DISPLAY_KEY);
 		vsOrtho.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsOrtho);
+		doSingleNonADVocab(vsOrtho, "HomoloGene");
 
 		log.info("Done Collecting Non AD Dag Information Records!");
 
@@ -472,7 +472,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doSingleNonADVocab(VocabSpec vs) throws SQLException, InterruptedException {
+	private void doSingleNonADVocab(VocabSpec vs, String vocab) throws SQLException, InterruptedException {
 		ResultSet rs_vocabTerm = executor.executeMGD(vs.getVoc_key());
 
 		ResultSet marker_display_rs = executor.executeMGD(vs.getDisplay_key());
@@ -485,7 +485,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			child_rs.next();
 		}
 
-		log.info("Time taken gather result set: " + executor.getTiming());
+		log.info("Time taken gather " + vocab + " result set: " + executor.getTiming());
 		int place = -1;
 
 		/*
@@ -495,8 +495,10 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		 * indexing process.
 		 */
 
+		int count = 0;
 		while (rs_vocabTerm.next()) {
 
+			count++;
 			// Have we found a new document?
 
 			if (place != rs_vocabTerm.getInt(1)) {
@@ -567,6 +569,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		if (child_rs != null) {
 			child_rs.close();
 		}
+		log.info("Processed " + count + " " + vocab + " IDs");
 	}
 
 }

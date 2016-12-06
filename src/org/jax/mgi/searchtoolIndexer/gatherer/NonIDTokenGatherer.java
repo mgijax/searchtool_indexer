@@ -117,11 +117,11 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// Gather up the vocabulary terms in all vocabularies but AD
-		// This includes GO, MP, PIRSF, Interpro and OMIM.
+		// This includes GO, MP, PIRSF, Interpro and DO (Disease Ontology).
 
 		String VOC_TERM_KEY = "select _Term_key, term, vocabName"
 				+ " from VOC_Term_View"
-				+ " where isObsolete != 1 and _Vocab_key in (44, 4, 5, 8, 46, 90, 91)";
+				+ " where isObsolete != 1 and _Vocab_key in (125, 4, 5, 8, 46, 90, 91)";
 
 		// Gather the data
 
@@ -163,13 +163,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// Gather up the synonyms for all the vocabularies outside of AD.
-		// This list currently includes GO, MP, OMIM, PIRSF, InterPro, EMAPA and
+		// This list currently includes GO, MP, Disease Ontology (DO), PIRSF, InterPro, EMAPA and
 		// EMAPS
 
 		String VOC_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName"
 				+ " from VOC_Term_View tv, MGI_Synonym s"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-				+ " and tv._Vocab_key in (44, 4, 5, 8, 46, 90, 91)"
+				+ " and tv._Vocab_key in (125, 4, 5, 8, 46, 90, 91)"
 				+ " and s._MGIType_key = 13 ";
 
 		// Gather the data
@@ -213,13 +213,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 
 		// Select vocab notes for the non ad vocabularies, for non obsolete
 		// terms.
-		// This list currently includes GO, MP, PIRSF, InterPro, OMIM, EMAPA,
+		// This list currently includes GO, MP, PIRSF, InterPro, Disease Ontology (DO), EMAPA,
 		// and EMAPS
 
 		String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
 				+ " from VOC_Term_View tv, VOC_text t"
 				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-				+ "and tv._Vocab_key in (44, 4, 5, 8, 46, 90, 91)"
+				+ "and tv._Vocab_key in (125, 4, 5, 8, 46, 90, 91)"
 				+ " order by tv._Term_key, t.sequenceNum";
 
 		// Gather the data
