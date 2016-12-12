@@ -375,6 +375,19 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsDO.setVoc_key(DO_VOC_KEY);
 
+		String DO_DAG_KEY = "select dc._AncestorObject_key,"
+				+ " dc._DescendentObject_key"
+				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
+				+ " VOC_Term vt, VOC_AnnotType vat"
+				+ " where dc._MGIType_key = 13"
+				+ " and dc._DescendentObject_key = vacc._Term_key"
+				+ " and vt._Term_key =dc._DescendentObject_key "
+				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
+				+ " vacc.annotType " + "and vacc.annotType = 'DO/Genotype'"
+				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
+
+		vsDO.setDag_key(DO_DAG_KEY);
+
 		// Gather the marker keys for given Disease Ontology (DO) non human terms. (via
 		// annotations of DO disease terms to mouse genotypes)
 		//
@@ -408,6 +421,19 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsDOAllele.setVoc_key(DO_VOC_ALLELE_KEY);
 
+		String DO_ALLELE_DAG_KEY = "select dc._AncestorObject_key,"
+				+ " dc._DescendentObject_key"
+				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
+				+ " VOC_Term vt, VOC_AnnotType vat"
+				+ " where dc._MGIType_key = 13"
+				+ " and dc._DescendentObject_key = vacc._Term_key"
+				+ " and vt._Term_key =dc._DescendentObject_key "
+				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
+				+ " vacc.annotType " + "and vacc.annotType = 'DO/Genotype'"
+				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
+
+		vsDOAllele.setDag_key(DO_ALLELE_DAG_KEY);
+
 		// Gather the marker keys for given Disease Ontology (DO) non human terms.
 
 		String DO_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key,"
@@ -439,6 +465,19 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsOrtho.setVoc_key(DO_HUMAN_VOC_KEY);
 
+		String DO_HUMAN_DAG_KEY = "select dc._AncestorObject_key,"
+				+ " dc._DescendentObject_key"
+				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
+				+ " VOC_Term vt, VOC_AnnotType vat"
+				+ " where dc._MGIType_key = 13"
+				+ " and dc._DescendentObject_key = vacc._Term_key"
+				+ " and vt._Term_key =dc._DescendentObject_key "
+				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
+				+ " vacc.annotType " + "and vacc.annotType = 'DO/Human Marker'"
+				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
+
+		vsOrtho.setDag_key(DO_HUMAN_DAG_KEY);
+
 		// Gather the marker keys for given DO/human terms. (via the
 		// VOC_Marker_Cache -- human marker DO IDs, not DO disease IDs)
 		//
@@ -448,7 +487,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		String DO_HUMAN_MARKER_DISPLAY_KEY =
 
 			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
-			"where vt._term_key = a._term_key and a._AnnotType_key = 1006 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
+			"where vt._term_key = a._term_key and a._AnnotType_key = 1022 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
 			"hcm._cluster_key = mc._cluster_key and mc._ClusterSource_key = 13764519 and mc._ClusterType_key = 9272150 and mc._cluster_key = mcm._cluster_key and " +
 			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key = 1 order by a._Term_key";
 
