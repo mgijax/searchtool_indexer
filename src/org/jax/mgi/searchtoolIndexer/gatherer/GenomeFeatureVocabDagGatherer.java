@@ -8,7 +8,7 @@ import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
 /**
- * This class is responsible for gatherings up the relationiships between a
+ * This class is responsible for gatherings up the relationships between a
  * given vocabulary term, and the markers that are directly annotated to it. We
  * also gather up the parent/child relationships for a given term.
  *
@@ -39,7 +39,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	}
 
 	public void runLocal() throws Exception {
-		doNonADVocabs();
+		doVocabs();
 	}
 
 	/**
@@ -51,9 +51,9 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doNonADVocabs() throws SQLException, InterruptedException {
+	private void doVocabs() throws SQLException, InterruptedException {
 
-		log.info("Collecting Non AD Dag Information");
+		log.info("Collecting Dag Information");
 
 		// Since this is a compound object, the order by clauses are important.
 
@@ -99,7 +99,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsGO.setDag_key(GO_DAG_KEY);
 		vsGO.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsGO, "GO");
+		doSingleVocab(vsGO, "GO");
 
 
 		// For now EMAPA results are not returned oblod 1/23/2014
@@ -182,7 +182,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsEMAPS.setDag_key(EMAPS_DAG_KEY);
 		vsEMAPS.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsEMAPS, "EMAPS");
+		doSingleVocab(vsEMAPS, "EMAPS");
 
 
 		log.info("Collecting MP Records!");
@@ -226,7 +226,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsMP.setDag_key(MP_DAG_KEY);
 		vsMP.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsMP, "MP/Marker");
+		doSingleVocab(vsMP, "MP/Marker");
 
 		log.info("Collecting MP Alleles Records!");
 
@@ -269,7 +269,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsMPAllele.setDag_key(MP_ALLELE_DAG_KEY);
 		vsMPAllele.setObject_type("ALLELE");
 
-		doSingleNonADVocab(vsMPAllele, "MP/Allele");
+		doSingleVocab(vsMPAllele, "MP/Allele");
 
 		// Interpro
 
@@ -298,7 +298,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsInterpro.setDisplay_key(INTERPRO_MARKER_DISPLAY_KEY);
 		vsInterpro.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsInterpro, "InterPro");
+		doSingleVocab(vsInterpro, "InterPro");
 
 		
 		// PROTEOFORM ONTOLOGY
@@ -326,7 +326,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsProteoform.setDisplay_key(PROTEOFORM__MARKER_DISPLAY_KEY);
 		vsProteoform.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsProteoform, "Proteoform");
+		doSingleVocab(vsProteoform, "Proteoform");
 
 
 		// PIRSF
@@ -355,7 +355,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsPIRSF.setDisplay_key(PIRSF_MARKER_DISPLAY_KEY);
 		vsPIRSF.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsPIRSF, "PIRSF");
+		doSingleVocab(vsPIRSF, "PIRSF");
 
 		// Disease Ontology (DO)
 
@@ -375,15 +375,15 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsDO.setVoc_key(DO_VOC_KEY);
 
-		String DO_DAG_KEY = "select dc._AncestorObject_key,"
-				+ " dc._DescendentObject_key"
+		String DO_DAG_KEY = "select dc._AncestorObject_key, dc._DescendentObject_key"
 				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
 				+ " VOC_Term vt, VOC_AnnotType vat"
 				+ " where dc._MGIType_key = 13"
 				+ " and dc._DescendentObject_key = vacc._Term_key"
-				+ " and vt._Term_key =dc._DescendentObject_key "
-				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
-				+ " vacc.annotType " + "and vacc.annotType = 'DO/Genotype'"
+				+ " and vt._Term_key = dc._DescendentObject_key "
+				+ " and vt._Vocab_key = vat._Vocab_key "
+				+ " and vat.name = vacc.annotType "
+				+ " and vacc.annotType = 'DO/Genotype'"
 				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
 
 		vsDO.setDag_key(DO_DAG_KEY);
@@ -403,7 +403,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsDO.setDisplay_key(DO_MARKER_DISPLAY_KEY);
 		vsDO.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsDO, "DO/Marker");
+		doSingleVocab(vsDO, "DO/Marker");
 
 		log.info("Collecting DO Alleles Records!");
 
@@ -421,15 +421,15 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsDOAllele.setVoc_key(DO_VOC_ALLELE_KEY);
 
-		String DO_ALLELE_DAG_KEY = "select dc._AncestorObject_key,"
-				+ " dc._DescendentObject_key"
+		String DO_ALLELE_DAG_KEY = "select dc._AncestorObject_key, dc._DescendentObject_key"
 				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
 				+ " VOC_Term vt, VOC_AnnotType vat"
 				+ " where dc._MGIType_key = 13"
 				+ " and dc._DescendentObject_key = vacc._Term_key"
 				+ " and vt._Term_key =dc._DescendentObject_key "
-				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
-				+ " vacc.annotType " + "and vacc.annotType = 'DO/Genotype'"
+				+ " and vt._Vocab_key = vat._Vocab_key "
+				+ " and vat.name = vacc.annotType "
+				+ " and vacc.annotType = 'DO/Genotype'"
 				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
 
 		vsDOAllele.setDag_key(DO_ALLELE_DAG_KEY);
@@ -446,7 +446,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsDOAllele.setDisplay_key(DO_ALLELE_DISPLAY_KEY);
 		vsDOAllele.setObject_type("ALLELE");
 
-		doSingleNonADVocab(vsDOAllele, "DO/Allele");
+		doSingleVocab(vsDOAllele, "DO/Allele");
 
 		// Disease Ontology (DO) Human Orthologs
 
@@ -465,15 +465,15 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsOrtho.setVoc_key(DO_HUMAN_VOC_KEY);
 
-		String DO_HUMAN_DAG_KEY = "select dc._AncestorObject_key,"
-				+ " dc._DescendentObject_key"
+		String DO_HUMAN_DAG_KEY = "select dc._AncestorObject_key, dc._DescendentObject_key"
 				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
 				+ " VOC_Term vt, VOC_AnnotType vat"
 				+ " where dc._MGIType_key = 13"
 				+ " and dc._DescendentObject_key = vacc._Term_key"
-				+ " and vt._Term_key =dc._DescendentObject_key "
-				+ " and vt._Vocab_key = vat._Vocab_key and vat.name ="
-				+ " vacc.annotType " + "and vacc.annotType = 'DO/Human Marker'"
+				+ " and vt._Term_key = dc._DescendentObject_key "
+				+ " and vt._Vocab_key = vat._Vocab_key "
+				+ " and vat.name = vacc.annotType "
+				+ " and vacc.annotType = 'DO/Human Marker'"
 				+ " order by dc._AncestorObject_key, dc._DescendentObject_key";
 
 		vsOrtho.setDag_key(DO_HUMAN_DAG_KEY);
@@ -485,19 +485,29 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
 		String DO_HUMAN_MARKER_DISPLAY_KEY =
-
-			"select distinct m._Marker_key, a._Term_key from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, mrk_clustermember mcm, mrk_marker m " +
-			"where vt._term_key = a._term_key and a._AnnotType_key = 1022 and a._object_key = h._marker_key and h._organism_key = 2 and h._marker_key = hcm._marker_key and " +
-			"hcm._cluster_key = mc._cluster_key and mc._ClusterSource_key = 13764519 and mc._ClusterType_key = 9272150 and mc._cluster_key = mcm._cluster_key and " +
-			"mcm._marker_key = m._marker_key and m._organism_key = 1 and m._Marker_Status_key = 1 order by a._Term_key";
-
+			"select distinct m._Marker_key, a._Term_key "
+			+ "from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, "
+			+ "  mrk_clustermember mcm, mrk_marker m "
+			+ "where vt._term_key = a._term_key "
+			+ " and a._AnnotType_key = 1022 "
+			+ " and a._object_key = h._marker_key "
+			+ " and h._organism_key = 2 "
+			+ " and h._marker_key = hcm._marker_key "
+			+ " and hcm._cluster_key = mc._cluster_key "
+			+ " and mc._ClusterSource_key = 13764519 "
+			+ " and mc._ClusterType_key = 9272150 "
+			+ " and mc._cluster_key = mcm._cluster_key "
+			+ " and mcm._marker_key = m._marker_key "
+			+ " and m._organism_key = 1 "
+			+ " and m._Marker_Status_key = 1 "
+			+ "order by a._Term_key";
 
 		vsOrtho.setDisplay_key(DO_HUMAN_MARKER_DISPLAY_KEY);
 		vsOrtho.setObject_type("MARKER");
 
-		doSingleNonADVocab(vsOrtho, "HomoloGene");
+		doSingleVocab(vsOrtho, "HomoloGene");
 
-		log.info("Done Collecting Non AD Dag Information Records!");
+		log.info("Done Collecting Dag Information Records!");
 
 	}
 
@@ -511,7 +521,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doSingleNonADVocab(VocabSpec vs, String vocab) throws SQLException, InterruptedException {
+	private void doSingleVocab(VocabSpec vs, String vocab) throws SQLException, InterruptedException {
 		ResultSet rs_vocabTerm = executor.executeMGD(vs.getVoc_key());
 
 		ResultSet marker_display_rs = executor.executeMGD(vs.getDisplay_key());
