@@ -485,6 +485,22 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " order by tv._Term_key, t.sequenceNum";
 
 		doVocabNote(MP_NOTE_KEY);
+
+		log.info("Collecting DO Notes/Definitions");
+
+		// Gather up all the DO (Disease Ontology) notes, where the terms is not obsolete, in
+		// sequence number order.
+
+		String DO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
+				+ " from VOC_Term_View tv, VOC_text t,"
+				+ " Voc_Annot_count_cache vacc"
+				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+				+ " and tv._Vocab_key = 125"
+				+ " and tv._Term_key = vacc._Term_key"
+				+ " and vacc.annotType in ('DO/Genotype', 'DO/Human Marker')"
+				+ " order by tv._Term_key, t.sequenceNum";
+
+		doVocabNote(DO_NOTE_KEY);
 	}
 
 	/**
