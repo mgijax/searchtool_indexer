@@ -176,29 +176,68 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		log.info("Collecting DO Accession ID's");
 
 		// Gather up Disease Ontology (DO) non human accession ID's, ignoring ID's that are
-		// obsolete.
+		// obsolete.  VOC_Term_View provides primary ID for each term; must use union to get
+		// secondary IDs.
 
-		String DO_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName,"
-				+ " tv.term"
+		String DO_ACCID_KEY = "select tv._Term_key, tv.accId, tv.vocabName, tv.term"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
 				+ " where isObsolete != 1 and _Vocab_key = 125"
-				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'DO/Genotype'";
+				+ " and tv._Term_key = vacc._Term_key"
+				+ " and vacc.annotType = 'DO/Genotype'"
+
+				// add in numeric-only version of OMIM IDs for DO terms
+				+ "union "
+				+ "select vtv._Term_key, a.numericPart::text, 'Disease Ontology' as vocabName, vtv.term "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				+ "and a.preferred = 0 and a._LogicalDB_key = 15 "
+
+				// secondary IDs
+				+ " union"
+				+ " select vtv._Term_key, a.accId, 'Disease Ontology' as vocabName, vtv.term "
+				+ " from VOC_Term_View vtv, ACC_Accession a "
+				+ " where vtv.isObsolete != 1 "
+				+ " and vtv._Vocab_key = 125 "
+				+ " and vtv._Term_key = a._Object_key "
+				+ " and a._MGIType_key = 13 "
+				+ " and a.preferred = 0";
 
 		doVocabAccessionID(DO_ACCID_KEY, "DO/Mouse");
 
 		log.info("Collecting DO/Human Accession ID's");
 
 		// Gather up Disease Ontology (DO) human accession ID's, ignorning ID's that are
-		// obsolete.
+		// obsolete.  VOC_Term_View provides primary ID for each term; must use union to get
+		// secondary IDs.
 
-		String DO_HUMAN_ACCID_KEY = "select tv._Term_key, tv.accId," + " '"
-				+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName,"
-				+ " tv.term"
+		String DO_HUMAN_ACCID_KEY = "select tv._Term_key, tv.accId, '"
+				+    IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName, tv.term"
 				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where isObsolete != 1 and _Vocab_key = 125"
-				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'DO/Human Marker'";
+				+ " where isObsolete != 1"
+				+ " and _Vocab_key = 125"
+				+ " and tv._Term_key = vacc._Term_key"
+				+ " and vacc.annotType = 'DO/Human Marker'"
+
+				// add in numeric-only version of OMIM IDs for DO terms
+				+ "union "
+				+ "select vtv._Term_key, a.numericPart::text, '"
+				+    IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName, vtv.term "
+				+ "from VOC_Term_View vtv, ACC_Accession a "
+				+ "where isObsolete != 1 "
+				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
+				+ "and a.preferred = 0 and a._LogicalDB_key = 15 "
+
+				// secondary IDs
+				+ " union"
+				+ " select vtv._Term_key, a.accId, '"
+				+    IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName, vtv.term "
+				+ " from VOC_Term_View vtv, ACC_Accession a "
+				+ " where vtv.isObsolete != 1 "
+				+ " and vtv._Vocab_key = 125 "
+				+ " and vtv._Term_key = a._Object_key "
+				+ " and a._MGIType_key = 13 "
+				+ " and a.preferred = 0";
 
 		doVocabAccessionID(DO_HUMAN_ACCID_KEY, "DO/Human");
 
