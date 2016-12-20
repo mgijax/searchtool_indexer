@@ -500,7 +500,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and vacc.annotType in ('DO/Genotype', 'DO/Human Marker')"
 				+ " order by tv._Term_key, t.sequenceNum";
 
-		doVocabNote(DO_NOTE_KEY);
+//		doVocabNote(DO_NOTE_KEY);
 	}
 
 	/**
