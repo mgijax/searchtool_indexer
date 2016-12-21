@@ -71,7 +71,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		// gather up vocab accession id's, please note that AD has no acc id's
 		// each additional union gets all the terms alt id's.
 		// all the other vocabs could be add to index all ALT ids
-		String VOC_ACCID_KEY = "select _Term_key, accId, vocabName "
+		String VOC_ACCID_KEY = "select _Term_key, accId, vocabName, _LogicaldB_key "
 				+ "from VOC_Term_View where isObsolete != 1 "
 				+ "and _Vocab_key in (125, 4, 5, 8, 46, 90, 91) "
 				
@@ -79,7 +79,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 				
 				// secondary DO terms from any provider
 				
-				+ "select vtv._Term_key, a.accId, 'Disease Ontology' as vocabName "
+				+ "select vtv._Term_key, a.accId, 'Disease Ontology' as vocabName, a._LogicalDB_key "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
@@ -89,7 +89,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 				
 				// add in numeric-only version of OMIM IDs for DO terms
 				
-				+ "select vtv._Term_key, a.numericPart::text, 'Disease Ontology' as vocabName "
+				+ "select vtv._Term_key, a.numericPart::text, 'Disease Ontology' as vocabName, a._LogicalDB_key "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 125 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
@@ -97,7 +97,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 
 				+ "union "
 				
-				+ "select vtv._Term_key, a.accId, 'Mammalian Phenotype' as vocabName "
+				+ "select vtv._Term_key, a.accId, 'Mammalian Phenotype' as vocabName, a._LogicalDB_key "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 5 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
@@ -105,7 +105,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 				
 				+ "union "
 				
-				+ "select vtv._Term_key, a.accId, 'EMAPA' as vocabName "
+				+ "select vtv._Term_key, a.accId, 'EMAPA' as vocabName, a._LogicalDB_key "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 90 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
@@ -113,7 +113,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 				
 				+ "union "
 				
-				+ "select vtv._Term_key, a.accId, 'GO' as vocabName "
+				+ "select vtv._Term_key, a.accId, 'GO' as vocabName, a._LogicalDB_key "
 				+ "from VOC_Term_View vtv, ACC_Accession a "
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 4 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
@@ -137,6 +137,17 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 			builder.setDataType(IndexConstants.ACCESSION_ID);
 			builder.setDisplay_type(providerMap.get(IndexConstants.ACCESSION_ID));
 
+			// for OMIM IDs that are associated with DO (Disease Ontology) terms, we need to ensure
+			// that we show a special provider suffix.
+			
+			if (rs_acc_id.getString("vocabName").equals("Disease Ontology")) {
+				if (rs_acc_id.getInt("_LogicalDB_key") == 15) {
+					if (rs_acc_id.getString("accId").matches("^[0-9]+$")) {
+						builder.setProvider("(OMIM)");
+					}
+				}
+			}
+			
 			// Place the document on the stack.
 
 			documentStore.push(builder.getDocument());
