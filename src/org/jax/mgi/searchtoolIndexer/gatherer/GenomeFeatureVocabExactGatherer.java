@@ -59,7 +59,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	}
 
 	/**
-	 * Gather the non AD Vocab Terms.
+	 * Gather the Vocab Terms.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
@@ -171,7 +171,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	}
 
 	/**
-	 * Gather the non ad vocab synonyms.
+	 * Gather the vocab synonyms.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
@@ -272,12 +272,12 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(DO_HUMAN_SYN_KEY, "DO/Human");
 
-		log.info("Done collecting All Vocab Non AD Synonyms!");
+		log.info("Done collecting All Vocab Synonyms!");
 
 	}
 
 	/**
-	 * Gather the non ad vocab notes/definitions. Please note that this is a
+	 * Gather the vocab notes/definitions. Please note that this is a
 	 * compound field, and thus its parser has special handling.
 	 * 
 	 * @throws SQLException
@@ -321,12 +321,29 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 		doVocabNote(MP_NOTE_KEY, "MP");
 
-		log.info("Done collecting all Vocab Non AD Notes/Definitions");
+		log.info("Collecting DO Notes/Definitions");
+
+		// Collect DO (Disease Ontology) notes that are related to markers and are not obsolete.
+		// These are ordered by sequence number so they can be put back together
+		// in the lucene document
+
+		String DO_NOTE_KEY = "select distinct tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
+				+ " from VOC_Term_View tv, VOC_Text t, VOC_Annot_Count_Cache vacc"
+				+ " where tv._Term_key = t._Term_key "
+				+ " and tv.isObsolete != 1 "
+				+ " and tv._Vocab_key = 125 "
+				+ " and tv._Term_key = vacc._Term_key "
+				+ " and vacc.annotType in ('DO/Genotype', 'DO/Human Marker') "
+				+ " order by tv._Term_key, t.sequenceNum";
+
+		//doVocabNote(DO_NOTE_KEY, "DO");
+
+		log.info("Done collecting all Vocab Notes/Definitions");
 
 	}
 
 	/**
-	 * Gather the non AD Vocab Terms.
+	 * Gather the Vocab Terms.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
@@ -334,39 +351,39 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 	private void doVocabTerm(String sql, String vocab) throws SQLException, InterruptedException {
 
-		ResultSet rs_non_ad_term = executor.executeMGD(sql);
-		rs_non_ad_term.next();
+		ResultSet rs_term = executor.executeMGD(sql);
+		rs_term.next();
 
 		log.debug("Time taken gather " + vocab + " term result set: " + executor.getTiming());
 
 		// Parse it
 
 		int count = 0;
-		while (!rs_non_ad_term.isAfterLast()) {
+		while (!rs_term.isAfterLast()) {
 			count++;
-			builder.setVocabulary(rs_non_ad_term.getString("vocabName"));
-			builder.setData(rs_non_ad_term.getString("term"));
-			builder.setRaw_data(rs_non_ad_term.getString("term"));
-			builder.setDb_key(rs_non_ad_term.getString("_Term_key"));
+			builder.setVocabulary(rs_term.getString("vocabName"));
+			builder.setData(rs_term.getString("term"));
+			builder.setRaw_data(rs_term.getString("term"));
+			builder.setDb_key(rs_term.getString("_Term_key"));
 			builder.setDataType(IndexConstants.VOCAB_TERM);
-			builder.setUnique_key(rs_non_ad_term.getString("_Term_key") + rs_non_ad_term.getString("vocabName"));
-			builder.setDisplay_type(providerMap.get(rs_non_ad_term.getString("vocabName")));
+			builder.setUnique_key(rs_term.getString("_Term_key") + rs_term.getString("vocabName"));
+			builder.setDisplay_type(providerMap.get(rs_term.getString("vocabName")));
 
 			// Place the document on the stack.
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_non_ad_term.next();
+			rs_term.next();
 		}
 
 		// Clean up
 
-		rs_non_ad_term.close();
+		rs_term.close();
 		log.info("Processed " + count + " " + vocab + " terms"); 
 	}
 
 	/**
-	 * Gather the non ad vocab synonyms.
+	 * Gather the vocab synonyms.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
@@ -377,39 +394,39 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 		// Gather the Data
 
-		ResultSet rs_non_ad_syn = executor.executeMGD(sql);
-		rs_non_ad_syn.next();
+		ResultSet rs_syn = executor.executeMGD(sql);
+		rs_syn.next();
 
 		log.debug("Time taken gather " + vocab + " synonym result set: " + executor.getTiming());
 
 		// Parse it
 
 		int count = 0;
-		while (!rs_non_ad_syn.isAfterLast()) {
+		while (!rs_syn.isAfterLast()) {
 			count++;
-			builder.setData(rs_non_ad_syn.getString("synonym"));
-			builder.setRaw_data(rs_non_ad_syn.getString("synonym"));
-			builder.setDb_key(rs_non_ad_syn.getString("_Term_key"));
-			builder.setVocabulary(rs_non_ad_syn.getString("vocabName"));
+			builder.setData(rs_syn.getString("synonym"));
+			builder.setRaw_data(rs_syn.getString("synonym"));
+			builder.setDb_key(rs_syn.getString("_Term_key"));
+			builder.setVocabulary(rs_syn.getString("vocabName"));
 			builder.setDataType(IndexConstants.VOCAB_SYNONYM);
-			builder.setUnique_key(rs_non_ad_syn.getString("_Synonym_key") + IndexConstants.VOCAB_SYNONYM + rs_non_ad_syn.getString("vocabName"));
-			builder.setDisplay_type(providerMap.get(rs_non_ad_syn.getString("vocabName")));
+			builder.setUnique_key(rs_syn.getString("_Synonym_key") + IndexConstants.VOCAB_SYNONYM + rs_syn.getString("vocabName"));
+			builder.setDisplay_type(providerMap.get(rs_syn.getString("vocabName")));
 
 			// Place the document on the stack.
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_non_ad_syn.next();
+			rs_syn.next();
 		}
 
 		// Clean up
 
-		rs_non_ad_syn.close();
+		rs_syn.close();
 		log.info("Processed " + count + " " + vocab + " synonyms");
 	}
 
 	/**
-	 * Gather the non ad vocab notes/definitions. Please note that this is a
+	 * Gather the vocab notes/definitions. Please note that this is a
 	 * compound field, and thus its parser has special handling.
 	 * 
 	 * @throws SQLException
@@ -421,8 +438,8 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 		// Gather the data.
 
-		ResultSet rs_non_ad_note = executor.executeMGD(sql);
-		rs_non_ad_note.next();
+		ResultSet rs_note = executor.executeMGD(sql);
+		rs_note.next();
 
 		log.debug("Time taken gather " + vocab + " note result set: " + executor.getTiming());
 
@@ -431,9 +448,9 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		int place = -1;
 		int count = 0;
 
-		while (!rs_non_ad_note.isAfterLast()) {
+		while (!rs_note.isAfterLast()) {
 			count++;
-			if (place != rs_non_ad_note.getInt("_Term_key")) {
+			if (place != rs_note.getInt("_Term_key")) {
 				if (place != -1) {
 					builder.setRaw_data(builder.getData());
 
@@ -443,20 +460,20 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 					builder.clear();
 				}
 
-				builder.setDb_key(rs_non_ad_note.getString("_Term_key"));
-				builder.setVocabulary(rs_non_ad_note.getString("vocabName"));
+				builder.setDb_key(rs_note.getString("_Term_key"));
+				builder.setVocabulary(rs_note.getString("vocabName"));
 				builder.setDataType(IndexConstants.VOCAB_NOTE);
-				builder.setUnique_key(rs_non_ad_note.getString("_Term_key") + IndexConstants.VOCAB_NOTE + rs_non_ad_note.getString("vocabName"));
-				builder.setDisplay_type(providerMap.get(rs_non_ad_note.getString("vocabName")));
-				place = rs_non_ad_note.getInt("_Term_key");
+				builder.setUnique_key(rs_note.getString("_Term_key") + IndexConstants.VOCAB_NOTE + rs_note.getString("vocabName"));
+				builder.setDisplay_type(providerMap.get(rs_note.getString("vocabName")));
+				place = rs_note.getInt("_Term_key");
 			}
-			builder.appendData(rs_non_ad_note.getString("note"));
-			rs_non_ad_note.next();
+			builder.appendData(rs_note.getString("note"));
+			rs_note.next();
 		}
 
 		// Clean up
 
-		rs_non_ad_note.close();
+		rs_note.close();
 		log.info("Processed " + count + " " + vocab + " notes");
 	}
 }

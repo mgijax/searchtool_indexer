@@ -491,7 +491,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Gather up all the DO (Disease Ontology) notes, where the terms is not obsolete, in
 		// sequence number order.
 
-		String DO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
+		String DO_NOTE_KEY = "select distinct tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
 				+ " from VOC_Term_View tv, VOC_text t,"
 				+ " Voc_Annot_count_cache vacc"
 				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
