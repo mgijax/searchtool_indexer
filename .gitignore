@@ -1,17 +1,4 @@
 .#*
 ._.DS_Store
 .DS_Store
-.project
-.pydevproject
-.Python
-*.pyc
-*.error
-*.local
-bin
 Configuration
-CVS
-include
-lib
-lib64
-logs
-nohup.out
