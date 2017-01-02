@@ -366,12 +366,13 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		VocabSpec vsDO = new VocabSpec();
 
-		String DO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
-				+ " tv.vocabName"
+		String DO_VOC_KEY = "SELECT tv._Term_key, tv.term,  tv.accID, tv.vocabName"
 				+ " FROM VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
-				+ " and vacc.annotType = 'DO/Genotype' and vacc._Term_key ="
-				+ " tv._Term_key" + " order by _Term_key";
+				+ " where tv.isObsolete != 1 "
+				+ " and tv._Vocab_key = 125"
+				+ " and vacc.annotType = 'DO/Genotype' "
+				+ " and vacc._Term_key = tv._Term_key"
+				+ " order by _Term_key";
 
 		vsDO.setVoc_key(DO_VOC_KEY);
 
@@ -393,12 +394,13 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		//
 		// Excludes: Transgenes involving Cre
 
-		String DO_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key,"
-				+ " vmc._Marker_key"
+		String DO_MARKER_DISPLAY_KEY = "select distinct vmc._Term_key, vmc._Marker_key"
 				+ " from VOC_Marker_Cache vmc, mrk_label ml"
-				+ " where annotType = 'DO/Genotype' and vmc._Marker_key = "
-				+ " ml._Marker_key and ml.label not like 'tg%cre%' and"
-				+ " ml.labelType = 'MS'" + " order by _Term_key";
+				+ " where annotType = 'DO/Genotype' "
+				+ " and vmc._Marker_key = ml._Marker_key "
+				+ " and ml.label not like 'tg%cre%' "
+				+ " and ml.labelType = 'MS'"
+				+ " order by _Term_key";
 
 		vsDO.setDisplay_key(DO_MARKER_DISPLAY_KEY);
 		vsDO.setObject_type("MARKER");
@@ -407,17 +409,18 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		log.info("Collecting DO Alleles Records!");
 
-		// Gather term key, term, accession id, and vocabulary name for omin
-		// non human.
+		// Gather term key, term, accession id, and vocabulary name for DO (Disease Ontology)
+		// terms related to alleles via genotype annotations.
 
 		VocabSpec vsDOAllele = new VocabSpec();
 
-		String DO_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID,"
-				+ " tv.vocabName"
+		String DO_VOC_ALLELE_KEY = "SELECT tv._Term_key, tv.term,  tv.accID, tv.vocabName"
 				+ " FROM VOC_Term_View tv, VOC_Allele_Cache vac"
-				+ " where tv.isObsolete != 1 and tv._Vocab_key = 125"
-				+ " and vac.annotType = 'DO/Genotype' and vac._Term_key ="
-				+ " tv._Term_key" + " order by _Term_key";
+				+ " where tv.isObsolete != 1 "
+				+ " and tv._Vocab_key = 125"
+				+ " and vac.annotType = 'DO/Genotype' "
+				+ " and vac._Term_key = tv._Term_key"
+				+ " order by _Term_key";
 
 		vsDOAllele.setVoc_key(DO_VOC_ALLELE_KEY);
 
@@ -434,13 +437,13 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		vsDOAllele.setDag_key(DO_ALLELE_DAG_KEY);
 
-		// Gather the marker keys for given Disease Ontology (DO) non human terms.
+		// Gather the allele keys for given Disease Ontology (DO) terms (via genotypes).
 
-		String DO_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key,"
-				+ " vac._Allele_key as _Marker_key"
+		String DO_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key, vac._Allele_key as _Marker_key"
 				+ " from VOC_Allele_Cache vac, all_label al"
-				+ " where annotType = 'DO/Genotype' and vac._Allele_key = "
-				+ " al._Allele_key and al.labelType = 'AS'"
+				+ " where annotType = 'DO/Genotype' "
+				+ " and vac._Allele_key = al._Allele_key "
+				+ " and al.labelType = 'AS'"
 				+ " order by _Term_key";
 
 		vsDOAllele.setDisplay_key(DO_ALLELE_DISPLAY_KEY);
@@ -449,6 +452,8 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		doSingleVocab(vsDOAllele, "DO/Allele");
 
 		// Disease Ontology (DO) Human Orthologs
+
+		log.info("Collecting DO/Homolog Records!");
 
 		VocabSpec vsOrtho = new VocabSpec();
 
@@ -505,7 +510,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsOrtho.setDisplay_key(DO_HUMAN_MARKER_DISPLAY_KEY);
 		vsOrtho.setObject_type("MARKER");
 
-		doSingleVocab(vsOrtho, "HomoloGene");
+		doSingleVocab(vsOrtho, "DO/Homolog");
 
 		log.info("Done Collecting Dag Information Records!");
 
@@ -534,7 +539,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 			child_rs.next();
 		}
 
-		log.info("Time taken gather " + vocab + " result set: " + executor.getTiming());
+		log.info(" - Time taken gather " + vocab + " result set: " + executor.getTiming());
 		int place = -1;
 
 		/*
@@ -546,8 +551,6 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		int count = 0;
 		while (rs_vocabTerm.next()) {
-
-			count++;
 			// Have we found a new document?
 
 			if (place != rs_vocabTerm.getInt(1)) {
@@ -562,6 +565,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 					// Place the current document on the stack.
 
 					documentStore.push(builder.getDocument());
+					count++;
 
 					// Clear the document creation object, to ready it for the
 					// next doc.
@@ -572,10 +576,15 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 				// Populate the document with information pertaining
 				// specifically to the vocab term we are now on.
 
+				String uniqueKey = rs_vocabTerm.getString("_Term_key") + rs_vocabTerm.getString("vocabName");
+				if (vocab.startsWith("DO")) {
+				    uniqueKey = uniqueKey + "_" + vocab;
+				}
+				
 				builder.setDb_key(rs_vocabTerm.getString("_Term_key"));
 				builder.setVocabulary(rs_vocabTerm.getString("vocabName"));
 				builder.setAcc_id(rs_vocabTerm.getString("accID"));
-				builder.setUnique_key(rs_vocabTerm.getString("_Term_key") + rs_vocabTerm.getString("vocabName"));
+				builder.setUnique_key(uniqueKey);
 				builder.setObject_type(vs.getObject_type());
 
 				// Set the place to be the current terms object key, when this
@@ -610,6 +619,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		documentStore.push(builder.getDocument());
 		builder.clear();
+		count++;
 
 		// Clean up
 
@@ -618,7 +628,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		if (child_rs != null) {
 			child_rs.close();
 		}
-		log.info("Processed " + count + " " + vocab + " IDs");
+		log.info(" - Processed " + count + " " + vocab + " terms");
 	}
 
 }
