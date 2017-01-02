@@ -243,18 +243,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'EMAPS'";
 
-		doVocabTerm(EMAPS_TERM_KEY);
-
-//		log.info("Collecting EMAPA Terms");
-//
-//		// Collect all emapa vocabulary terms, where the term is not obsolete.
-//		String EMAPA_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
-//				+ " from VOC_Term_View tv, VOC_annot_count_cache vacc"
-//				+ " where tv.isObsolete != 1 and tv._Vocab_key = 90"
-//				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-//				+ " 'EMAPA'";
-//
-//		doVocabTerm(EMAPA_TERM_KEY);
+		doVocabTerm(EMAPS_TERM_KEY, "EMAPS");
 
 		log.info("Collecting GO Terms");
 
@@ -266,7 +255,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'GO/Marker'";
 
-		doVocabTerm(GO_TERM_KEY);
+		doVocabTerm(GO_TERM_KEY, "GO");
 
 		log.info("Collecting MP Terms");
 
@@ -278,7 +267,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'Mammalian Phenotype/Genotype'";
 
-		doVocabTerm(MP_TERM_KEY);
+		doVocabTerm(MP_TERM_KEY, "MP");
 
 		log.info("Collecting InterPro Terms");
 
@@ -291,7 +280,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'InterPro/Marker'";
 
-		doVocabTerm(INTERPRO_TERM_KEY);
+		doVocabTerm(INTERPRO_TERM_KEY, "InterPro");
 
 		log.info("Collecting PIRSF Terms");
 
@@ -303,7 +292,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'PIRSF/Marker'";
 
-		doVocabTerm(PIRSF_TERM_KEY);
+		doVocabTerm(PIRSF_TERM_KEY, "PIRSF");
 
 		log.info("Collecting DO Terms");
 
@@ -315,7 +304,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'DO/Genotype'";
 
-		doVocabTerm(DO_TERM_KEY);
+		doVocabTerm(DO_TERM_KEY, "DO/Mouse");
 
 		log.info("Collecting DO/Human Terms");
 
@@ -328,7 +317,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType = "
 				+ "'DO/Human Marker'";
 
-		doVocabTerm(DO_HUMAN_TERM_KEY);
+		doVocabTerm(DO_HUMAN_TERM_KEY, "DO/Human");
 
 		log.info("Done collecting all non AD vocab terms");
 
@@ -361,21 +350,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'EMAPS'";
 
-		doVocabSynonym(EMAPS_SYN_KEY);
-
-//		log.info("Collecintg EMAPA Synonyms");
-//
-//		// Gather up all the emapa synonyms, where the term is not obsolete.
-//
-//		String EMAPA_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName,"
-//				+ " s._Synonym_key" + " from VOC_Term_View tv, MGI_Synonym s,"
-//				+ " Voc_Annot_count_cache vacc"
-//				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1"
-//				+ " and tv._Vocab_key = 90 and s._MGIType_key = 13 "
-//				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
-//				+ " 'EMAPA'";
-//
-//		doVocabSynonym(EMAPA_SYN_KEY);
+		doVocabSynonym(EMAPS_SYN_KEY, "EMAPS");
 
 		log.info("Collecintg GO Synonyms");
 
@@ -389,7 +364,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'GO/Marker'";
 
-		doVocabSynonym(GO_SYN_KEY);
+		doVocabSynonym(GO_SYN_KEY, "GO");
 
 		log.info("Collecintg MP Synonyms");
 
@@ -403,7 +378,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'Mammalian Phenotype/Genotype'";
 
-		doVocabSynonym(MP_SYN_KEY);
+		doVocabSynonym(MP_SYN_KEY, "MP");
 
 		log.info("Collecintg DO Synonyms");
 
@@ -418,7 +393,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'DO/Genotype'";
 
-		doVocabSynonym(DO_SYN_KEY);
+		doVocabSynonym(DO_SYN_KEY, "DO/Mouse");
 
 		log.info("Collecintg DO/Human Synonyms");
 
@@ -435,7 +410,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ "and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'DO/Human Marker'";
 
-		doVocabSynonym(DO_HUMAN_SYN_KEY);
+		doVocabSynonym(DO_HUMAN_SYN_KEY, "DO/Human");
 	}
 
 	/**
@@ -468,7 +443,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and vacc.annotType = 'GO/Marker'"
 				+ " order by tv._Term_key, t.sequenceNum";
 
-		doVocabNote(GO_NOTE_KEY);
+		doVocabNote(GO_NOTE_KEY, "GO");
 
 		log.info("Collecting MP Notes/Definitions");
 
@@ -484,7 +459,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " 'Mammalian Phenotype/Genotype'"
 				+ " order by tv._Term_key, t.sequenceNum";
 
-		doVocabNote(MP_NOTE_KEY);
+		doVocabNote(MP_NOTE_KEY, "MP");
 
 		log.info("Collecting DO Notes/Definitions");
 
@@ -500,7 +475,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 				+ " and vacc.annotType in ('DO/Genotype', 'DO/Human Marker')"
 				+ " order by tv._Term_key, t.sequenceNum";
 
-//		doVocabNote(DO_NOTE_KEY);
+//		doVocabNote(DO_NOTE_KEY, "DO");
 	}
 
 	/**
@@ -580,23 +555,28 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabTerm(String sql) throws SQLException, InterruptedException {
+	private void doVocabTerm(String sql, String vocab) throws SQLException, InterruptedException {
 
 		// Gather the data
 
 		ResultSet rs_term = executor.executeMGD(sql);
 		
 
-		log.info("Time taken gather vocab term result set: " + executor.getTiming());
+		log.info(" - Time taken gather " + vocab + " vocab term result set: " + executor.getTiming());
 
 		// Parse it
+		int i = 0;
 
 		while (rs_term.next()) {
-
 			builder.setData(rs_term.getString("term"));
 			builder.setRaw_data(rs_term.getString("term"));
 			builder.setDb_key(rs_term.getString("_Term_key"));
-			builder.setUnique_key(rs_term.getString("_Term_key") + rs_term.getString("vocabName"));
+			
+			String uniqueKey = rs_term.getString("_Term_key") + rs_term.getString("vocabName");
+			if (vocab.startsWith("DO")) {
+				uniqueKey = uniqueKey + "_" + vocab;
+			}
+			builder.setUnique_key(uniqueKey);
 			builder.setVocabulary(rs_term.getString("vocabName"));
 			builder.setDisplay_type(providerMap.get(rs_term.getString("vocabName")));
 			builder.setDataType(IndexConstants.VOCAB_TERM);
@@ -605,8 +585,9 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-
+			i++;
 		}
+		log.info(" - Added " + i + " documents for " + vocab);
 
 		// Clean up
 		rs_term.close();
@@ -620,19 +601,19 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabSynonym(String sql) throws SQLException, InterruptedException {
+	private void doVocabSynonym(String sql, String vocab) throws SQLException, InterruptedException {
 
 		// Gather the data
 
 		ResultSet rs_syn = executor.executeMGD(sql);
 
 
-		log.info("Time taken gather vocab synonym result set: " + executor.getTiming());
+		log.info(" - Time taken gather " + vocab + " synonym result set: " + executor.getTiming());
 
 		// Parse it
 
+		int i = 0;
 		while (rs_syn.next()) {
-
 			builder.setData(rs_syn.getString("synonym"));
 			builder.setRaw_data(rs_syn.getString("synonym"));
 			builder.setDb_key(rs_syn.getString("_Term_key"));
@@ -645,12 +626,11 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-
+			i++;
 		}
+		log.info(" - Added " + i + " documents for " + vocab);
 
 		// Clean up
-
-		log.info("Done Vocab Synonyms!");
 		rs_syn.close();
 	}
 
@@ -661,14 +641,13 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 	 * @throws InterruptedException
 	 */
 
-	private void doVocabNote(String sql) throws SQLException,
+	private void doVocabNote(String sql, String vocab) throws SQLException,
 			InterruptedException {
 
 		ResultSet rs_note = executor.executeMGD(sql);
 		rs_note.next();
 
-		log.info("Time taken gather vocab notes/definition result set: "
-				+ executor.getTiming());
+		log.info("Time taken gather " + vocab + " notes/definition result set: " + executor.getTiming());
 
 		// Parse it
 
@@ -677,6 +656,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Since notes are compound rows in the database, we have to
 		// construct the searchable field.
 
+		int i = 0;
 		while (!rs_note.isAfterLast()) {
 			if (place != rs_note.getInt(1)) {
 				if (place != -1) {
@@ -685,6 +665,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 					documentStore.push(builder.getDocument());
 					builder.clear();
+					i++;
 				}
 				builder.setDb_key(rs_note.getString("_Term_key"));
 				builder.setUnique_key(rs_note.getString("_Term_key") + IndexConstants.VOCAB_NOTE + rs_note.getString("vocabName"));
@@ -698,6 +679,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 			rs_note.next();
 		}
 
-		log.info("Done Vocab Notes/Definitions!");
+		log.info(" - Added " + i + " documents for " + vocab);
 	}
 }
