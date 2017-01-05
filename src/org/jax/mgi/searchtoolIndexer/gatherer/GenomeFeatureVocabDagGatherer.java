@@ -425,8 +425,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		vsDOAllele.setVoc_key(DO_VOC_ALLELE_KEY);
 
 		String DO_ALLELE_DAG_KEY = "select dc._AncestorObject_key, dc._DescendentObject_key"
-				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, "
-				+ " VOC_Term vt, VOC_AnnotType vat"
+				+ " from DAG_Closure dc, VOC_Annot_Count_Cache vacc, VOC_Term vt, VOC_AnnotType vat"
 				+ " where dc._MGIType_key = 13"
 				+ " and dc._DescendentObject_key = vacc._Term_key"
 				+ " and vt._Term_key =dc._DescendentObject_key "
@@ -439,11 +438,9 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		// Gather the allele keys for given Disease Ontology (DO) terms (via genotypes).
 
-		String DO_ALLELE_DISPLAY_KEY = "select distinct vac._Term_key, vac._Allele_key as _Marker_key"
-				+ " from VOC_Allele_Cache vac, all_label al"
+		String DO_ALLELE_DISPLAY_KEY = "select distinct _Term_key, _Allele_key as _Marker_key"
+				+ " from VOC_Allele_Cache "
 				+ " where annotType = 'DO/Genotype' "
-				+ " and vac._Allele_key = al._Allele_key "
-				+ " and al.labelType = 'AS'"
 				+ " order by _Term_key";
 
 		vsDOAllele.setDisplay_key(DO_ALLELE_DISPLAY_KEY);
