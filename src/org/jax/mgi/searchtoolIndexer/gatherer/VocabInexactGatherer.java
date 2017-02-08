@@ -86,12 +86,12 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(VOC_TERM_KEY);
-		rs.next();
+		
 		log.info("Time taken gather non ad terms result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			builder.setData(rs.getString("term"));
 			builder.setRaw_data(rs.getString("term"));
@@ -104,7 +104,6 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs.next();
 		}
 
 		rs.close();
@@ -136,12 +135,12 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// gather the data
 
 		ResultSet rs_syn = executor.executeMGD(VOC_SYN_KEY);
-		rs_syn.next();
+		
 		log.info("Time taken gather non ad synonyms result set: " + executor.getTiming());
 
 		// parse it
 
-		while (!rs_syn.isAfterLast()) {
+		while (rs_syn.next()) {
 
 			builder.setData(rs_syn.getString("synonym"));
 			builder.setRaw_data(rs_syn.getString("synonym"));
@@ -154,7 +153,6 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_syn.next();
 		}
 
 		// Clean up
@@ -192,14 +190,14 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// construct the searchable field.
 
 		ResultSet rs_note = executor.executeMGD(VOC_NOTE_KEY);
-		rs_note.next();
+		
 		log.info("Time taken gather non ad notes/definitions result set: " + executor.getTiming());
 
 		// Parse it
 
 		int place = -1;
 
-		while (!rs_note.isAfterLast()) {
+		while (rs_note.next()) {
 			if (place != rs_note.getInt("_Term_key")) {
 				if (place != -1) {
 					builder.setRaw_data(builder.getData());
@@ -216,7 +214,6 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 				place = rs_note.getInt("_Term_key");
 			}
 			builder.appendData(rs_note.getString("note"));
-			rs_note.next();
 		}
 
 		documentStore.push(builder.getDocument());

@@ -102,14 +102,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		    + "order by g._Genotype_key, m.symbol";
 
 		ResultSet rs = executor.executeMGD(MARKERS);
-		rs.next();
 
 		Map<String,String> m = new HashMap<String,String>();
 
 		int mCt = 0;	// count of markers included in genotypes
 		int gCt = 0;	// count of genotypes
 
-		while (!rs.isAfterLast()) {
+		while (!rs.next()) {
 		    String genotypeKey = rs.getString("_Genotype_key");
 		    String symbol = rs.getString("symbol");
 
@@ -121,7 +120,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			m.put(genotypeKey, symbol);
 			gCt++;
 		    }
-		    rs.next();
 		}
 		log.info("Got " + mCt + " markers in " + gCt + " genotypes");
 		return m;
@@ -141,7 +139,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		    + "    and va._Object_key = gg._Genotype_key)";
 
 		ResultSet rs = executor.executeMGD(OTHER_GENOTYPE_DISPLAY);
-		rs.next();
 
 		log.info("Time taken gather genotype result set: " + executor.getTiming());
 
@@ -149,7 +146,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 			String genotypeKey = rs.getString("_Genotype_key");
 
 			builder.setDb_key(genotypeKey);
@@ -171,7 +168,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up
@@ -201,13 +197,12 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(OTHER_PROBE_DISPLAY_KEY);
-		rs.next();
 
 		log.info("Time taken gather probe result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			builder.setDb_key(rs.getString("_Probe_key"));
 			builder.setDataType(rs.getString("type"));
@@ -223,7 +218,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up
@@ -253,13 +247,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_assay = executor.executeMGD(OTHER_ASSAY_DISPLAY_KEY);
-		rs_assay.next();
+
 		log.info("Time taken gather ASSAY result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_assay.isAfterLast()) {
+		while (rs_assay.next()) {
 
 			builder.setDb_key(rs_assay.getString("_Assay_key"));
 			builder.setDataType(rs_assay.getString("type"));
@@ -275,7 +269,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_assay.next();
 		}
 
 		// Clean up
@@ -305,14 +298,12 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		ResultSet rs_ref = executor.executeMGD(OTHER_REF_DISPLAY_KEY);
 
-		rs_ref.next();
-
 		log.info("Time taken gather reference result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_ref.isAfterLast()) {
+		while (rs_ref.next()) {
 
 			builder.setDb_key(rs_ref.getString("_Refs_key"));
 			builder.setDataType(rs_ref.getString("type"));
@@ -327,7 +318,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ref.next();
 		}
 
 		// Clean up
@@ -364,7 +354,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		ResultSet rs_snp = executor.executeMGD(OTHER_SNP_DISPLAY_KEY);
 
-		rs_snp.next();
 		log.info("Time taken gather SNP result set: " + executor.getTiming());
 
 		String ldb = IndexConstants.OTHER_SNP;
@@ -376,7 +365,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		
 		HashSet<String> multiCoordSnps = new HashSet<String>();
 
-		while (!rs_snp.isAfterLast()) {
+		while (rs_snp.next()) {
 
 			String objectKey = rs_snp.getString("_Object_key");
 
@@ -418,7 +407,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_snp.next();
 		}
 
 		// Clean up
@@ -450,12 +438,11 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		ResultSet rs_seq = executor.executeMGD(OTHER_SEQ_DISPLAY_KEY);
 
-		rs_seq.next();
 		log.info("Time taken gather sequence result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_seq.isAfterLast()) {
+		while (rs_seq.next()) {
 
 			builder.setDb_key(rs_seq.getString("_Sequence_key"));
 			builder.setDataType(rs_seq.getString("type"));
@@ -473,7 +460,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_seq.next();
 		}
 
 		// Clean up
@@ -517,14 +503,14 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_ortho = executor.executeMGD(OTHER_ORTHOLOG_DISPLAY);
-		rs_ortho.next();
+		
 		log.info("Time taken gather homologous marker result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
 		int documentCount = 0;
-		while (!rs_ortho.isAfterLast()) {
+		while (rs_ortho.next()) {
 			documentCount++;
 
 			builder.setDb_key(rs_ortho.getString("_Marker_key"));
@@ -546,7 +532,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ortho.next();
 		}
 
 		// Clean up
@@ -587,14 +572,14 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_ortho = executor.executeMGD(HOMOLOGENE_CLASSES_DISPLAY);
-		rs_ortho.next();
+		
 		log.info("Time taken gather HomoloGene class result set: "
 				+ executor.getTiming());
 
 		String hgID = null;
 
 		int documentCount = 0;
-		while (!rs_ortho.isAfterLast()) {
+		while (rs_ortho.next()) {
 			documentCount++;
 
 			hgID = rs_ortho.getString("HomoloGeneID");
@@ -616,7 +601,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ortho.next();
 		}
 
 		// Clean up
@@ -659,10 +643,8 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				+ "group by aa.accID, mo.commonName";
 
 		ResultSet rs_counts = executor.executeMGD(HOMOLOGENE_CLASS_SEARCH);
-		rs_counts.next();
 
-		log.info("Time taken to gather organism counts for HomoloGene classes: "
-				+ executor.getTiming());
+		log.info("Time taken to gather organism counts for HomoloGene classes: " + executor.getTiming());
 
 		// keyed by organism name, values are counts of markers for that
 		// organism in the HomoloGene class we are considering
@@ -674,7 +656,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		int rowCount = 0;
 
-		while (!rs_counts.isAfterLast()) {
+		while (rs_counts.next()) {
 			rowCount++;
 
 			hgID = rs_counts.getString("accID");
@@ -689,7 +671,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			}
 			inner.put(organism, count);
 
-			rs_counts.next();
 		}
 		rs_counts.close();
 
@@ -837,13 +818,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_antibody = executor.executeMGD(OTHER_ANTIBODY_DISPLAY_KEY);
-		rs_antibody.next();
+		
 		log.info("Time taken gather antibody result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_antibody.isAfterLast()) {
+		while (rs_antibody.next()) {
 
 			builder.setDb_key(rs_antibody.getString("_Antibody_key"));
 			builder.setDataType(rs_antibody.getString("type"));
@@ -858,7 +839,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_antibody.next();
 		}
 
 		// Clean up
@@ -888,13 +868,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_experiment = executor.executeMGD(OTHER_EXPERIMENT_DISPLAY_KEY);
-		rs_experiment.next();
+		
 		log.info("Time taken gather experiment result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_experiment.isAfterLast()) {
+		while (rs_experiment.next()) {
 
 			builder.setDb_key(rs_experiment.getString("_Expt_key"));
 			builder.setDataType(rs_experiment.getString("type"));
@@ -910,7 +890,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_experiment.next();
+
 		}
 
 		// Clean up
@@ -939,13 +919,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_image = executor.executeMGD(OTHER_IMAGE_DISPLAY_KEY);
-		rs_image.next();
+		
 		log.info("Time taken gather image result set: "
 				+ executor.getTiming());
 
 		// parse it
 
-		while (!rs_image.isAfterLast()) {
+		while (rs_image.next()) {
 
 			builder.setDb_key(rs_image.getString("_Image_key"));
 			builder.setDataType(rs_image.getString("type"));
@@ -960,7 +940,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_image.next();
 		}
 
 		// Clean up
@@ -989,13 +968,13 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_ama = executor.executeMGD(OTHER_AMA_DISPLAY);
-		rs_ama.next();
+		
 		log.info("Time taken gather AMA result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_ama.isAfterLast()) {
+		while (rs_ama.next()) {
 
 			builder.setDb_key(rs_ama.getString("_Term_key"));
 			builder.setDataType(rs_ama.getString("type"));
@@ -1011,7 +990,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ama.next();
 		}
 
 		// Clean up

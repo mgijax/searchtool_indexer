@@ -114,7 +114,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(MARKER_LABEL_KEY);
-		rs.next();
 
 		log.info("Time taken gather marker label result set "
 				+ executor.getTiming());
@@ -123,7 +122,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		String displayType = "";
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			displayType = InitCap.initCap(rs.getString("labelTypeName"));
 
@@ -207,7 +206,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up
@@ -533,14 +531,14 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(ALLELE_NOMEN_KEY);
-		rs.next();
+		
 
 		log.info("Time taken gather allele nomenclature result set "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			builder.setData(rs.getString("label"));
 			builder.setRaw_data(rs.getString("label"));
@@ -554,7 +552,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up

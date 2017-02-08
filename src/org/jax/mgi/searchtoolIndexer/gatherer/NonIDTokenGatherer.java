@@ -75,14 +75,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(GEN_MARKER_LABEL);
-		rs.next();
 
 		log.info("Time taken gather marker label result set "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			builder.setData(rs.getString("label"));
 
@@ -95,7 +94,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 				documentStore.push(builder.getDocument());
 			}
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up
@@ -126,14 +124,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_term = executor.executeMGD(VOC_TERM_KEY);
-		rs_term.next();
 
 		log.info("Time taken gather vocab term result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_term.isAfterLast()) {
+		while (rs_term.next()) {
 
 			builder.setData(rs_term.getString("term"));
 
@@ -141,7 +138,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_term.next();
 		}
 
 		// Clean up
@@ -175,14 +171,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_syn = executor.executeMGD(VOC_SYN_KEY);
-		rs_syn.next();
 
 		log.info("Time taken gather vocab synonym result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_syn.isAfterLast()) {
+		while (rs_syn.next()) {
 
 			builder.setData(rs_syn.getString("synonym"));
 
@@ -190,7 +185,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_syn.next();
 		}
 
 		// Clean up
@@ -225,7 +219,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_note = executor.executeMGD(VOC_NOTE_KEY);
-		rs_note.next();
 
 		log.info("Time taken gather vocab notes/definition result set: "
 				+ executor.getTiming());
@@ -237,7 +230,7 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Since notes are compound rows in the database, we have to
 		// contruct the searchable field.
 
-		while (!rs_note.isAfterLast()) {
+		while (rs_note.next()) {
 			if (place != rs_note.getInt(1)) {
 				if (place != -1) {
 
@@ -249,7 +242,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 				place = rs_note.getInt("_Term_key");
 			}
 			builder.appendData(rs_note.getString("note"));
-			rs_note.next();
 		}
 
 		log.info("Done Vocab Notes/Definitions!");
@@ -281,14 +273,13 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs = executor.executeMGD(ALLELE_SYNONYM_KEY);
-		rs.next();
 
 		log.info("Time taken gather allele synonym result set "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs.isAfterLast()) {
+		while (rs.next()) {
 
 			builder.setData(rs.getString("label"));
 
@@ -302,7 +293,6 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 			documentStore.push(builder.getDocument());
 
 			builder.clear();
-			rs.next();
 		}
 
 		// Clean up

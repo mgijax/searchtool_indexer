@@ -96,13 +96,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
 			+ " and a._MGIType_key = " + mgiTypeKeyId;
 
 		ResultSet rs_ref = executor.executeMGD(OTHER_GENERIC_SEARCH);
-		rs_ref.next();
+		
 
 		log.info("Time taken gather " + mgiTypeKey + " data set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_ref.isAfterLast()) {
+		while (rs_ref.next()) {
 
 			builder.setType(rs_ref.getString("_MGIType_key"));
 			builder.setData(rs_ref.getString("accID"));
@@ -120,7 +120,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ref.next();
 		}
 
 		// Clean up
@@ -164,7 +163,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather the data.
 
 		ResultSet rs_geno = executor.executeMGD(OTHER_GENOTYPE_SEARCH);
-		rs_geno.next();
+		
 
 		log.info("Time taken gather genotype data set: " + executor.getTiming());
 
@@ -172,7 +171,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// Parse it
 
-		while (!rs_geno.isAfterLast()) {
+		while (rs_geno.next()) {
 
 			builder.setType(rs_geno.getString("_MGIType_key"));
 			builder.setData(rs_geno.getString("accID"));
@@ -191,7 +190,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_geno.next();
 		}
 
 		// Clean up
@@ -221,7 +219,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather the data.
 
 		ResultSet rs_snp = executor.executeMGD(OTHER_SNP_SEARCH);
-		rs_snp.next();
 
 		log.info("Time taken gather SNP data set: " + executor.getTiming());
 
@@ -229,7 +226,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// Parse it
 
-		while (!rs_snp.isAfterLast()) {
+		while (rs_snp.next()) {
 
 			builder.setType(IndexConstants.OTHER_SNP);
 			builder.setData(rs_snp.getString("accID"));
@@ -248,7 +245,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_snp.next();
 		}
 
 		// Clean up
@@ -282,13 +278,13 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather the data.
 
 		ResultSet rs_seq = executor.executeMGD(OTHER_SEQ_SEARCH);
-		rs_seq.next();
+		
 
 		log.info("Time taken gather sequence data set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_seq.isAfterLast()) {
+		while (rs_seq.next()) {
 
 			builder.setType(rs_seq.getString("_MGIType_key"));
 			builder.setData(rs_seq.getString("accID"));
@@ -307,7 +303,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_seq.next();
 		}
 
 		// Clean up
@@ -347,14 +342,14 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_seq_by_probe = executor.executeMGD(OTHER_SEQ_BY_PROBE_SEARCH);
-		rs_seq_by_probe.next();
+		
 
 		log.info("Time taken gather sequence by probe id data set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_seq_by_probe.isAfterLast()) {
+		while (rs_seq_by_probe.next()) {
 
 			builder.setType(rs_seq_by_probe.getString("_MGIType_key"));
 			builder.setData(rs_seq_by_probe.getString("accID"));
@@ -374,7 +369,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_seq_by_probe.next();
 		}
 
 		// Clean up
@@ -429,7 +423,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// gather the data
 
 		ResultSet rs_orthologs = executor.executeMGD(OTHER_ORTHOLOG_SEARCH);
-		rs_orthologs.next();
+		
 
 		log.info("Time taken to gather homologous marker id data set: "
 				+ executor.getTiming());
@@ -437,7 +431,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Parse it
 
 		int documentCount = 0;
-		while (!rs_orthologs.isAfterLast()) {
+		while (rs_orthologs.next()) {
 			documentCount++;
 
 			builder.setType(rs_orthologs.getString("_MGIType_key"));
@@ -463,7 +457,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_orthologs.next();
 		}
 
 		// Clean up
@@ -505,14 +498,14 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// gather the data
 
 		ResultSet rs_homologene = executor.executeMGD(HOMOLOGENE_CLUSTER_SEARCH);
-		rs_homologene.next();
+		
 
 		log.info("Time taken to gather HomoloGene class id data set: " + executor.getTiming());
 
 		// Parse it
 
 		int documentCount = 0;
-		while (!rs_homologene.isAfterLast()) {
+		while (rs_homologene.next()) {
 			documentCount++;
 
 			builder.setType(IndexConstants.OTHER_HOMOLOGY);
@@ -533,7 +526,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 
-			rs_homologene.next();
 		}
 
 		// Clean up
@@ -568,13 +560,12 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_ama = executor.executeMGD(OTHER_AMA_SEARCH);
-		rs_ama.next();
-
+	
 		log.info("Time taken gather ama data set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_ama.isAfterLast()) {
+		while (rs_ama.next()) {
 
 			builder.setType(rs_ama.getString("_MGIType_key"));
 			builder.setData(rs_ama.getString("accID"));
@@ -592,7 +583,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				output_threshold += output_incrementer;
 			}
 			builder.clear();
-			rs_ama.next();
 		}
 
 		// Clean up

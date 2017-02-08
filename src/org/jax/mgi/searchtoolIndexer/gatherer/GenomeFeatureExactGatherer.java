@@ -92,7 +92,6 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
-		rs_label.next();
 
 		log.info("Time taken to gather label's result set: "
 				+ executor.getTiming());
@@ -101,7 +100,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
 		String displayType = "";
 		String dataType = "";
-		while (!rs_label.isAfterLast()) {
+		while (rs_label.next()) {
 
 			dataType = rs_label.getString("labelType");
 
@@ -138,7 +137,6 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_label.next();
 		}
 
 		// Clean up
@@ -186,7 +184,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_label = executor.executeMGD(ALLELE_LABEL_EXACT);
-		rs_label.next();
+
 
 		log.info("Time taken to gather label's result set: "
 				+ executor.getTiming());
@@ -195,7 +193,7 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 
 		String displayType = "";
 		String dataType = "";
-		while (!rs_label.isAfterLast()) {
+		while (rs_label.next()) {
 
 			dataType = rs_label.getString("labelType");
 
@@ -236,7 +234,6 @@ public class GenomeFeatureExactGatherer extends DatabaseGatherer {
 			}
 
 			builder.clear();
-			rs_label.next();
 		}
 
 		// Clean up

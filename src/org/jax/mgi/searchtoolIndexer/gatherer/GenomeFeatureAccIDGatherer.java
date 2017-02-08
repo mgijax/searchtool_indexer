@@ -111,7 +111,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_acc = executor.executeMGD(GENE_ACC_KEY);
-		rs_acc.next();
 
 		String provider = "";
 
@@ -131,7 +130,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 		// Parse it
 
-		while (!rs_acc.isAfterLast()) {
+		while (rs_acc.next()) {
 
 			skipThisOne = false;
 
@@ -179,7 +178,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			}
 
 			builder.clear();
-			rs_acc.next();
 		}
 
 		// Clean up
@@ -211,14 +209,14 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_all_acc = executor.executeMGD(ALLELE_TO_MARKER_EXACT);
-		rs_all_acc.next();
+
 
 		log.info("Time taken to gather Allele's Accession ID result set: "
 				+ executor.getTiming());
 
 		// Parse it
 
-		while (!rs_all_acc.isAfterLast()) {
+		while (rs_all_acc.next()) {
 			builder.setData(rs_all_acc.getString("accID"));
 			builder.setDb_key(rs_all_acc.getString("_allele_key"));
 			builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
@@ -229,7 +227,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_all_acc.next();
 		}
 
 		// Clean up
@@ -278,13 +275,13 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_orth_acc = executor.executeMGD(ORTH_TO_MARKER_ACC_ID);
-		rs_orth_acc.next();
+
 
 		log.info("Time taken to gather Ortholog's Accession ID result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_orth_acc.isAfterLast()) {
+		while (rs_orth_acc.next()) {
 
 			builder.setData(rs_orth_acc.getString("accID"));
 			builder.setDb_key(rs_orth_acc.getString("_Marker_key"));
@@ -304,8 +301,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-
-			rs_orth_acc.next();
 
 		}
 
@@ -343,13 +338,13 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_transgene = executor.executeMGD(ALLELE_MARKER_TRANSGENE_SEARCH);
-		rs_transgene.next();
+
 
 		log.info("Time taken gather marker transgene -> alelle data set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_transgene.isAfterLast()) {
+		while (rs_transgene.next()) {
 			builder.setData(rs_transgene.getString("accID"));
 			builder.setDb_key(rs_transgene.getString("_Allele_key"));
 			builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
@@ -370,7 +365,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			documentStore.push(builder.getDocument());
 
 			builder.clear();
-			rs_transgene.next();
 		}
 
 		// Clean up
@@ -407,13 +401,12 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
-		rs_escell.next();
 
 		log.info("Time taken gather es cell line data set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_escell.isAfterLast()) {
+		while (rs_escell.next()) {
 			builder.setData(rs_escell.getString("accID"));
 			builder.setDb_key(rs_escell.getString("_Allele_key"));
 			builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
@@ -433,7 +426,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			documentStore.push(builder.getDocument());
 
 			builder.clear();
-			rs_escell.next();
 		}
 
 		// Clean up
@@ -464,11 +456,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ " and saa._Sequence_key = a._Object_key and saa._Allele_key is not null";
 
 		ResultSet rs_all = executor.executeMGD(OTHER_ALL_BY_SEQUENCE_SEARCH);
-		rs_all.next();
 
 		log.info("Time taken gather allele by sequence data set: " + executor.getTiming());
 
-		while (!rs_all.isAfterLast()) {
+		while (rs_all.next()) {
 
 			builder.setData(rs_all.getString("accID"));
 			builder.setDb_key(rs_all.getString("_Allele_key"));
@@ -489,7 +480,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			documentStore.push(builder.getDocument());
 
 			builder.clear();
-			rs_all.next();
 		}
 
 		// Clean up
@@ -526,11 +516,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_escell = executor.executeMGD(OTHER_ES_CELL_LINE_SEARCH);
-		rs_escell.next();
 
 		log.info("Time taken gather es cell line name data set: " + executor.getTiming());
 
-		while (!rs_escell.isAfterLast()) {
+		while (rs_escell.next()) {
 			builder.setData(rs_escell.getString("cellLine"));
 			builder.setDb_key(rs_escell.getString("_Allele_key"));
 			builder.setDataType(IndexConstants.ALLELE_ACCESSION_ID);
@@ -540,7 +529,6 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			documentStore.push(builder.getDocument());
 
 			builder.clear();
-			rs_escell.next();
 		}
 
 		log.info("Done creating documents for es cell lines!");

@@ -123,13 +123,13 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_acc_id = executor.executeMGD(VOC_ACCID_KEY);
-		rs_acc_id.next();
+		
 
 		log.info("Time taken gather result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_acc_id.isAfterLast()) {
+		while (rs_acc_id.next()) {
 			builder.setData(rs_acc_id.getString("accId"));
 			builder.setRaw_data(rs_acc_id.getString("accId"));
 			builder.setDb_key(rs_acc_id.getString("_Term_key"));
@@ -152,7 +152,6 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_acc_id.next();
 		}
 
 		// Clean up

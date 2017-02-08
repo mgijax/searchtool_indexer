@@ -88,7 +88,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
-		rs_label.next();
+
 
 		log.info("Time taken to gather label's result set: " + executor.getTiming());
 
@@ -96,7 +96,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
 		String displayType = "";
 
-		while (!rs_label.isAfterLast()) {
+		while (rs_label.next()) {
 
 			if (rs_label.getString("labelType").equals(
 					IndexConstants.ORTHOLOG_SYMBOL)) {
@@ -137,7 +137,6 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_label.next();
 		}
 
 		// Clean up
@@ -172,7 +171,6 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_label = executor.executeMGD(GENE_LABEL_EXACT);
-		rs_label.next();
 
 		log.info("Time taken to gather allele label's result set: " + executor.getTiming());
 
@@ -180,7 +178,7 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 
 		String displayType = "";
 
-		while (!rs_label.isAfterLast()) {
+		while (rs_label.next()) {
 
 			builder.setDataType(rs_label.getString("labelType"));
 
@@ -215,7 +213,6 @@ public class GenomeFeatureSymbolGatherer extends DatabaseGatherer {
 				documentStore.push(builder.getDocument());
 			}
 			builder.clear();
-			rs_label.next();
 		}
 
 		// Clean up

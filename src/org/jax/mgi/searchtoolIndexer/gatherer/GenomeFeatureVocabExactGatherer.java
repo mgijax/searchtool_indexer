@@ -352,14 +352,14 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 	private void doVocabTerm(String sql, String vocab) throws SQLException, InterruptedException {
 
 		ResultSet rs_term = executor.executeMGD(sql);
-		rs_term.next();
+		;
 
 		log.debug("Time taken gather " + vocab + " term result set: " + executor.getTiming());
 
 		// Parse it
 
 		int count = 0;
-		while (!rs_term.isAfterLast()) {
+		while (rs_term.next()) {
 			count++;
 			builder.setVocabulary(rs_term.getString("vocabName"));
 			builder.setData(rs_term.getString("term"));
@@ -373,7 +373,6 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_term.next();
 		}
 
 		// Clean up
@@ -395,14 +394,13 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		// Gather the Data
 
 		ResultSet rs_syn = executor.executeMGD(sql);
-		rs_syn.next();
 
 		log.debug("Time taken gather " + vocab + " synonym result set: " + executor.getTiming());
 
 		// Parse it
 
 		int count = 0;
-		while (!rs_syn.isAfterLast()) {
+		while (rs_syn.next()) {
 			count++;
 			builder.setData(rs_syn.getString("synonym"));
 			builder.setRaw_data(rs_syn.getString("synonym"));
@@ -416,7 +414,6 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_syn.next();
 		}
 
 		// Clean up
@@ -439,7 +436,6 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		// Gather the data.
 
 		ResultSet rs_note = executor.executeMGD(sql);
-		rs_note.next();
 
 		log.debug("Time taken gather " + vocab + " note result set: " + executor.getTiming());
 
@@ -448,7 +444,7 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		int place = -1;
 		int count = 0;
 
-		while (!rs_note.isAfterLast()) {
+		while (rs_note.next()) {
 			count++;
 			if (place != rs_note.getInt("_Term_key")) {
 				if (place != -1) {
@@ -468,7 +464,6 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 				place = rs_note.getInt("_Term_key");
 			}
 			builder.appendData(rs_note.getString("note"));
-			rs_note.next();
 		}
 
 		// Clean up

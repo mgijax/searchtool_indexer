@@ -77,13 +77,12 @@ public class VocabExactGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_non_ad_term = executor.executeMGD(VOC_TERM_KEY);
-		rs_non_ad_term.next();
-
+		
 		log.info("Time taken gather result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_non_ad_term.isAfterLast()) {
+		while (rs_non_ad_term.next()) {
 
 			builder.setVocabulary(rs_non_ad_term.getString("vocabName"));
 			builder.setData(rs_non_ad_term.getString("term"));
@@ -96,7 +95,6 @@ public class VocabExactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_non_ad_term.next();
 		}
 
 		// Clean up
@@ -131,13 +129,12 @@ public class VocabExactGatherer extends DatabaseGatherer {
 		// Gather the Data
 
 		ResultSet rs_non_ad_syn = executor.executeMGD(VOC_SYN_KEY);
-		rs_non_ad_syn.next();
 
 		log.info("Time taken gather result set: " + executor.getTiming());
 
 		// Parse it
 
-		while (!rs_non_ad_syn.isAfterLast()) {
+		while (rs_non_ad_syn.next()) {
 			builder.setData(rs_non_ad_syn.getString("synonym"));
 			builder.setRaw_data(rs_non_ad_syn.getString("synonym"));
 			builder.setDb_key(rs_non_ad_syn.getString("_Term_key"));
@@ -149,7 +146,6 @@ public class VocabExactGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_non_ad_syn.next();
 		}
 
 		// Clean up
@@ -185,7 +181,6 @@ public class VocabExactGatherer extends DatabaseGatherer {
 		// Gather the data.
 
 		ResultSet rs_non_ad_note = executor.executeMGD(VOC_NOTE_KEY);
-		rs_non_ad_note.next();
 
 		log.info("Time taken gather result set: " + executor.getTiming());
 
@@ -193,7 +188,7 @@ public class VocabExactGatherer extends DatabaseGatherer {
 
 		int place = -1;
 
-		while (!rs_non_ad_note.isAfterLast()) {
+		while (rs_non_ad_note.next()) {
 			if (place != rs_non_ad_note.getInt("_Term_key")) {
 				if (place != -1) {
 					builder.setRaw_data(builder.getData());
@@ -211,7 +206,6 @@ public class VocabExactGatherer extends DatabaseGatherer {
 				place = rs_non_ad_note.getInt("_Term_key");
 			}
 			builder.appendData(rs_non_ad_note.getString("note"));
-			rs_non_ad_note.next();
 		}
 
 		// Clean up

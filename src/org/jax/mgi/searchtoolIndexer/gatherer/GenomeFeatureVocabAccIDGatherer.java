@@ -259,7 +259,6 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		// Gather the data
 
 		ResultSet rs_acc_id = executor.executeMGD(sql);
-		rs_acc_id.next();
 
 		log.info("Time taken gather " + vocab + " result set: " + executor.getTiming());
 		//log.info("entireMap " + providerMap );
@@ -270,7 +269,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 		// Parse it
 
 		int count = 0;
-		while (!rs_acc_id.isAfterLast()) {
+		while (rs_acc_id.next()) {
 
 			count++;
 			builder.setData(rs_acc_id.getString("accId"));
@@ -285,7 +284,7 @@ public class GenomeFeatureVocabAccIDGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-			rs_acc_id.next();
+
 		}
 
 		// Clean up
