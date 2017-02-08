@@ -662,7 +662,6 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 			InterruptedException {
 
 		ResultSet rs_note = executor.executeMGD(sql);
-		rs_note.next();
 
 		log.info("Time taken gather " + vocab + " notes/definition result set: " + executor.getTiming());
 
@@ -674,7 +673,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// construct the searchable field.
 
 		int i = 0;
-		while (!rs_note.isAfterLast()) {
+		while (rs_note.next()) {
 			if (place != rs_note.getInt(1)) {
 				if (place != -1) {
 
