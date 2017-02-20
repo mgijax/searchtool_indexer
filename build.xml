@@ -18,7 +18,7 @@
 
 	<target name="compile" depends="init" description="compile the source " >
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac debug="true" classpath="${MGI_JAVALIB}/core.jar; ${MGI_JAVALIB}/searchtool.jar; " srcdir="${src}" destdir="${build}"/>
+		<javac debug="true" classpath="${MGI_JAVALIB}/core.jar; ${MGI_JAVALIB}/searchtool.jar; lib/*" srcdir="${src}" destdir="${build}"/>
 	</target>
 
 	<target name="jar" depends="compile">

@@ -1,13 +1,7 @@
 .#*
 ._.DS_Store
 .DS_Store
-.project
-.pydevproject
-.Python
-*.pyc
-*.error
-*.local
-bin
+searchtool_indexer.config
 Configuration
 CVS
 include
