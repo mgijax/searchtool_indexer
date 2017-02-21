@@ -18,7 +18,7 @@
 
 	<target name="compile" depends="init" description="compile the source " >
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac debug="true" classpath="${MGI_JAVALIB}/core.jar; ${MGI_JAVALIB}/searchtool.jar; lib/*" srcdir="${src}" destdir="${build}"/>
+		<javac debug="true" classpath="${MGI_JAVALIB}/searchtool.jar; lib/*;" srcdir="${src}" destdir="${build}"/>
 	</target>
 
 	<target name="jar" depends="compile">
@@ -32,21 +32,17 @@
 		<delete dir="${build}"/>
 		<delete dir="${doc}"/>
 	</target>
-	
-	<target name="javadoc" description="Generate Javadocs"> 
-		<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="
-			${MGI_JAVALIB}/searchtool.jar;
-			lib/log4j-1.2.15.jar; 
-			lib/lucene-core-2.3.2.jar; 
-			lib/lucene-snowball-2.3.2.jar;
-			lib/core.jar; "
-		>
+
+	<target name="javadoc" description="Generate Javadocs">
+		<property environment="env" />
+		<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="${env.MGI_JAVALIB}/searchtool.jar; lib/log4j-1.2.15.jar; lib/lucene-core-2.3.2.jar; lib/core.jar;" >
 			<tag name="is" scope="all" description="Is:" />
 			<tag name="has" scope="all" description="Has:" />
 			<tag name="does" scope="all" description="Does:" />
 		</javadoc>
 	</target>
-	
+
 	<target name="build" description="Make Jar and Javadocs" depends="clean, jar, javadoc"/>
-	
+
 </project>
+
