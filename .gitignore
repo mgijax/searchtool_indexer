@@ -5,8 +5,6 @@ searchtool_indexer.config
 Configuration
 CVS
 include
-lib
-lib64
 logs
 nohup.out
 /build/
