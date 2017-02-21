@@ -26,6 +26,11 @@ STACK_MAX=100000
 # The Jconn JDBC Driver
 DB_DRIVER=org.postgresql.Driver
 
-CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/searchtool_indexer.jar:${MGI_JAVALIB}/core.jar:${ST_INDEXER_PUB}/lib/lucene-core-2.3.2.jar:${ST_INDEXER_PUB}/lib/lucene-snowball-2.3.2.jar:${MGI_JAVALIB}/searchtool.jar:${LOG4J}
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/searchtool_indexer.jar
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/lib/core.jar
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/lib/log4j-1.2.15.jar
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/lib/lucene-core-2.3.2.jar
+CLASSPATH=$CLASSPATH:${ST_INDEXER_PUB}/lib/lucene-snowball-2.3.2.jar
+CLASSPATH=$CLASSPATH:${MGI_JAVALIB}/searchtool.jar
 
 export CLASSPATH
