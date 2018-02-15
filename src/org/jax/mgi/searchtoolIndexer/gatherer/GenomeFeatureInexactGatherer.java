@@ -236,7 +236,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		// Collect all emaps vocabulary terms, where the term is not obsolete.
 		String EMAPS_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
-				+ " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key = 91"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'EMAPS'";
@@ -248,7 +248,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Collect all go vocabulary terms, where the term is not obsolete.
 
 		String GO_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
-				+ " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key = 4"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'GO/Marker'";
@@ -260,7 +260,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Collect all mp vocabulary terms, where the term is not obsolete.
 
 		String MP_TERM_KEY = "select tv._Term_key, tv.term, tv.vocabName"
-				+ " from VOC_Term_View tv, VOC_annot_count_cache vacc"
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
 				+ " where tv.isObsolete != 1 and tv._Vocab_key = 5"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'Mammalian Phenotype/Genotype'";
@@ -429,66 +429,62 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		log.info("Collecting GO Notes/Definitions");
 
-		// Gather up all the go notes, where the term is not obsolete, in
-		// sequence number order.
+		// Gather up all the go notes, where the term is not obsolete
 
-		String GO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+		String GO_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1"
 				+ " and tv._Vocab_key = 4"
 				+ " and tv._Term_key = vacc._Term_key"
 				+ " and vacc.annotType = 'GO/Marker'"
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " order by tv._Term_key";
 
 		doVocabNote(GO_NOTE_KEY, "GO");
 
 		log.info("Collecting MP Notes/Definitions");
 
-		// Gather up all the mp notes, where the terms is not obsolete, in
-		// sequence number order.
+		// Gather up all the mp notes, where the terms is not obsolete
 
-		String MP_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+		String MP_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1"
 				+ " and tv._Vocab_key = 5"
 				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
 				+ " 'Mammalian Phenotype/Genotype'"
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " order by tv._Term_key";
 
 		doVocabNote(MP_NOTE_KEY, "MP");
 
 		log.info("Collecting DO/Mouse Definitions");
 
-		// Gather up all the DO (Disease Ontology) notes for Mouse annotations, where the terms is not obsolete, in
-		// sequence number order.
+		// Gather up all the DO (Disease Ontology) notes for Mouse annotations, where the terms is not obsolete
 
-		String DO_NOTE_KEY = "select distinct tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+		String DO_NOTE_KEY = "select distinct tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1"
 				+ " and tv._Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key"
 				+ " and vacc.annotType = 'DO/Genotype' "
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " order by tv._Term_key";
 
 		doVocabNote(DO_NOTE_KEY, "DO/Mouse");
 
 		log.info("Collecting DO/ORTH Definitions");
 
-		// Gather up all the DO (Disease Ontology) notes for human marker annotations, where the terms is not
-		// obsolete, in sequence number order.
+		// Gather up all the DO (Disease Ontology) notes for human marker annotations, where the terms is not obsolete
 
-		String DO_ORTH_NOTE_KEY = "select distinct tv._Term_key, t.note, '"
-					+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1"
+		String DO_ORTH_NOTE_KEY = "select distinct tv._Term_key, tv.note, '"
+					+ IndexConstants.DO_ORTH_TYPE_NAME + "' as vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1"
 				+ " and tv._Vocab_key = 125"
 				+ " and tv._Term_key = vacc._Term_key"
 				+ " and vacc.annotType = 'DO/Human Marker'"
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " order by tv._Term_key";
 
 		doVocabNote(DO_ORTH_NOTE_KEY, "DO/ORTH");
 	}

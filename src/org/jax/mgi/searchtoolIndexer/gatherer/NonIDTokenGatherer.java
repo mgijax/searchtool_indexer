@@ -210,11 +210,12 @@ public class NonIDTokenGatherer extends DatabaseGatherer {
 		// This list currently includes GO, MP, PIRSF, InterPro, Disease Ontology (DO), EMAPA,
 		// and EMAPS
 
-		String VOC_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
-				+ "and tv._Vocab_key in (125, 4, 5, 8, 46, 90, 91)"
-				+ " order by tv._Term_key, t.sequenceNum";
+		String VOC_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv "
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1 "
+				+ " and tv._Vocab_key in (125, 4, 5, 8, 46, 90, 91)"
+				+ " order by tv._Term_key";
 
 		// Gather the data
 

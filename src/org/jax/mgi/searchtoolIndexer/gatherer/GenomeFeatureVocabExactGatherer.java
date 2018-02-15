@@ -291,50 +291,45 @@ public class GenomeFeatureVocabExactGatherer extends DatabaseGatherer {
 		log.info("Collecting GO Notes/Definitions");
 
 		// Collect go notes that are related to markers and are not obsolete.
-		// These are ordered by sequence number so they can be put back together
-		// in the lucene document
 
-		String GO_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
+		String GO_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1 "
 				+ " and tv._Vocab_key = 4"
-				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'GO/Marker' order by tv._Term_key, t.sequenceNum";
+				+ " and tv._Term_key = vacc._Term_key "
+				+ " and vacc.annotType = 'GO/Marker' "
+				+ "order by tv._Term_key";
 
 		doVocabNote(GO_NOTE_KEY, "GO");
 
 		log.info("Collecting MP Notes/Definitions");
 
 		// Collect mp notes that are related to markers and are not obsolete.
-		// These are ordered by sequence number so they can be put back together
-		// in the lucene document
 
-		String MP_NOTE_KEY = "select tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_text t,"
-				+ " Voc_Annot_count_cache vacc"
-				+ " where tv._Term_key = t._Term_key and tv.isObsolete != 1 "
+		String MP_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
+				+ " and tv.isObsolete != 1 "
 				+ " and tv._Vocab_key = 5"
-				+ " and tv._Term_key = vacc._Term_key and vacc.annotType ="
-				+ " 'Mammalian Phenotype/Genotype'"
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " and tv._Term_key = vacc._Term_key "
+				+ " and vacc.annotType = 'Mammalian Phenotype/Genotype'"
+				+ " order by tv._Term_key";
 
 		doVocabNote(MP_NOTE_KEY, "MP");
 
 		log.info("Collecting DO Notes/Definitions");
 
 		// Collect DO (Disease Ontology) notes that are related to markers and are not obsolete.
-		// These are ordered by sequence number so they can be put back together
-		// in the lucene document
 
-		String DO_NOTE_KEY = "select distinct tv._Term_key, t.note, tv.vocabName, t.sequenceNum "
-				+ " from VOC_Term_View tv, VOC_Text t, VOC_Annot_Count_Cache vacc"
-				+ " where tv._Term_key = t._Term_key "
+		String DO_NOTE_KEY = "select distinct tv._Term_key, tv.note, tv.vocabName "
+				+ " from VOC_Term_View tv, VOC_Annot_Count_Cache vacc"
+				+ " where tv.note is not null"
 				+ " and tv.isObsolete != 1 "
 				+ " and tv._Vocab_key = 125 "
 				+ " and tv._Term_key = vacc._Term_key "
 				+ " and vacc.annotType in ('DO/Genotype', 'DO/Human Marker') "
-				+ " order by tv._Term_key, t.sequenceNum";
+				+ " order by tv._Term_key";
 
 		doVocabNote(DO_NOTE_KEY, "DO");
 
