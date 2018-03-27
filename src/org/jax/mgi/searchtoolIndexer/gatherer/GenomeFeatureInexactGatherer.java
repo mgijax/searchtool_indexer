@@ -336,7 +336,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 		// Since this is a marker related index, only bring back vocab items
 		// that have markers actually annotated to them, or their children.
 
-		log.info("Collecintg EMAPS Synonyms");
+		log.info("Collecting EMAPS Synonyms");
 
 		// Gather up all the emaps synonyms, where the term is not obsolete.
 
@@ -350,7 +350,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(EMAPS_SYN_KEY, "EMAPS");
 
-		log.info("Collecintg GO Synonyms");
+		log.info("Collecting GO Synonyms");
 
 		// Gather up all the go synonyms, where the term is not obsolete.
 
@@ -364,7 +364,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(GO_SYN_KEY, "GO");
 
-		log.info("Collecintg MP Synonyms");
+		log.info("Collecting MP Synonyms");
 
 		// Gather up all the MP synonyms, where the term is not obsolete.
 
@@ -378,7 +378,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(MP_SYN_KEY, "MP");
 
-		log.info("Collecintg DO Synonyms");
+		log.info("Collecting DO Synonyms");
 
 		// Gather up all the Disease Ontology (DO) non human synonyms, where the term is not
 		// obsolete.
@@ -393,7 +393,7 @@ public class GenomeFeatureInexactGatherer extends DatabaseGatherer {
 
 		doVocabSynonym(DO_SYN_KEY, "DO/Mouse");
 
-		log.info("Collecintg DO/Human Synonyms");
+		log.info("Collecting DO/Human Synonyms");
 
 		// Gather up all the Disease Ontology (DO) human synyonms, where the term is not
 		// obsolete.

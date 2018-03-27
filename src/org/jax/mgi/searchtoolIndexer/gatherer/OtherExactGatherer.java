@@ -390,7 +390,8 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// Get accession IDs for non-mouse markers involved in HomoloGene
-		// homology classes.
+		// homology classes.  Lower part of UNION brings in just the numeric
+		// portion of the OMIM ID (for human markers) as IDs, too.
 
 		String OTHER_ORTHOLOG_SEARCH = "select aa._Accession_key, "
 				+ " aa.accID, "
@@ -415,6 +416,24 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ " and mm._Organism_key = mo._Organism_key "
 				+ " and mm._Marker_key = aa._Object_key "
 				+ " and aa._MGIType_key = 2 "
+				+ " and aa.private = 0"
+				+ " and mc._Cluster_key = hg._Object_key "
+				+ " and hg._MGIType_key = 39 "
+				+ " and hg.private = 0 "
+				+ "UNION "
+				+ "select aa._Accession_key, aa.numericPart::text, mm._Marker_key, 'ORTHOLOG' as _MGIType_key, "
+				+ " aa.preferred, aa._LogicalDB_key, mo.commonName, hg.accID as HomoloGeneID "
+				+ "from VOC_Term source, MRK_Cluster mc, MRK_ClusterMember mcm, MRK_Marker mm, MGI_Organism mo, "
+				+ " ACC_Accession aa, ACC_Accession hg "
+				+ "where source.term = 'HomoloGene' "
+				+ " and source._Term_key = mc._ClusterSource_key "
+				+ " and mc._Cluster_key = mcm._Cluster_key "
+				+ " and mcm._Marker_key = mm._Marker_key "
+				+ " and mm._Organism_key = 2 "					// human
+				+ " and mm._Organism_key = mo._Organism_key "
+				+ " and mm._Marker_key = aa._Object_key "
+				+ " and aa._MGIType_key = 2 "
+				+ " and aa._LogicalDB_key = 15 "				// OMIM
 				+ " and aa.private = 0"
 				+ " and mc._Cluster_key = hg._Object_key "
 				+ " and hg._MGIType_key = 39 "
