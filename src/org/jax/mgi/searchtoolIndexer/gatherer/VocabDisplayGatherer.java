@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.VocabDisplayLuceneDocBuilder;
+import org.jax.mgi.searchtoolIndexer.util.StrainUtils;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
@@ -59,6 +60,7 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		providerMap.put(IndexConstants.EMAPA_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.EMAPS_TYPE_NAME, "Expression");
 		providerMap.put(IndexConstants.PROTEOFORM_NAME, "Proteoform");
+		providerMap.put(IndexConstants.STRAIN_NAME, "Strain");
 
 	}
 
@@ -165,6 +167,8 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 		}
 		vocab_annot_rs.close();
 
+
+		
 		// Since this is a compound object, the order by clauses are important.
 
 		// Gather up the term, term key, accession id, and vocabulary name
@@ -252,12 +256,63 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 			builder.clear();
 
 		}
+		log.info("Done Non AD Display Information!");
+		rs_vocabTerm.close();
 
+		/*** now process strains as a vocabulary ***/
+		
+		// create a hash that maps from strain key to a count of references for the strain
+		HashMap<String, String> strainToRefCountMap = new HashMap<String, String>();
+		String STRAIN_REFERENCE_COUNT = StrainUtils.withStrains
+			+ "select mra._Object_key, count(distinct mra._Refs_key) as ref_count "
+			+ "from mgi_reference_assoc mra, " + StrainUtils.strainTempTable + " t "
+			+ "where mra._RefAssocType_key in (1009, 1010) "
+			+ "	and mra._Object_key = t._Strain_key "
+			+ "group by mra._Object_key";
+		ResultSet strain_ref_count_rs = executor.executeMGD(STRAIN_REFERENCE_COUNT);
+		while (strain_ref_count_rs.next()) {
+			strainToRefCountMap.put(strain_ref_count_rs.getString("_Object_key"), strain_ref_count_rs.getString("ref_count"));
+		}
+		strain_ref_count_rs.close();
+		
+		// Gather up the strain, strain key, accession id, and vocabulary name
+		// in term key order.
+
+		String STRAIN_DATA = StrainUtils.withStrains 
+				+ " select t._Strain_key, s.strain, a.accID "
+				+ " from prb_strain s, " + StrainUtils.strainTempTable + " t, acc_accession a "
+				+ " where s._Strain_key = t._Strain_key "
+				+ "   and s._Strain_key = a._Object_key "
+				+ "   and a._MGITYpe_key = 10 "
+				+ "   and a._LogicalDB_key = 1 "
+				+ "   and a.preferred = 1";
+
+		ResultSet rs_strain = executor.executeMGD(STRAIN_DATA);
+
+		log.info("Time taken gather Strain Display result sets: " + executor.getTiming());
+		
+		while (rs_strain.next()) {
+			String strainKey = rs_strain.getString("_Strain_key");
+			builder.setDb_key(StrainUtils.getDocumentKey(strainKey, "Strain"));
+			builder.setVocabulary("Strain");
+			builder.setTypeDisplay(providerMap.get("Strain"));
+			builder.setAcc_id(rs_strain.getString("accID"));
+			builder.setData(rs_strain.getString("strain"));
+
+			if (strainToRefCountMap.containsKey(strainKey)) {
+				builder.setAnnotation_count(strainToRefCountMap.get(strainKey));
+				builder.setAnnotation_objects(strainToRefCountMap.get(strainKey));
+				builder.setAnnotation_object_type("Reference");
+			}
+
+			documentStore.push(builder.getDocument());
+			builder.clear();
+		}
+		
 		// Clean up
 
-		log.info("Done Non AD Display Information!");
-
-		rs_vocabTerm.close();
+		log.info("Done Strain Display Information!");
+		rs_strain.close();
 	}
 
 }

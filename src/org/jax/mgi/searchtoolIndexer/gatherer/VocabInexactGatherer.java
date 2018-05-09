@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.VocabInexactLuceneDocBuilder;
+import org.jax.mgi.searchtoolIndexer.util.StrainUtils;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
@@ -77,11 +78,17 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// SQL for this Subsection
 
 		// gather up vocab term, that are not obsolete for all vocabs but ad.
-		// Currently this list includes: GO, MP, Disease Ontology (DO), InterPro, and PIRSF
+		// Currently this list includes: GO, MP, Disease Ontology (DO), InterPro, and PIRSF.
+		// Lower part of the union brings in Strain synonyms, as we want to treat strains as a vocab for now.
 
-		String VOC_TERM_KEY = "select _Term_key, term, vocabName"
+		String VOC_TERM_KEY = StrainUtils.withStrains
+				+ " select _Term_key, term, vocabName"
 				+ " from VOC_Term_View"
-				+ " where isObsolete != 1 and _Vocab_key in (125, 4, 5, 8, 46, 90)";
+				+ " where isObsolete != 1 and _Vocab_key in (125, 4, 5, 8, 46, 90)"
+				+ " union "
+				+ "select t._Strain_key, s.strain, 'Strain' "
+				+ "from " + StrainUtils.strainTempTable + " t, prb_strain s "
+				+ "where t._Strain_key = s._Strain_key";
 
 		// Gather the data
 
@@ -95,7 +102,7 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 
 			builder.setData(rs.getString("term"));
 			builder.setRaw_data(rs.getString("term"));
-			builder.setDb_key(rs.getString("_Term_key"));
+			builder.setDb_key(StrainUtils.getDocumentKey(rs.getString("_Term_key"), rs.getString("vocabName")));
 			builder.setVocabulary(rs.getString("vocabName"));
 			builder.setDataType(IndexConstants.VOCAB_TERM);
 			builder.setDisplay_type(providerMap.get(IndexConstants.VOCAB_TERM));
@@ -125,12 +132,19 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 		// AD.
 
 		// Currently this list includes: GO, MP, Disease Ontology (DO), Interpro and PIRSF
+		// Lower part of the union brings in Strain synonyms, as we want to treat strains as a vocab for now.
 
-		String VOC_SYN_KEY = "select tv._Term_key, s.synonym, tv.vocabName"
+		String VOC_SYN_KEY = StrainUtils.withStrains 
+				+ " select tv._Term_key, s.synonym, tv.vocabName"
 				+ " from VOC_Term_View tv, MGI_Synonym s"
 				+ " where tv._Term_key = s._Object_key and tv.isObsolete != 1 "
-				+ "and tv._Vocab_key in (125, 4, 5, 8, 46, 90)"
-				+ " and s._MGIType_key = 13 ";
+				+ " and tv._Vocab_key in (125, 4, 5, 8, 46, 90)"
+				+ " and s._MGIType_key = 13 "
+				+ "union "
+				+ "select s._Object_key, s.synonym, 'Strain' "
+				+ "from mgi_synonym s "
+				+ "inner join mgi_synonymtype t on (s._SynonymType_key = t._SynonymType_key and t._MGIType_key = 10) "
+				+ "inner join " + StrainUtils.strainTempTable + " ps on (s._Object_key = ps._Strain_key)";
 
 		// gather the data
 
@@ -144,7 +158,7 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 
 			builder.setData(rs_syn.getString("synonym"));
 			builder.setRaw_data(rs_syn.getString("synonym"));
-			builder.setDb_key(rs_syn.getString("_Term_key"));
+			builder.setDb_key(StrainUtils.getDocumentKey(rs_syn.getString("_Term_key"), rs_syn.getString("vocabName")));
 			builder.setVocabulary(rs_syn.getString("vocabName"));
 			builder.setDataType(IndexConstants.VOCAB_SYNONYM);
 			builder.setDisplay_type(providerMap.get(IndexConstants.VOCAB_SYNONYM));
@@ -175,6 +189,7 @@ public class VocabInexactGatherer extends DatabaseGatherer {
 
 		// Gather up the vocabulary notes for all vocabs except for AD.
 		// Currently this list includes: GO, MP, Disease Ontology (DO), PIRSH and Interpro.
+		// No notes for strains.
 
 		String VOC_NOTE_KEY = "select tv._Term_key, tv.note, tv.vocabName "
 				+ " from VOC_Term_View tv "

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.VocabAccIDLuceneDocBuilder;
+import org.jax.mgi.searchtoolIndexer.util.StrainUtils;
 import org.jax.mgi.shr.config.IndexCfg;
 import org.jax.mgi.shr.searchtool.IndexConstants;
 
@@ -71,7 +72,8 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		// gather up vocab accession id's, please note that AD has no acc id's
 		// each additional union gets all the terms alt id's.
 		// all the other vocabs could be add to index all ALT ids
-		String VOC_ACCID_KEY = "select _Term_key, accId, vocabName, _LogicaldB_key "
+		String VOC_ACCID_KEY = StrainUtils.withStrains
+				+ " select _Term_key, accId, vocabName, _LogicaldB_key "
 				+ "from VOC_Term_View where isObsolete != 1 "
 				+ "and _Vocab_key in (125, 4, 5, 8, 46, 90, 91) "
 				
@@ -118,7 +120,11 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 				+ "where isObsolete != 1 "
 				+ "and vtv._Vocab_key = 4 and vtv._Term_key = a._Object_key and a._MGIType_key = 13 "
 				
-				;
+				+ "union "
+				+ "select t._Strain_key, a.accID, 'Strain', a._LogicalDB_key "
+				+ "from " + StrainUtils.strainTempTable + " t, acc_accession a "
+				+ "where t._Strain_key = a._Object_key "
+				+ " and a._MGIType_key = 10";
 
 		// Gather the data
 
@@ -132,7 +138,7 @@ public class VocabAccIDGatherer extends DatabaseGatherer {
 		while (rs_acc_id.next()) {
 			builder.setData(rs_acc_id.getString("accId"));
 			builder.setRaw_data(rs_acc_id.getString("accId"));
-			builder.setDb_key(rs_acc_id.getString("_Term_key"));
+			builder.setDb_key(StrainUtils.getDocumentKey(rs_acc_id.getString("_Term_key"), rs_acc_id.getString("vocabName")));
 			builder.setVocabulary(rs_acc_id.getString("vocabName"));
 			builder.setDataType(IndexConstants.ACCESSION_ID);
 			builder.setDisplay_type(providerMap.get(IndexConstants.ACCESSION_ID));
