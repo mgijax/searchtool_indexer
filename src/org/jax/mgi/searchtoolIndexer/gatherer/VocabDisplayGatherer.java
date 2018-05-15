@@ -261,20 +261,6 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 
 		/*** now process strains as a vocabulary ***/
 		
-		// create a hash that maps from strain key to a count of references for the strain
-		HashMap<String, String> strainToRefCountMap = new HashMap<String, String>();
-		String STRAIN_REFERENCE_COUNT = StrainUtils.withStrains
-			+ "select mra._Object_key, count(distinct mra._Refs_key) as ref_count "
-			+ "from mgi_reference_assoc mra, " + StrainUtils.strainTempTable + " t "
-			+ "where mra._RefAssocType_key in (1009, 1010) "
-			+ "	and mra._Object_key = t._Strain_key "
-			+ "group by mra._Object_key";
-		ResultSet strain_ref_count_rs = executor.executeMGD(STRAIN_REFERENCE_COUNT);
-		while (strain_ref_count_rs.next()) {
-			strainToRefCountMap.put(strain_ref_count_rs.getString("_Object_key"), strain_ref_count_rs.getString("ref_count"));
-		}
-		strain_ref_count_rs.close();
-		
 		// Gather up the strain, strain key, accession id, and vocabulary name
 		// in term key order.
 
@@ -298,12 +284,6 @@ public class VocabDisplayGatherer extends DatabaseGatherer {
 			builder.setTypeDisplay(providerMap.get("Strain"));
 			builder.setAcc_id(rs_strain.getString("accID"));
 			builder.setData(rs_strain.getString("strain"));
-
-			if (strainToRefCountMap.containsKey(strainKey)) {
-				builder.setAnnotation_count(strainToRefCountMap.get(strainKey));
-				builder.setAnnotation_objects(strainToRefCountMap.get(strainKey));
-				builder.setAnnotation_object_type("Reference");
-			}
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
