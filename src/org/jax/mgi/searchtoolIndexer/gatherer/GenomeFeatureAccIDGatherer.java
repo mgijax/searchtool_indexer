@@ -82,8 +82,10 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Select all marker related accession id's, where the id is
 		// not private, where its for the mouse, and the marker has not
 		// been withdrawn. Order to prefer lower logical databases.
-		// Lower half of union brings in all non-private seq IDs for
+		// Middle of union brings in all non-private seq IDs for
 		// sequences associated to markers.  Exclude MyGene IDs, though.
+		// Bottom of union brings in IDs for strain markers associated
+		// with the given canonical marker.
 
 		String GENE_ACC_KEY = "SELECT a._Object_key, a.accID, "
 			+ "    a._LogicalDB_key "
@@ -106,6 +108,14 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 			+ "    AND a._MGIType_key = 19 "
 			+ "    AND a._Object_key = smc._Sequence_key "
 			+ "    AND a.private = 0 "
+			+ "UNION "
+			+ "SELECT msm._Marker_key, a_seq.accID, a_seq._LogicalDB_key "
+			+ "FROM MRK_StrainMarker msm, ACC_Accession a, ACC_Accession a_seq "
+			+ "WHERE msm._StrainMarker_key = a._Object_key "
+			+ "    AND a._MGIType_key = 44 "
+			+ "    AND a.accID = a_seq.accID "
+			+ "    AND a_seq._MGIType_key = 19 "
+			+ "    AND msm._Marker_key is not null "
 			+ "order by _Object_key, accID, _LogicalDB_key";
 
 		// Gather the data
