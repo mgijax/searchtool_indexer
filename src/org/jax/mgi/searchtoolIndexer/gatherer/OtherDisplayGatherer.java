@@ -73,7 +73,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 	 */
 
 	public void runLocal() throws Exception {
-		doSnps();
 		doOrthologs();
 		doProbes();
 		doAssays();
@@ -325,94 +324,6 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		log.info("Done References!");
 		rs_ref.close();
 
-	}
-
-	/**
-	 * Gather the SNP data. (consensus SNPs only, not sub SNPs)
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-	private void doSnps() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// gather up sequence key, type and description
-
-		String OTHER_SNP_DISPLAY_KEY = "select a.accID, a._Object_key, "
-			+ "   c.chromosome, c.isMultiCoord, "
-			+ "   to_char(c.startCoordinate, '999999999999') as startCoordinate, "
-			+ "   t.term as varClass, s.alleleSummary "
-			+ "from snp_accession a, snp_coord_cache c, "
-			+ "   snp_consensussnp s, voc_term t "
-			+ "where a._LogicalDB_key = 73 "
-			+ "   and a._Object_key = c._ConsensusSnp_key "
-			+ "   and a._Object_key = s._ConsensusSnp_key "
-			+ "   and s._VarClass_key = t._Term_key";
-
-		// Gather the data
-
-		ResultSet rs_snp = executor.executeMGD(OTHER_SNP_DISPLAY_KEY);
-
-		log.info("Time taken gather SNP result set: " + executor.getTiming());
-
-		String ldb = IndexConstants.OTHER_SNP;
-
-		// Parse it
-
-		// Note: We must track the multi-coordinate SNPs to ensure that
-		// we only add one document for each.
-		
-		HashSet<String> multiCoordSnps = new HashSet<String>();
-
-		while (rs_snp.next()) {
-
-			String objectKey = rs_snp.getString("_Object_key");
-
-			if (rs_snp.getInt("isMultiCoord") == 1) {
-				if (multiCoordSnps.contains(objectKey)) {
-					rs_snp.next();
-					continue;
-				} else {
-					multiCoordSnps.add(objectKey);
-				}
-			}
-
-			builder.setDb_key(objectKey);
-			builder.setDataType(ldb);
-			builder.setQualifier("RefSNP");
-
-			StringBuffer sb = new StringBuffer();
-			sb.append(rs_snp.getString("accID"));
-			sb.append(", Chr");
-			sb.append(rs_snp.getString("chromosome"));
-			sb.append(":");
-			sb.append(rs_snp.getString("startCoordinate"));
-			if (rs_snp.getInt("isMultiCoord") == 1) {
-				sb.append(" (multiple)");
-			}
-			sb.append(", ");
-			sb.append(rs_snp.getString("varClass"));
-			sb.append(", ");
-			sb.append(rs_snp.getString("alleleSummary"));
-
-			builder.setName(sb.toString());
-
-			// Place a document on the stack.
-
-			documentStore.push(builder.getDocument());
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-			builder.clear();
-		}
-
-		// Clean up
-
-		log.info("Done SNPs!");
-		rs_snp.close();
 	}
 
 	/**

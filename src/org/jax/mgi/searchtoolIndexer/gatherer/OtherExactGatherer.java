@@ -82,7 +82,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		doSequencesByProbe();
 		doAMA();
 		doGenotypes();
-		doSnps();
 	}
 
 	public void doAccessionByType(String mgiTypeKey, String mgiTypeKeyId, boolean setProvider) throws SQLException, InterruptedException {
@@ -197,60 +196,6 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		log.info("Done creating " + (total - startCount)
 			+ " documents for genotypes!");
 		rs_geno.close();
-	}
-
-	/**
-	 * Gather the SNP data (only consensus SNPs, not subSNPs).
-	 * 
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-	private void doSnps() throws SQLException, InterruptedException {
-
-		// SQL for this Subsection
-
-		// gather up the accession id's for consensus SNPs
-
-		String OTHER_SNP_SEARCH = "select _Accession_key, accID,"
-			+ " _Object_key "
-			+ "from snp_accession "
-			+ "where _LogicalDB_key = 73";
-
-		// Gather the data.
-
-		ResultSet rs_snp = executor.executeMGD(OTHER_SNP_SEARCH);
-
-		log.info("Time taken gather SNP data set: " + executor.getTiming());
-
-		String ldb = phm.get("73");
-
-		// Parse it
-
-		while (rs_snp.next()) {
-
-			builder.setType(IndexConstants.OTHER_SNP);
-			builder.setData(rs_snp.getString("accID"));
-			builder.setDb_key(rs_snp.getString("_Object_key"));
-			builder.setAccessionKey(rs_snp.getString("_Accession_key"));
-			builder.setPreferred("1");
-			builder.setProvider(ldb);
-
-			// Place the document on the stack.
-
-			documentStore.push(builder.getDocument());
-			builder.clear();
-			total++;
-			if (total >= output_threshold) {
-				log.debug("We have now gathered " + total + " documents!");
-				output_threshold += output_incrementer;
-			}
-
-		}
-
-		// Clean up
-
-		log.info("Done creating documents for SNPs!");
-		rs_snp.close();
 	}
 
 	/**
