@@ -6,7 +6,6 @@
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="conf" location="conf"/>
-	<property name="doc" location="doc"/>
 
 
 	<target name="init">
@@ -30,19 +29,9 @@
 	<target name="clean" description="clean up" >
 		<!-- Delete the ${build} directory tree -->
 		<delete dir="${build}"/>
-		<delete dir="${doc}"/>
 	</target>
 
-	<target name="javadoc" description="Generate Javadocs">
-		<property environment="env" />
-		<javadoc destdir="${doc}/api" sourcepath="${src}" classpath="${env.MGI_JAVALIB}/searchtool.jar; lib/log4j-1.2.15.jar; lib/lucene-core-2.3.2.jar; lib/core.jar;" >
-			<tag name="is" scope="all" description="Is:" />
-			<tag name="has" scope="all" description="Has:" />
-			<tag name="does" scope="all" description="Does:" />
-		</javadoc>
-	</target>
-
-	<target name="build" description="Make Jar and Javadocs" depends="clean, jar, javadoc"/>
+	<target name="build" description="Make Jar" depends="clean, jar"/>
 
 </project>
 
