@@ -258,7 +258,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		log.info("Gathering Accession ID's for Orthologs");
 
 		// Collect accession IDs for non-mouse markers that can be related to
-		// mouse markers via HomoloGene classes.  Lower part of the union brings in
+		// mouse markers via homology classes.  Lower part of the union brings in
 		// the numeric part of OMIM gene IDs (for human markers) as IDs, too.
 
 		String ORTH_TO_MARKER_ACC_ID = "select distinct mouse._Marker_key, "
@@ -267,7 +267,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ " MRK_ClusterMember nonmouse, "
 				+ " MRK_ClusterMember mouse, " + " MRK_Marker mm, "
 				+ " ACC_Accession aa, " + " MRK_Marker nm, "
-				+ " MGI_Organism o " + "where source.term in ('HomoloGene', 'HGNC') "
+				+ " MGI_Organism o " + "where source.abbreviation = 'Alliance Direct' "
 				+ " and source._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mouse._Cluster_key "
 				+ " and mouse._Marker_key = mm._Marker_key "
@@ -286,7 +286,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 				+ "select distinct mouse._Marker_key, aa.numericPart::text, aa._LogicalDB_key, o.commonName "
 				+ "from VOC_Term source, MRK_Cluster mc, MRK_ClusterMember nonmouse, "
 				+ " MRK_ClusterMember mouse, MRK_Marker mm, ACC_Accession aa, MRK_Marker nm, MGI_Organism o "
-				+ "where source.term in ('HomoloGene', 'HGNC') "
+				+ "where source.abbreviation = 'Alliance Direct' "
 				+ " and source._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mouse._Cluster_key "
 				+ " and mouse._Marker_key = mm._Marker_key "

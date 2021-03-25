@@ -334,7 +334,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// SQL for this Subsection
 
-		// Get accession IDs for non-mouse markers involved in HomoloGene
+		// Get accession IDs for non-mouse markers involved in 
 		// homology classes.  Lower part of UNION brings in just the numeric
 		// portion of the OMIM ID (for human markers) as IDs, too.
 
@@ -345,15 +345,14 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ " aa.preferred, "
 				+ " aa._LogicalDB_key, "
 				+ " mo.commonName, "
-				+ " hg.accID as HomoloGeneID "
+				+ " mc._Cluster_key as homologyID "
 				+ "from VOC_Term source, "
 				+ " MRK_Cluster mc, "
 				+ " MRK_ClusterMember mcm, "
 				+ " MRK_Marker mm, "
 				+ " MGI_Organism mo, "
-				+ " ACC_Accession aa, "
-				+ " ACC_Accession hg "
-				+ "where source.term = 'HomoloGene' "
+				+ " ACC_Accession aa "
+				+ "where source.abbreviation = 'Alliance Direct' "
 				+ " and source._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mcm._Cluster_key "
 				+ " and mcm._Marker_key = mm._Marker_key "
@@ -362,15 +361,12 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ " and mm._Marker_key = aa._Object_key "
 				+ " and aa._MGIType_key = 2 "
 				+ " and aa.private = 0"
-				+ " and mc._Cluster_key = hg._Object_key "
-				+ " and hg._MGIType_key = 39 "
-				+ " and hg.private = 0 "
 				+ "UNION "
 				+ "select aa._Accession_key, aa.numericPart::text, mm._Marker_key, 'ORTHOLOG' as _MGIType_key, "
-				+ " aa.preferred, aa._LogicalDB_key, mo.commonName, hg.accID as HomoloGeneID "
+				+ " aa.preferred, aa._LogicalDB_key, mo.commonName, mc._Cluster_key as homologyID "
 				+ "from VOC_Term source, MRK_Cluster mc, MRK_ClusterMember mcm, MRK_Marker mm, MGI_Organism mo, "
-				+ " ACC_Accession aa, ACC_Accession hg "
-				+ "where source.term = 'HomoloGene' "
+				+ " ACC_Accession aa "
+				+ "where source.abbreviation = 'Alliance Direct' "
 				+ " and source._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mcm._Cluster_key "
 				+ " and mcm._Marker_key = mm._Marker_key "
@@ -379,10 +375,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ " and mm._Marker_key = aa._Object_key "
 				+ " and aa._MGIType_key = 2 "
 				+ " and aa._LogicalDB_key = 15 "				// OMIM
-				+ " and aa.private = 0"
-				+ " and mc._Cluster_key = hg._Object_key "
-				+ " and hg._MGIType_key = 39 "
-				+ " and hg.private = 0";
+				+ " and aa.private = 0";
 
 		// gather the data
 
@@ -429,31 +422,33 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ " documents for homologous marker IDs!");
 		rs_orthologs.close();
 
-		doHomoloGeneClasses();
+		doHomologyClasses();
 	}
 
 	/**
-	 * Gather the HomoloGene class data. This has a realized logical db display
+	 * Gather the homology class data. This has a realized logical db display
 	 * field.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
 
-	private void doHomoloGeneClasses() throws SQLException, InterruptedException {
-		// Get accession IDs for the HomoloGene classes themselves.
+	private void doHomologyClasses() throws SQLException, InterruptedException {
+		// Get accession IDs for the homology classes themselves.
 
-		String HOMOLOGENE_CLUSTER_SEARCH =
+		// Alliance currently has no IDs for homology clusters, so no results expected.
+		
+		String HOMOLOGY_CLUSTER_SEARCH =
 				"select aa._Accession_key, "
 						+ " aa._Object_key, "
 						+ " 'HOMOLOGY' as _MGIType_key, "
 						+ " aa.preferred, "
 						+ " aa._LogicalDB_key, "
-						+ " aa.accID as HomoloGeneID "
+						+ " aa.accID as homologyID "
 						+ "from VOC_Term source, "
 						+ " MRK_Cluster mc, "
 						+ " ACC_Accession aa "
-						+ "where source.term = 'HomoloGene' "
+						+ "where source.abbreviation = 'Alliance Direct' "
 						+ " and source._Term_key = mc._ClusterSource_key "
 						+ " and mc._Cluster_key = aa._Object_key "
 						+ " and aa._MGIType_key = 39 "
@@ -461,23 +456,23 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// gather the data
 
-		ResultSet rs_homologene = executor.executeMGD(HOMOLOGENE_CLUSTER_SEARCH);
+		ResultSet rs_homology = executor.executeMGD(HOMOLOGY_CLUSTER_SEARCH);
 		
 
-		log.info("Time taken to gather HomoloGene class id data set: " + executor.getTiming());
+		log.info("Time taken to gather homology class id data set: " + executor.getTiming());
 
 		// Parse it
 
 		int documentCount = 0;
-		while (rs_homologene.next()) {
+		while (rs_homology.next()) {
 			documentCount++;
 
 			builder.setType(IndexConstants.OTHER_HOMOLOGY);
-			builder.setData(rs_homologene.getString("HomoloGeneID"));
-			builder.setDb_key(rs_homologene.getString("HomoloGeneID"));
-			builder.setAccessionKey(rs_homologene.getString("_Accession_key"));
-			builder.setPreferred(rs_homologene.getString("preferred"));
-			builder.setProvider(phm.get(rs_homologene.getString("_LogicalDB_key")));
+			builder.setData(rs_homology.getString("homologyID"));
+			builder.setDb_key(rs_homology.getString("homologyID"));
+			builder.setAccessionKey(rs_homology.getString("_Accession_key"));
+			builder.setPreferred(rs_homology.getString("preferred"));
+			builder.setProvider(phm.get(rs_homology.getString("_LogicalDB_key")));
 
 			// Place the document on the stack.
 
@@ -495,8 +490,8 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		log.info("Done creating " + documentCount
-				+ " documents for HomoloGene class IDs!");
-		rs_homologene.close();
+				+ " documents for homology class IDs!");
+		rs_homology.close();
 	}
 
 	/**

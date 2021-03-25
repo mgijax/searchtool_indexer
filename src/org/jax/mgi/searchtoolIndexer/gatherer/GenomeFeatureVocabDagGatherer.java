@@ -485,18 +485,19 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		//
 		// Excludes: Transgenes involving Cre
 
-		// new query using HomoloGene relationships, avoids VOC_Marker_Cache:
+		// new query using homology relationships, avoids VOC_Marker_Cache:
 		String DO_HUMAN_MARKER_DISPLAY_KEY =
 			"select distinct m._Marker_key, a._Term_key "
 			+ "from voc_annot a, voc_term vt, mrk_marker h, mrk_clustermember hcm, mrk_cluster mc, "
-			+ "  mrk_clustermember mcm, mrk_marker m "
+			+ "  mrk_clustermember mcm, mrk_marker m, voc_term ad "
 			+ "where vt._term_key = a._term_key "
 			+ " and a._AnnotType_key = 1022 "
 			+ " and a._object_key = h._marker_key "
 			+ " and h._organism_key = 2 "
 			+ " and h._marker_key = hcm._marker_key "
 			+ " and hcm._cluster_key = mc._cluster_key "
-			+ " and mc._ClusterSource_key = 13764519 "
+			+ " and mc._ClusterSource_key = ad._Term_key "
+			+ " and ad.abbreviation = 'Alliance Direct' "
 			+ " and mc._ClusterType_key = 9272150 "
 			+ " and mc._cluster_key = mcm._cluster_key "
 			+ " and mcm._marker_key = m._marker_key "

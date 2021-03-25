@@ -390,26 +390,22 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// SQL for this Subsection
 
-		// gather up marker key, HomoloGene ID, ortholog symbol and name.
+		// gather up marker key, ortholog symbol and name.  Note that Alliance clusters
+		// do not have IDs, so we'll substitute a cluster key in this case.
 
-		String OTHER_ORTHOLOG_DISPLAY = "select distinct a.accID, "
+		String OTHER_ORTHOLOG_DISPLAY = "select distinct mc._Cluster_key as accID, "
 				+ " mv._Marker_key, "
 				+ " mv.symbol, "
 				+ " mv.name "
 				+ "from MRK_Marker_View mv, "
 				+ " MRK_ClusterMember mcm, "
-				+ " ACC_Accession a, "
 				+ " MRK_Cluster mc, "
 				+ " VOC_Term vt "
 				+ "where mv._Organism_key != 1 "
 				+ " and mv._Marker_key = mcm._Marker_key "
-				+ " and mcm._Cluster_key = a._Object_key "
-				+ " and a._MGIType_key = 39 "
 				+ " and mcm._Cluster_key = mc._Cluster_key "
 				+ " and mc._ClusterSource_key = vt._Term_key "
-				+ " and vt.term = 'HomoloGene' "
-				+ " and a.private = 0 "
-				+ " and a.preferred = 1";
+				+ " and vt.abbreviation = 'Alliance Direct' ";
 
 		// Gather the data
 
@@ -450,41 +446,37 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		log.info("Done homologous markers! (" + documentCount + " documents)");
 		rs_ortho.close();
 
-		doHomoloGeneClasses();
+		doHomologyClasses();
 	}
 
 	/**
-	 * Gather display data for HomoloGene classes. Please note that this has a
+	 * Gather display data for homology classes. Please note that this has a
 	 * realized display field.
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
 
-	private void doHomoloGeneClasses() throws SQLException, InterruptedException {
-		HashMap descriptions = getHomoloGeneClassDescriptions();
+	private void doHomologyClasses() throws SQLException, InterruptedException {
+		HashMap descriptions = getHomologyClassDescriptions();
 
 		// SQL for this Subsection
 
 		// gather up marker key, type, ortholog symbol and name
 
-		String HOMOLOGENE_CLASSES_DISPLAY =
-				"select distinct aa.accID as HomoloGeneID, "
+		String HOMOLOGY_CLASSES_DISPLAY =
+				"select distinct mc._Cluster_key as accID, "
 						+ " '" + IndexConstants.OTHER_HOMOLOGY + "' as type "
 						+ "from VOC_Term source, "
-						+ " MRK_Cluster mc, "
-						+ " ACC_Accession aa "
-						+ "where source.term = 'HomoloGene' "
-						+ " and source._Term_key = mc._ClusterSource_key "
-						+ " and mc._Cluster_key = aa._Object_key "
-						+ " and aa._MGIType_key = 39 "
-						+ " and aa.private = 0";
+						+ " MRK_Cluster mc "
+						+ "where source.abbreviation = 'Alliance Direct' "
+						+ " and source._Term_key = mc._ClusterSource_key ";
 
 		// Gather the data
 
-		ResultSet rs_ortho = executor.executeMGD(HOMOLOGENE_CLASSES_DISPLAY);
+		ResultSet rs_ortho = executor.executeMGD(HOMOLOGY_CLASSES_DISPLAY);
 		
-		log.info("Time taken gather HomoloGene class result set: "
+		log.info("Time taken gather homology class result set: "
 				+ executor.getTiming());
 
 		String hgID = null;
@@ -493,14 +485,14 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		while (rs_ortho.next()) {
 			documentCount++;
 
-			hgID = rs_ortho.getString("HomoloGeneID");
+			hgID = rs_ortho.getString("accID");
 			builder.setDb_key(hgID);
 			builder.setDataType(rs_ortho.getString("type"));
 
 			if (descriptions.containsKey(hgID)) {
 				builder.setName((String) descriptions.get(hgID));
 			} else {
-				builder.setName("HomoloGene class: " + hgID);
+				builder.setName("homology class: " + hgID);
 			}
 
 			// Place the document on the stack.
@@ -516,52 +508,48 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done HomoloGene classes! (" + documentCount + " documents)");
+		log.info("Done homology classes! (" + documentCount + " documents)");
 		rs_ortho.close();
 	}
 
 	/**
-	 * compose and return the HomoloGene class descriptions
+	 * compose and return the homology class descriptions
 	 * 
 	 * @throws SQLException
 	 * @throws InterruptedException
 	 */
-	private HashMap getHomoloGeneClassDescriptions() throws SQLException, InterruptedException {
+	private HashMap getHomologyClassDescriptions() throws SQLException, InterruptedException {
 
-		log.info("Building HomoloGene class descriptions");
+		log.info("Building homology class descriptions");
 
-		// key is HomoloGene ID, contents is a HashMap that maps from organism
-		// to a count of markers for that organism in the HomoloGene class
+		// key is homology ID, contents is a HashMap that maps from organism
+		// to a count of markers for that organism in the homology class
 		HashMap organismsById = new HashMap();
 
-		String HOMOLOGENE_CLASS_SEARCH = "select aa.accID, "
+		String HOMOLOGY_CLASS_SEARCH = "select mc._Cluster_key as accID, "
 				+ " mo.commonName, "
 				+ " count(1) as idCount "
 				+ "from MRK_Cluster mc, "
 				+ " VOC_Term vt, "
 				+ " MRK_ClusterMember mcm, "
-				+ " ACC_Accession aa, "
 				+ " MRK_Marker mm, "
 				+ " MGI_Organism mo "
-				+ "where vt.term = 'HomoloGene' "
+				+ "where vt.abbreviation = 'Alliance Direct' "
 				+ " and vt._Term_key = mc._ClusterSource_key "
 				+ " and mc._Cluster_key = mcm._Cluster_key "
 				+ " and mcm._Marker_key = mm._Marker_key "
 				+ " and mm._Organism_key = mo._Organism_key "
-				+ " and mc._Cluster_key = aa._Object_key "
-				+ " and aa._MGIType_key = 39 "
-				+ " and aa.private = 0 "
-				+ "group by aa.accID, mo.commonName";
+				+ "group by mc._Cluster_key, mo.commonName";
 
-		ResultSet rs_counts = executor.executeMGD(HOMOLOGENE_CLASS_SEARCH);
+		ResultSet rs_counts = executor.executeMGD(HOMOLOGY_CLASS_SEARCH);
 
-		log.info("Time taken to gather organism counts for HomoloGene classes: " + executor.getTiming());
+		log.info("Time taken to gather organism counts for homology classes: " + executor.getTiming());
 
 		// keyed by organism name, values are counts of markers for that
-		// organism in the HomoloGene class we are considering
+		// organism in the homology class we are considering
 		HashMap inner = null;
 
-		String hgID = null; // HomoloGene ID
+		String hgID = null; // homology ID
 		String organism = null; // common name for organism
 		String count = null; // integer count of markers
 
@@ -586,14 +574,14 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		rs_counts.close();
 
 		log.info("Processed " + rowCount + " rows for " +
-				organismsById.size() + " HomoloGene classes");
+				organismsById.size() + " homology classes");
 
 		// So we now have essentially:
-		// { HomoloGene ID : { organism : count of markers } }
+		// { homology ID : { organism : count of markers } }
 		// and we need to transform that into a 1-line description of each
-		// HomoloGene class.
+		// homology class.
 
-		// keys are HomoloGene IDs, values are description strings
+		// keys are homology IDs, values are description strings
 		HashMap descriptions = new HashMap();
 
 		// organisms which need to be renamed
@@ -705,7 +693,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		} // while (it.hasNext())
 
-		log.info("Finished building " + descriptions.size() + " HomoloGene class descriptions");
+		log.info("Finished building " + descriptions.size() + " homology class descriptions");
 		return descriptions;
 	}
 
