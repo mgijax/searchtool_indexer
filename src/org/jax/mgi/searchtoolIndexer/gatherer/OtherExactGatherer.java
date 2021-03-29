@@ -3,6 +3,7 @@ package org.jax.mgi.searchtoolIndexer.gatherer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -386,11 +387,12 @@ public class OtherExactGatherer extends DatabaseGatherer {
 				+ executor.getTiming());
 
 		// Parse it
-
+		Set<String> clusters = new HashSet<String>();
 		int documentCount = 0;
 		while (rs_orthologs.next()) {
 			documentCount++;
 
+			clusters.add(rs_orthologs.getString("homologyID"));
 			builder.setType(rs_orthologs.getString("_MGIType_key"));
 			builder.setData(rs_orthologs.getString("accID"));
 
@@ -419,7 +421,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		log.info("Done creating " + documentCount
-				+ " documents for homologous marker IDs!");
+				+ " documents for homologous marker IDs! (" + clusters.size() + " clusters)");
 		rs_orthologs.close();
 
 		doHomologyClasses();
@@ -463,6 +465,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 
 		// Parse it
 
+		Set<String> clusters = new HashSet<String>();
 		int documentCount = 0;
 		while (rs_homology.next()) {
 			documentCount++;
@@ -473,6 +476,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 			builder.setAccessionKey(rs_homology.getString("_Accession_key"));
 			builder.setPreferred(rs_homology.getString("preferred"));
 			builder.setProvider(phm.get(rs_homology.getString("_LogicalDB_key")));
+			clusters.add(rs_homology.getString("homologyID"));
 
 			// Place the document on the stack.
 
@@ -490,7 +494,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Clean up
 
 		log.info("Done creating " + documentCount
-				+ " documents for homology class IDs!");
+				+ " documents for homology class IDs! (" + clusters.size() + " clusters)");
 		rs_homology.close();
 	}
 

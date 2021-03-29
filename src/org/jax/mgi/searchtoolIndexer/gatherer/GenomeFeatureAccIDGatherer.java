@@ -307,6 +307,7 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		ResultSet rs_orth_acc = executor.executeMGD(ORTH_TO_MARKER_ACC_ID);
 
 
+		int i = 0;
 		log.info("Time taken to gather Ortholog's Accession ID result set: " + executor.getTiming());
 
 		// Parse it
@@ -331,13 +332,13 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 
 			documentStore.push(builder.getDocument());
 			builder.clear();
-
+			i++;
 		}
 
 		// Clean up
 
 		rs_orth_acc.close();
-		log.info("Done Ortholog Accession ID's!");
+		log.info("Added " + i + " Ortholog Accession ID's!");
 
 	}
 
@@ -535,13 +536,17 @@ public class GenomeFeatureAccIDGatherer extends DatabaseGatherer {
 		// Gather up the accession id's for es cell that are related to
 		// alleles.
 
+		log.info("Beginning ES cell line names for alleles...");
 		String OTHER_ES_CELL_LINE_SEARCH = "select aac._Allele_key, ac.cellLine "
 				+ "from all_cellline ac, ALL_Allele_CellLine aac "
-				+ "where ac._CellLine_key not in (select distinct "
-				+ "_Object_key from acc_accession where _MGIType_key = 28 "
-				+ "and private != 1) and ac.cellLine != 'Not Specified' and "
-				+ "ac.cellLine != 'Other (see notes)' and ac.isMutant = 1 and "
-				+ "ac._CellLine_key = aac._MutantCellLine_key";
+				+ "where ac.cellLine != 'Not Specified' "
+				+ " and ac.cellLine != 'Other (see notes)' "
+				+ " and ac.isMutant = 1 "
+				+ " and ac._CellLine_key = aac._MutantCellLine_key "
+				+ " and not exists (select 1 from acc_accession aa "
+				+ "  where aa._Object_key = ac._CellLine_key "
+				+ "  and _MGIType_key = 28 "
+				+ "  and private != 1)";
 
 		// Gather the data
 

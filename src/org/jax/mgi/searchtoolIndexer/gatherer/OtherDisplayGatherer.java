@@ -417,8 +417,11 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		// Parse it
 
 		int documentCount = 0;
+		Set<String> clusters = new HashSet<String>();
+		
 		while (rs_ortho.next()) {
 			documentCount++;
+			clusters.add(rs_ortho.getString("accID"));
 
 			builder.setDb_key(rs_ortho.getString("_Marker_key"));
 			builder.setDataType(IndexConstants.OTHER_ORTHOLOG);
@@ -443,7 +446,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done homologous markers! (" + documentCount + " documents)");
+		log.info("Done homologous markers! (" + documentCount + " documents for " + clusters.size() + "clusters)");
 		rs_ortho.close();
 
 		doHomologyClasses();
@@ -480,6 +483,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 				+ executor.getTiming());
 
 		String hgID = null;
+		Set<String> clusters = new HashSet<String>();
 
 		int documentCount = 0;
 		while (rs_ortho.next()) {
@@ -488,6 +492,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			hgID = rs_ortho.getString("accID");
 			builder.setDb_key(hgID);
 			builder.setDataType(rs_ortho.getString("type"));
+			clusters.add(hgID);
 
 			if (descriptions.containsKey(hgID)) {
 				builder.setName((String) descriptions.get(hgID));
@@ -508,7 +513,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done homology classes! (" + documentCount + " documents)");
+		log.info("Done homology classes! (" + documentCount + " documents for " + clusters.size() + " clusters)");
 		rs_ortho.close();
 	}
 
@@ -552,6 +557,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		String hgID = null; // homology ID
 		String organism = null; // common name for organism
 		String count = null; // integer count of markers
+		Set<String> clusters = new HashSet<String>();
 
 		int rowCount = 0;
 
@@ -561,6 +567,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 			hgID = rs_counts.getString("accID");
 			organism = rs_counts.getString("commonName");
 			count = rs_counts.getString("idCount");
+			clusters.add(hgID);
 
 			if (organismsById.containsKey(hgID)) {
 				inner = (HashMap) organismsById.get(hgID);
@@ -574,7 +581,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 		rs_counts.close();
 
 		log.info("Processed " + rowCount + " rows for " +
-				organismsById.size() + " homology classes");
+				organismsById.size() + " homology classes (" + clusters.size() + " clusters)");
 
 		// So we now have essentially:
 		// { homology ID : { organism : count of markers } }

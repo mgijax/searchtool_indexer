@@ -2,6 +2,8 @@ package org.jax.mgi.searchtoolIndexer.gatherer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.jax.mgi.searchtoolIndexer.luceneDocBuilder.GenomeFeatureVocabDagLuceneDocBuilder;
 import org.jax.mgi.shr.config.IndexCfg;
@@ -539,6 +541,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 
 		log.info(" - Time taken gather " + vocab + " result set: " + executor.getTiming());
 		int place = -1;
+		Set<String> markerKeys = new HashSet<String>();
 
 		/*
 		 * These documents are compound in nature, for each document we create,
@@ -595,6 +598,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 				while (!marker_display_rs.isAfterLast() && marker_display_rs.getInt("_Term_key") <= place) {
 					if (marker_display_rs.getInt("_Term_key") == place) {
 						builder.appendGene_ids(marker_display_rs.getString("_Marker_key"));
+						markerKeys.add(marker_display_rs.getString("_Marker_key"));
 					}
 					marker_display_rs.next();
 				}
@@ -626,7 +630,7 @@ public class GenomeFeatureVocabDagGatherer extends DatabaseGatherer {
 		if (child_rs != null) {
 			child_rs.close();
 		}
-		log.info(" - Processed " + count + " " + vocab + " terms");
+		log.info(" - Processed " + count + " " + vocab + " terms for " + markerKeys.size() + " markers");
 	}
 
 }
