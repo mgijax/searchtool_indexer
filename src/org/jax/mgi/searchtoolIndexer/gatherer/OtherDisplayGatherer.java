@@ -446,7 +446,7 @@ public class OtherDisplayGatherer extends DatabaseGatherer {
 
 		// Clean up
 
-		log.info("Done homologous markers! (" + documentCount + " documents for " + clusters.size() + "clusters)");
+		log.info("Done homologous markers! (" + documentCount + " documents for " + clusters.size() + " clusters)");
 		rs_ortho.close();
 
 		doHomologyClasses();

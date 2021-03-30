@@ -441,20 +441,16 @@ public class OtherExactGatherer extends DatabaseGatherer {
 		// Alliance currently has no IDs for homology clusters, so no results expected.
 		
 		String HOMOLOGY_CLUSTER_SEARCH =
-				"select aa._Accession_key, "
-						+ " aa._Object_key, "
+				"select mc._Cluster_key, "
+						+ " mc._Cluster_key as _Object_key, "
 						+ " 'HOMOLOGY' as _MGIType_key, "
-						+ " aa.preferred, "
-						+ " aa._LogicalDB_key, "
-						+ " aa.accID as homologyID "
+						+ " 1 as preferred, "
+						+ " 1 as _LogicalDB_key, "
+						+ " mc._Cluster_key as homologyID "
 						+ "from VOC_Term source, "
-						+ " MRK_Cluster mc, "
-						+ " ACC_Accession aa "
+						+ " MRK_Cluster mc "
 						+ "where source.abbreviation = 'Alliance Direct' "
-						+ " and source._Term_key = mc._ClusterSource_key "
-						+ " and mc._Cluster_key = aa._Object_key "
-						+ " and aa._MGIType_key = 39 "
-						+ " and aa.private = 0";
+						+ " and source._Term_key = mc._ClusterSource_key ";
 
 		// gather the data
 
