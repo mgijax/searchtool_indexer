@@ -469,7 +469,7 @@ public class OtherExactGatherer extends DatabaseGatherer {
 			builder.setType(IndexConstants.OTHER_HOMOLOGY);
 			builder.setData(rs_homology.getString("homologyID"));
 			builder.setDb_key(rs_homology.getString("homologyID"));
-			builder.setAccessionKey(rs_homology.getString("_Accession_key"));
+			builder.setAccessionKey("" + documentCount);
 			builder.setPreferred(rs_homology.getString("preferred"));
 			builder.setProvider(phm.get(rs_homology.getString("_LogicalDB_key")));
 			clusters.add(rs_homology.getString("homologyID"));
